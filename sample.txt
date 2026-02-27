@@ -1,0 +1,1094 @@
+custom-ghep-lang-and-VS Code Extension Setup Guide
+
+A step-by-step guide to create the custom-ghep-lang-api' VS Code extension from scratch. This extension starts a local Express.js HTTP server (port 3000) inside VS Code that proxies requests to Github Copilot's Language Model API.
+
+es Table of Contents
+
+1. [Prerequisites) (#1-prerequisites)
+
+2. [Install Required Tools] (#2-install-required-tools)
+
+3. [Scaffold the Extension Project] (@3-scaffold-the-extension-project)
+
+4. [Project Structure] (84-project-structure)
+
+5. [Create Configuration Files] (#5-create-configuration-files) 6. [Write the Source Code] (#6-write-the-source-code)
+
+7. [Build the Extension) (#7-build-the-extension)
+
+8. [Package as VSIX] (#8-package-as-vsix)
+
+9. [Install the Extension in VS Code) (09-install-the-extension-in-vs-code)
+
+10. [How to Use the Extension] (#10-how-to-use-the-extension)
+
+11. [API Reference](#11-api-reference)
+
+12. [Troubleshooting) (#12-troubleshooting)
+
+60 1. Prerequisites
+
+Before you start, make sure you have the following:
+
+Requirement |
+
+Mindmus Version |
+
+Purpose |
+
+***lade.js v18.x or later | JavaScript runtime for building
+
+the extension**Node.js** |
+
+v18.x or later |
+
+JavaScript runtime for building the extension |
+
+**npm** | v9.x or later (comes with Node.js) | Package manager |
+
+**
+
+Visual Studio Code** | v1.54.0 or later | The IDE where the extension will run |
+
+GitHub Copilot Extension** | Latest | Must be installed and authenticated in VS Code (provides the LLM API) |
+
+** **Git
+
+** | Any recent version | Version control (optional but recommended) |
+
+2. Install Required Tools
+
+##Step 2.1 - Install Node.js and npm
+
+Download and install Node.js from: https://nodejs.org/
+
+After installation, verify in your terminal:
+
+bash
+
+node --version
+
+Expected: v18.x.x or higher
+
+npm --version
+
+Expected: 9.x.x or higher
+
+# Step 2.2-Install Yeoman and VS Code Extension Generator
+
+These tools scaffold a new VS Code extension project:
+
+bash
+
+npm install -g yo generator-code
+Verify:
+
+bash
+
+yo --version
+
+### Step 2.3-Install vsce (VS Code Extension CLI)
+
+This tool is used to package the extension into a vsix file:
+
+bash
+
+npm install -g @vscode/vsce
+
+Verify:
+
+bash
+
+vsce-version
+
+000 Step 2.4-Install webpack and webpack-cli globally (optional)
+
+These are also installed locally per project, but having them globally can be useful:
+
+bash
+
+npm install -g webpack webpack-cli
+
+ee 3. Scaffold the Extension Project
+600 Step 3.1-Create the project folder
+
+bash
+
+mkdir custom-ghep-lang-api
+
+cd custom-ghep-lang-api
+
+000 Step 3.2 Initialize nom project
+
+bash
+
+minit -y
+
+400 Step 3.3-Install production dependencies
+
+bash
+
+nga install express@ 4.21.2
+
+600 Step 3.4-Install dev dependencies
+
+bash nom install-save-dev @types/mocha@ 10.0.10 @types/node@20.x @types/vscode@^1.54.0 @typescript-eslint/eslint-pluging 8.28.0 @typescript-eslint/parser@ 8.28.0 @rscode/test-clig 0.0.10 @vscode/test-electrong 2.4.1 eslint@ 9.23.0 ts-loader@ 9.5.2 typescript@ 5.8.2 webpack@^5.98.0 webpack-cli@ 6.0.1
+
+I
+
+04. Project Structure
+
+After completing all steps, your project should look like this:
+
+
+After completing all steps, your project should look like this:
+
+custom-ghcp-lang-api/
+
+src/
+
+E
+
+extension.ts
+
+Main extension entry point (activation/deactivation)
+
+server.ts
+
+Express server with endpoints
+
+package.json
+
+Extension manifest and npm config
+
+tsconfig.json
+
+TypeScript configuration
+
+webpack.config.js
+
+Webpack bundler configuration
+
+-vscodeignore
+
+Files to exclude from VSIX package
+
+README.md
+
+Extension readme (shown in VS Code marketplace)
+
+CHANGELOG.md
+
+Change log
+
+node_modules/
+
+Dependencies (auto-created by npm install)
+
+88 5. Create Configuration Files
+
+000 Step 5.1-package.json
+
+Replace the contents of your package.json with the following (this is the VS Code extension manifest):
+
+{
+
+son
+
+"name": "custom-ghcp-lang-api",
+
+"displayName": "custom-ghcp-lang-api",
+
+"description": "Uses GitHub Copilot to generate business rules from the given the code, generates java code from the requriements.",
+
+"version": "0.0.2",
+
+"publisher": "Infosys",
+
+"engines": {
+
+"vscode": "^1.54.0"
+
+}, "categories":[
+
+"Other"
+
+1,
+
+"activationEvents": [
+
+"onStartupFinished"
+
+1,
+
+"main": "./dist/extension.js",
+
+"contributes": {
+
+"commands": [
+
+{
+
+"command": "custom-ghcp-lang-api.customcopilotshutdown", "title": "Shut down custom GHCP Lang API server"
+
+{ "command": "custom-ghcp-lang-api.customcopilotstart",
+
+}
+
+"title": "Start custom GHCP Lang API server"
+
+},
+
+"scripts": {
+
+"vscode: prepublish": "npa run package",
+
+"compile": "webpack",
+
+"watch": "webpack --watch",
+
+"package": "webpack-mode production--devtool hidden-source-map",
+
+"compile-tests": "tsc -poutDir out",
+
+"watch-tests": "tsc-p.w-outDir out"
+
+"pretest": "npm run compile-tests && npm run compile && npm run lint",
+
+"lint": "eslint src",
+
+"test": "vscode-test"
+}, "devDependencies": {
+
+"@types/mocha": "^10.0.10",
+
+"@types/node": "20.x",
+
+"@types/vscode": "^1.54.0",
+
+"@typescript-eslint/eslint-plugin": "^8.28.0",
+
+"^8.28.0", "@typescript-eslint/parser":
+
+"@vscode/test-cli": "^0.0.10",
+
+"@vscode/test-electron": "^2.4.1",
+
+"eslint": "^9.23.0",
+
+"ts-loader": "^9.5.2",
+
+"typescript": "^5.8.2",
+
+"webpack": "^5.98.0",
+
+"webpack-c11": "^6.0.1"
+
+},
+
+"dependencies": {
+
+}
+
+"express": "^4.21.2"
+
+> **Note:** Change "publisher" to your own publisher name (e.g., ""Infosys"").
+
+080 Step 5.2-tsconfig.json
+
+Create a 'tsconfig.json" file in the project root:
+json
+
+{
+
+"compilerOptions": {
+
+"module": "commonjs",
+
+"target": "ES2021",
+
+"outDir": "out",
+
+"lib": ["ES2021"],
+
+"sourceMap": true,
+
+"rootDir": "src",
+
+"strict": true,
+
+"noImplicitReturns": true,
+
+"noFallthroughCasesInSwitch": true,
+
+"noUnusedLocals": false,
+
+"noUnusedParameters":
+
+false,
+
+"esModuleInterop": true,
+
+"skipLibCheck": true,
+
+"forceConsistentCasingInFileNames": true,
+
+"resolveJsonModule": true
+
+"exclude": ["node_modules", ".vscode-test"]
+
+},
+
+}
+
+###Step 5.3
+
+webpack.config.js
+
+Create a webpack.config.js' file in the project root:
+
+1s
+
+//@ts-check
+
+"use strict";
+const path require("path");
+
+//@ts-check
+
+/**@typedef (import('webpack').Configuration} WebpackConfig **/
+
+/**@type WebpackConfig /
+
+const extensionConfig - {
+
+target: "node",
+
+mode: "none",
+
+entry: "./src/extension.ts",
+
+output: {
+
+},
+
+path: path.resolve(_dirname, "dist"),
+
+filename: "extension.js", libraryTarget: "commonjs2",
+
+externals: {
+
+},
+
+vscode: "commonjs vscode",
+
+resolve: {
+
+},
+
+extensions: [".ts", ".js"],
+
+module: {
+
+rules: [
+
+{
+
+test: /\.ts$/,
+
+exclude: /node_modules/,
+use: [
+
+{
+
+loader: "ts-loader",
+
+},
+
+1,
+
+},
+
+1,
+
+},
+
+devtool: "nosources-source-map",
+
+infrastructureLogging: {
+
+level: "log",
+
+},
+
+};
+
+module.exports = [extensionConfig];
+Step 5.4 - vscodeignore
+
+Create a vscodeignore file in the project root. This tells 'vsce which files to exclude from the final vsix package:
+
+vscode/**
+
+vscode-test/**
+
+src/
+
+out/**
+
+node_modules/**
+
+.gitignore
+
+tsconfig.json
+
+webpack.config.js
+
+**/*.ts
+
+**/*.мар
+
+###Step 5.5-README.md
+
+Create a README.md file in the project root:
+
+markdown
+
+#custom-ghcp-lang-api
+
+Uses Github Copilot to generate business rules from the given the code, generates java code from the requriements.
+### Step 5.6-CHANGELOG.md
+
+Create a CHANGELOG.md file in the project root:
+
+markdown
+
+# Change Log
+
+All notable changes to the "custom-ghcp-lang-api" extension will be documented in this file.
+
+##[Unreleased]
+
+Initial release
+
+00 6. Write the Source Code
+
+000 Step 6.1- Create the "src" folder
+
+bash
+
+mkdir src
+
+889 Step 6.2-Create src/server.ts
+
+This file contains the Express server with all three endpoints. This is the core logic of the extension.
+
+typescript
+
+import as vscade from "vscode"; import express from "express";
+
+let server: ReturnTypecexpress.Application["listen"]> | undefined;
+let isRunning - false;
+
+const app express();
+
+const outputChannel vscode.window.createOutputChannel( ); "custom-ghcp-lang-api-output", { log: true }
+
+function logError(message: any): void { outputChannel.error("${message}"); }
+
+function loginfo(message: any): void { outputChannel.info("${message}"); }
+
+function logTrace(message: any): void { } outputChannel.trace(`${message}`);
+
+I export function startServer(): void { let model: vscode. LanguageModelChat | undefined;
+
+// Middleware: parse 350N bodies up to 10mb app.use(express.json({ limit: "10mb" }));
+
+11 // Endpoint 1: GET / (Health Check)
+app.get("/", (req, res) => {
+
+res.send({ greet: "\uD83D\uDC4B" });
+
+});
+
+//
+
+// Endpoint 2: POST/summarization
+
+// Purpose: Send code + prompt to Copilot LLM and get business rules / summaries back.
+
+app.post("/summarization", async (req, res) => {
+
+try {
+
+// Step 1: Load or switch the Copilot model
+
+if (Imodel || model.family 1-- (req.body.model ?? "gpt-4.1")) { logInfo("Loading the model"); const models await vscode.lm.selectChatModels({ vendor: "copilot", family: req.body.model ?? "gpt-4.1", }); model models[0]; loginfo('Using Models $(model.family}^);
+
+}
+
+logInfo(model.maxInputTokens);
+
+// Step 2: Build the chat messages
+
+const messages - [ ]; vscode. LanguageModelChatMessage.User(req.body.prompt), vscode. LanguageModelChatMessage.User(req.body.code),
+
+// Step 3: Log the token count
+// Step 3: Log the token count
+
+const tokenCount -
+
+(await model.countTokens (req.body.prompt)) + (await model.countTokens (req.body.code)); loginfo('Token size of the user prompt ${tokenCount)");
+
+logTrace (messages);
+
+if (model) {
+
+// Step 4: Send request to Copilot with retry logic
+
+const maxRetries - 3;
+
+const retryDelay 1000; // 1 second
+
+let response: vscode.LanguageModelChatResponse | undefined;
+
+let success false;
+
+for (let attempt 0; attempt < maxRetries; attempt++) {
+
+try {
+
+response await model.sendRequest( ); messages, {}, new vscode.CancellationTokenSource().token
+
+success true;
+
+break;
+
+} catch (err) { logError(err);
+
+} logInfo("Retrying the prompt"); await new Promise((resolve) -> setTimeout(resolve, retryDelay));
+
+}
+
+// Step 5: Collect streamed response and return
+
+if (success && response) (
+let text ""; for await (const chunk of response.text) { text += chunk; } res.json({ text: text });
+
+} else {
+
+} res.json({ text: "Error occured while connecting GHCP" }); } else { res.json({ text: "Error occured while connecting GHCP" });
+
+} catch (err) {
+
+} } res.json({ text: "Error occured while connecting GHCP" });
+
+logError(err);
+
+});
+
+// Endpoint 3: POST/codeconversion
+
+// Purpose: Send code + prompt to Copilot LLM and get converted code (e.g., COBOL to Java) back.
+
+app.post("/codeconversion", async (req, res) => {
+
+try {
+
+// Step 1: Load or switch the Copilot model if (Imodel || model.family 1- (req.body.model ?? "gpt-4.1")) { logInfo("Loading the model"); const models await vscode.lm.selectChatModels({ vendor: "copilot", family: req.body.model ?? "gpt-4.1", }); model models[0]; logInfo("Using Models ${model.family}');
+loginfo(model.maxInputTokens);
+
+// Step 2: Build the chat messages
+
+const messages - [
+
+1; vscode. Language ModelChatMessage. User(req.body.prompt), vscode.LanguageModelChatMessage.User(req.body.code),
+
+// Step 3: Log the token count
+
+const tokenCount -
+
+(await model.countTokens(req.body..prompt)) + (await model.countTokens (req.body.code)); logInfo(Token size of the user prompt ${tokenCount}"); logTrace (messages);
+
+if (model) {
+
+// Step 4: Send request to Copilot with retry logic const retryDelay 1000; // 1 second let response: vscode. LanguageModelChatResponse | undefined;
+
+const maxRetries - 3;
+
+let success - false;
+
+for (let attempt 0; attempt < maxRetries; attempt++) {
+
+try {
+
+response await model.sendRequest( ); messages, {}, new vscode.CancellationTokenSource().token true;
+
+success
+
+break;
+
+} catch (err) {
+catch (err) {
+
+}
+
+logError(err);
+
+loginfo("Retrying the prompt");
+
+await new Promise((resolve) -> setTimeout(resolve, retryDelay));
+
+// Step 5: Collect streamed response and return
+
+if (success && response) {
+
+let text = "";
+
+for await (const chunk of response.text) {
+
+}
+
+text += chunk;
+
+res.json({ text: text });
+
+} else {
+
+} res.json({ text: "Error occured while connecting GHCP" });
+
+} else {
+
+}
+
+res.json({ text: "Error occured while connecting GHCP" });
+
+} catch (err) {
+
+logError(err);
+
+} res.json({ text: "Error occured while connecting GHCP" });
+
+});
+
+// Start listening on port 3000
+
+server app.listen(3000, () => {
+
+isRunning true;
+
+logInfo("GHCP Server started at port no 3000");
+
+vscode.window.showInformationMessage( ۱:
+
+"Started the GHCP Custom Extension Server™
+"Started the GHCP Custom Extension Server"
+
+export function closeServer(); void {
+
+if (isRunning) (
+
+server?.close(() => {
+
+logInfo("GHCP Server stopped at port no 3000"); vacode.window.showInformationMessage( "Stopped the GHCP Custom Extension Server" );
+
+isRunning false;
+
+ab
+
+}
+
+#Step 6.3-Create src/extension.ts
+
+I
+
+This is the main entry point that VS Code calls when the extension activates/deactivates.
+
+typescript
+
+import as vscode from "vscode";
+
+import (startServer, closeServer) from "./server";
+
+export function activate(context: vscode. ExtensionContext) (
+
+// Register the "Start server™ command
+
+const startCommand vscode.commands.registerCommand(
+
+"custom-ghcp-lang-api.customcopilotstart",
+export function activate(context: vscode.ExtensionContext) {
+
+// Register the "Start server" command
+
+const startCommand vscode.commands.registerCommand( "custom-ghep-lang-api.customcopilotstart", () { >{ startServer(); } );
+
+// Register the "Shut down server" command const shutdownCommand vscode.commands.registerCommand( "custom-ghcp-lang-api.customcopilotshutdown", ); () { } closeServer();
+
+} context.subscriptions.push(startCommand); context.subscriptions.push(shutdownCommand);
+
+export function deactivate() { closeServer();
+
+I
+
+#07. Build the Extension
+
+08 Step 7.1 Install all dependencies
+
+Rake sure you are in the project root folder, then run:
+bash
+
+nom install
+
+#Step 7.2 Compile with Webpack (development build)
+
+bash
+
+npm run compile
+
+This will create 'dist/extension.js".
+
+## Step 7.3 Production build
+
+bash
+
+npm run package
+
+This creates an optimized, minified dist/extension.js with hidden source maps.
+
+If you see TypeScript errors
+
+Make sure your @types/vscode' version matches the engines.vscode version in package.json". The vscode. Im API requires a recent enough VS Code version. If you get errors related to vscode.lm', update the minimum engine version:
+
+"engines": {
+
+"vscode": "^1.90.0"
+"vscode": "1.90.0"
+
+And update the types:
+
+bash
+
+npm install-save-dev @types/vscode@^1.90.0
+
+>**Note: The 'vscode.Im' (Language Model) API was introduced in VS Code 1.90+. The original extension declared 1.54.0 but the runtime requires a newer version for the API to work.
+
+8. Package as VSIX
+
+000 Step 8.1 Package the extension
+
+Run the following command from the project root: I
+
+bash
+
+vsce package
+
+If prompted about the publisher, press 'y to continue.
+
+This will generate a file named:
+
+custom-ghep-lang-api-0.0.2.vsix
+Common vsce package issues and fixes
+
+Issue Fix
+
+Missing publisher name
+
+README.md not found | Create a 'README.md in the project root | | Ensure "publisher" is set in package.json" |
+
+License file warning
+
+You can add --allow-missing-repository
+
+flag: "ysce package
+
+low-missing-repository |
+
+Create a 'CHANGELOG.md or use --allow-missing-repository |
+
+CHANGELOG missing
+
+mull command with common flags:
+
+bash
+
+sce package--allow-missing-repository
+
+9. Install the Extension in VS Code
+
+Option A- Using the VS Code UI
+
+1. Open VS Code
+
+2. Go to the "Extensions** sidebar (Ctrl+Shift+X)
+
+I
+
+3. Click the ... (three dots) menu at the top of the Extensions panel
+
+4. Select "Install from VSIX...**
+
+5. Browse and select your custom-ghep-lang-api-0.0.2.vsix file
+
+6. Click "Install**
+
+7. Reload VS Code when prompted
+
+Option B-Using the command line
+Option B-Using the command line
+
+bash
+
+code--install-extension custom-ghcp-lang-ap1-0.0.2.vsix
+
+### Verify installation
+
+1. Open VS Code
+
+2. Open Command Palette (Ctrl+Shift+P)
+
+3. Type 'Start custom GHCP Lang API server
+
+4. If the command appears, the extension is installed correctly
+
+##10. How to Use the Extension
+
+### Step 1- Make sure GitHub Copilot is active
+
+GitHub Copilot extension must be installed in VS Code You must be signed in to GitHub Copilot
+
+### Step 2- Start the server
+
+1. Open Command Palette (Ctrl+Shift+P")
+
+2. Run: Start custom GHCP Lang API server**
+
+I
+
+3. You should see a notification: "Started the GHCP Custom Extension Server™
+
+### Step 3- Make API calls
+
+From any terminal, script, or external tool:
+
+**Summarization (business rules extraction):*Summarization (business rules extraction):**
+
+bash
+
+curl -X POST http://localhost:3000/summarization ^
+
+-H "Content-Type: application/json" ^
+
+-d "{\"prompt\": \"Extract the business rules from this COBOL code\", \"code\":
+
+"PERFORM CALCULATE-INTEREST THRU CALCULATE-EXIT\"}"
+
+**Code conversion:**
+
+bash
+
+curl -X POST http://localhost:3000/codeconversion
+
+-H "Content-Type: application/json" ^
+
+-d "{\"prompt\": \"Convert this COBOL code to Java\", \"code\": \"PERFORM CALCULATE-
+
+INTEREST THRU CALCULATE-EXIT\"}"
+
+**Health check:**
+
+bash
+
+curl http://localhost:3000/
+
+880 Step 4-View logs
+
+I
+
+In VS Code, go to: "View** > **Output** > Select custom-ghcp-lang-api-output from the
+
+dropdown.
+
+Step 5-Stop the server
+
+1. Open Command Palette (Ctrl+Shift+P")1. Open Command Palette (Ctrl+Shift+P")
+
+2. Run: Shut down custon GHCP Lang API server**
+
+11. API Reference
+
+GET/
+
+Health check endpoint.
+
+**Response:**
+
+1100
+
+{"greet": "\ub83D\uDC48" }
+
+tab
+
+000 POST/summarization
+
+Send code with a prompt to generate business rules or summaries
+
+**Request body:**
+
+| Field |
+
+Type |
+
+Required |
+
+Default |
+
+Description |
+
+prompt | string | Yes - The instruction for the AI (e.g., "Extract business rules
+
+from this code") |
+
+`code`
+
+string | Yes|| The source code to analyze |
+
+model |
+
+string | No
+
+"gpt-4.1" |
+
+The Copilot model family to use |
+
+**Example request:**
+
+**Example request:**
+
+{
+
+Json
+
+"prompt": "Extract the business rules from this COBOL code",
+
+"code": "IF ACCOUNT-BALANCE > 10000\n COMPUTE INTEREST BALANCE 0.05\nELSE\n
+
+COMPUTE INTEREST BALANCE 0.03\nEND-IF",
+
+"model": "gpt-4.1" !..
+
+**Response:**
+
+Json
+
+{ "text": "Business Rule 1: If account balance exceeds 10,000, apply 5% interest rate..."
+
+**Error response:**
+
+Json
+
+{
+
+I
+
+"text": "Error occured while connecting GHCP
+
+?..
+
+POST/codeconversion
+
+Send code with a prompt to convert it to another language.
+
+**Request body:** Same schema as/summarization".
+
+**Example request:**Example request:**
+
+{
+
+Json
+
+"prompt": "Convert this COBOL code to Java",
+
+"code": "IF ACCOUNT-BALANCE > 10000\n COMPUTE INTEREST BALANCE 0.05\nELSE\n
+
+COMPUTE INTEREST BALANCE 0.03\nEND-IF"
+
+**Response:** Json
+
+{ "text": "public double calculateInterest(double balance) (\n return balance 0.05;\n } else {\n } if (balance 10000) (\n
+
+return balance 0.03;\n \n}"
+
+12. Troubleshooting
+
+Problem Solution |
+
+I vsce package fails with missing publisher | Add "publisher": "Yourflame" to
+
+package.json |
+
+npm run compile fails with TS errors on 'vscode.lm | Update @types/vscode to "A
+
+1.90.0 and engines.vscode" to 1.90.0 |
+
+Server starts but API returns "Error occured while connecting GHCP | Make sure GitHub Copilot is installed, authenticated, and active in VS Code |
+
+EADORINUSE: port 3000 already in use | Another process is using port 3000. Kill it or
+
+change the port in server.ts |
+
+Extension not appearing in Command Palette | Reload VS Code (Ctrl+Shift+P >
+
+"Developer: Reload Mindow") |
+
+|
+
+curl returns connection refused | Make sure you ran 'Start custom GHCP Lang API server"
+Extension not appearing in Command Palette | Reload VS Code (Ctrl+Shift+P" >
+
+Developer: Reload Window') |
+
+curl returns connection refused | Make sure you ran 'Start custom GHCP Lang API server
+
+from the Command Palette first |
+
+Your Copilot subscription may not
+
+I`vscode.In.selectChatHodels' returns empty array | support the requested model family. Try a different model. |
+
+Quick Reference All Commands
+
+bash
+
+1. Create project
+
+mkdir custom-ghep-lang-api && cd custom-ghcp-lang-api
+
+2. Initialize
+
+nom init-y
+
+3. Install dependencies
+
+npm install express@^4.21.2
+
+npm install --save-dev @types/mocha@^10.0.10 @types/node@20.x @types/vscode@^1.54.0 @typescript-eslint/eslint-pluging^8.28.0 @typescript-eslint/parser@^8.28.0 @vscode/test-clis 0.0.10 @vscode/test-electron@ 2.4.1 eslint@^9.23.0 ts-loader 9.5.2 typescript@ 5.8.2 webpack 5.98.0 webpack-cl1@^6.0.1
+
+4. Create files (src/extension.ts, src/server.ts, tsconfig.json, webpack.config.js, vscodeignore, README.md, CHANGELOG.md)
+
+5. Build
+
+npa run compile
+
+development build
+
+npm run package
+
+production build
+# 6. Package as VSIX
+
+vsce package --allow-missing-repository
+
+#7. Install in VS Code
+
+code --install-extension custom-ghcp-lang-api-0.0.2.vsix
