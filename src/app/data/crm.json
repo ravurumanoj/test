@@ -1,0 +1,1111 @@
+[
+  {
+    "customer_id": "CUST-1001",
+    "customer_profile": {
+      "name": "Rajesh Kumar",
+      "email": "rajesh.kumar@email.com",
+      "phone": "+91-98100-11001",
+      "date_of_birth": "1974-03-22",
+      "segment": "HNI",
+      "sub_segment": "Private Banking",
+      "kyc_status": "verified",
+      "kyc_last_updated": "2025-04-10",
+      "preferred_contact_method": "phone",
+      "preferred_contact_time": "10:00-12:00 IST",
+      "language_preference": "English",
+      "city": "Mumbai",
+      "address": "Flat 1204, Hiranandani Gardens, Powai, Mumbai 400076"
+    },
+    "relationship_manager": {
+      "name": "Asha Patel",
+      "employee_id": "RM-501",
+      "email": "asha.patel@bank.com",
+      "phone": "+91-22-6600-1501",
+      "designation": "Senior Relationship Manager",
+      "branch": "Powai Branch"
+    },
+    "account_metadata": {
+      "account_since": "2019-03-15",
+      "lifetime_value": 4250000,
+      "nps_score": 9,
+      "churn_risk": "low",
+      "satisfaction_rating": "highly_satisfied",
+      "last_interaction_date": "2026-07-08",
+      "total_interactions_ytd": 14,
+      "total_suggestions_given": 12,
+      "suggestions_accepted": 9
+    },
+    "conversation_history": [
+      {
+        "conversation_id": "CONV-10010001",
+        "date": "2026-07-08",
+        "channel": "phone",
+        "duration_minutes": 35,
+        "topic": "Quarterly Performance Review",
+        "summary": "Reviewed Q2 2026 portfolio performance. Portfolio returned 9.4% in Q2, outperforming Nifty 500 TRI by 2.1%. Client expressed satisfaction with equity holdings, particularly Infosys position. Discussed interest rate trajectory impact on bond holdings. Client requested more exposure to mid-cap equities. Next review scheduled for Q3.",
+        "sentiment": "positive",
+        "key_points_discussed": [
+          "Q2 portfolio return: 9.4%",
+          "Infosys position performing well (+25%)",
+          "Interest rate impact on bond portfolio discussed",
+          "Request to increase mid-cap allocation"
+        ],
+        "outcome": "Client satisfied; agreed to review mid-cap allocation in next meeting",
+        "follow_up_required": true,
+        "follow_up_date": "2026-07-20",
+        "follow_up_action": "Prepare mid-cap fund analysis and rebalancing proposal",
+        "action_items": [
+          "Prepare report on mid-cap fund options",
+          "Send Q2 performance summary PDF"
+        ],
+        "rm_notes": "Client is interested in thematic funds — specifically manufacturing and defence sectors"
+      },
+      {
+        "conversation_id": "CONV-10010002",
+        "date": "2026-07-01",
+        "channel": "email",
+        "duration_minutes": null,
+        "topic": "Q2 2026 Performance Report Delivery",
+        "summary": "Sent Q2 2026 performance report via email. Report included detailed analysis of holdings, attribution analysis, and benchmark comparison. Client acknowledged receipt and scheduled follow-up call.",
+        "sentiment": "neutral",
+        "key_points_discussed": [
+          "Q2 performance summary shared",
+          "Attribution analysis: equity contributed 72%, bonds 18%"
+        ],
+        "outcome": "Report acknowledged; follow-up call booked",
+        "follow_up_required": false,
+        "follow_up_date": null,
+        "action_items": [],
+        "rm_notes": "Client always prefers a PDF summary alongside call discussions"
+      },
+      {
+        "conversation_id": "CONV-10010003",
+        "date": "2026-06-15",
+        "channel": "in_person",
+        "duration_minutes": 60,
+        "topic": "Portfolio Rebalancing & LOC Discussion",
+        "summary": "In-branch meeting to discuss portfolio rebalancing post RBI rate pause. Reviewed debt portfolio duration and discussed LOC utilization strategy. Client expressed interest in using LOC for a short-term business liquidity need (INR 7.5L). Agreed to draw 30% of LOC. Rebalancing plan reviewed — no changes to equity allocation; reduced cash allocation from 14% to 10%.",
+        "sentiment": "positive",
+        "key_points_discussed": [
+          "RBI rate pause — impact on bond yields discussed",
+          "LOC drawdown of INR 7.5L approved",
+          "Cash allocation reduced from 14% to 10%",
+          "No changes to equity allocation"
+        ],
+        "outcome": "LOC drawdown initiated; rebalancing executed",
+        "follow_up_required": false,
+        "follow_up_date": null,
+        "action_items": [
+          "Process LOC drawdown of INR 7.5L",
+          "Execute rebalancing — reduce cash, add to corporate bond fund"
+        ],
+        "rm_notes": "Client uses LOC tactically for business needs — not investment leverage"
+      },
+      {
+        "conversation_id": "CONV-10010004",
+        "date": "2026-05-20",
+        "channel": "video_call",
+        "duration_minutes": 45,
+        "topic": "Tax Planning for FY2026-27",
+        "summary": "Annual tax planning session with client and CA. Identified tax loss harvesting opportunity in a mid-cap MF position. Reviewed STCG vs LTCG distribution. Discussed ELSS investment for Section 80C benefit. Client decided to invest INR 1.5L in ELSS before 31 March 2027.",
+        "sentiment": "positive",
+        "key_points_discussed": [
+          "Tax loss harvesting opportunity: INR 22,000",
+          "STCG: INR 85,000 — tax liability INR 17,000",
+          "ELSS investment decision: INR 1.5L",
+          "80C limit utilization reviewed"
+        ],
+        "outcome": "Tax plan agreed; ELSS investment scheduled for Q3",
+        "follow_up_required": true,
+        "follow_up_date": "2026-09-01",
+        "follow_up_action": "Initiate ELSS investment of INR 1.5L",
+        "action_items": [
+          "Initiate ELSS SIP from September 2026",
+          "Implement tax loss harvesting by 31 July 2026"
+        ],
+        "rm_notes": "Client's CA (Suresh Sharma) is a key influencer in investment decisions"
+      },
+      {
+        "conversation_id": "CONV-10010005",
+        "date": "2026-04-10",
+        "channel": "app_chat",
+        "duration_minutes": 12,
+        "topic": "Gold ETF Query",
+        "summary": "Client enquired about increasing Gold ETF allocation as a geopolitical hedge. Discussed current allocation (0.23%), historical performance of gold during equity market corrections, and recommended maintaining allocation within 2-3% range. Client agreed to increase from 0.23% to 1.5%.",
+        "sentiment": "neutral",
+        "key_points_discussed": [
+          "Gold as inflation and geopolitical hedge",
+          "Current allocation: 0.23% — recommended range 2-3%",
+          "Gold performance during 2022 and 2024 corrections discussed"
+        ],
+        "outcome": "Client agreed to increase Gold ETF allocation to 1.5%",
+        "follow_up_required": false,
+        "follow_up_date": null,
+        "action_items": [
+          "Purchase additional Gold BeES units to bring allocation to 1.5%"
+        ],
+        "rm_notes": null
+      }
+    ],
+    "suggestions_provided": [
+      {
+        "suggestion_id": "SUGG-10010001",
+        "date": "2026-07-08",
+        "type": "product_recommendation",
+        "category": "equity",
+        "instrument": "SBI Contra Fund - Direct Growth",
+        "description": "Recommended SBI Contra Fund to add mid-cap exposure via a contrarian strategy. Fund has outperformed category by 3.2% over 3 years. Allocation suggested: 5% of portfolio (INR 6.25L).",
+        "rationale": "Client's portfolio is skewed toward large-cap. Contra fund adds value-tilted mid-cap exposure at lower volatility than pure mid-cap funds.",
+        "suggested_amount": 625000,
+        "status": "pending",
+        "client_response": "Reviewing",
+        "outcome": null
+      },
+      {
+        "suggestion_id": "SUGG-10010002",
+        "date": "2026-06-15",
+        "type": "rebalancing",
+        "category": "asset_allocation",
+        "description": "Reduce cash allocation from 14% to 10% and deploy into ICICI Prudential Corporate Bond Fund. Improves overall yield by ~1.8% on the deployed amount.",
+        "rationale": "Excess cash drag was reducing overall portfolio yield. Corporate bond fund with AAA rating provides liquidity plus better return.",
+        "suggested_amount": 500000,
+        "status": "accepted",
+        "client_response": "Executed",
+        "outcome": "Deployed INR 5L into corporate bond fund on 16-Jun-2026. Yield improved."
+      },
+      {
+        "suggestion_id": "SUGG-10010003",
+        "date": "2026-05-20",
+        "type": "tax_optimization",
+        "category": "tax",
+        "description": "Tax loss harvesting: book INR 22,000 loss on underperforming mid-cap MF position before 31 July 2026 to offset against STCG.",
+        "rationale": "Short-term capital gain of INR 85,000 can be partially offset by harvesting the identified loss. Net tax saving of ~INR 4,400.",
+        "suggested_amount": null,
+        "status": "accepted",
+        "client_response": "Agreed",
+        "outcome": "Harvesting executed on 28-Jun-2026. Tax saving achieved."
+      },
+      {
+        "suggestion_id": "SUGG-10010004",
+        "date": "2026-04-10",
+        "type": "product_recommendation",
+        "category": "alternatives",
+        "description": "Increase Gold BeES ETF allocation from 0.23% to 1.5% as geopolitical and inflation hedge.",
+        "rationale": "Portfolio lacks commodities exposure. Gold allocation of 1.5-3% is standard for moderate risk profiles.",
+        "suggested_amount": 160000,
+        "status": "accepted",
+        "client_response": "Executed",
+        "outcome": "Purchased additional 280 units of Gold BeES on 11-Apr-2026."
+      },
+      {
+        "suggestion_id": "SUGG-10010005",
+        "date": "2026-02-15",
+        "type": "risk_review",
+        "category": "portfolio_risk",
+        "description": "Annual risk profile review — suggest upgrading from Moderate to Moderate-Aggressive given client's 7-year horizon and increased income stability.",
+        "rationale": "Client income grew 18% in FY2025-26; emergency fund is fully funded; home loan paid off. Risk capacity has increased.",
+        "suggested_amount": null,
+        "status": "rejected",
+        "client_response": "Declined — prefers current moderate profile",
+        "outcome": "Risk profile unchanged. Noted for next annual review."
+      }
+    ],
+    "service_requests": [
+      {
+        "ticket_id": "SR-100101",
+        "date": "2026-06-15",
+        "type": "LOC_drawdown",
+        "description": "LOC drawdown request of INR 7.5L for business liquidity",
+        "status": "resolved",
+        "resolution_date": "2026-06-16",
+        "resolution_notes": "Drawdown processed. Amount credited to registered bank account."
+      },
+      {
+        "ticket_id": "SR-100102",
+        "date": "2026-04-05",
+        "type": "statement_request",
+        "description": "FY2025-26 capital gains statement requested for ITR filing",
+        "status": "resolved",
+        "resolution_date": "2026-04-07",
+        "resolution_notes": "Statement generated and emailed to client and CA."
+      }
+    ],
+    "compliance_flags": [],
+    "tags": ["tax_sensitive", "loc_user", "gold_interest", "mid_cap_interest", "ca_influenced"],
+    "alerts": [
+      "Annual review due in 10 days",
+      "Follow-up pending: Mid-cap fund proposal to be sent by 20-Jul-2026",
+      "ELSS SIP initiation due in September 2026"
+    ]
+  },
+
+  {
+    "customer_id": "CUST-2002",
+    "customer_profile": {
+      "name": "Priya Sharma",
+      "email": "priya.sharma@email.com",
+      "phone": "+91-98200-22002",
+      "date_of_birth": "1959-11-08",
+      "segment": "Affluent",
+      "sub_segment": "Retail Affluent",
+      "kyc_status": "verified",
+      "kyc_last_updated": "2025-01-20",
+      "preferred_contact_method": "phone",
+      "preferred_contact_time": "14:00-16:00 IST",
+      "language_preference": "Hindi",
+      "city": "Delhi",
+      "address": "House No 42, Sector 15, Dwarka, New Delhi 110078"
+    },
+    "relationship_manager": {
+      "name": "Rahul Nair",
+      "employee_id": "RM-502",
+      "email": "rahul.nair@bank.com",
+      "phone": "+91-11-4400-2502",
+      "designation": "Relationship Manager",
+      "branch": "Dwarka Branch"
+    },
+    "account_metadata": {
+      "account_since": "2016-08-20",
+      "lifetime_value": 1820000,
+      "nps_score": 7,
+      "churn_risk": "low",
+      "satisfaction_rating": "satisfied",
+      "last_interaction_date": "2026-07-12",
+      "total_interactions_ytd": 8,
+      "total_suggestions_given": 7,
+      "suggestions_accepted": 5
+    },
+    "conversation_history": [
+      {
+        "conversation_id": "CONV-20020001",
+        "date": "2026-07-12",
+        "channel": "phone",
+        "duration_minutes": 22,
+        "topic": "Bond Maturity Planning",
+        "summary": "Discussed upcoming NCD maturity in September 2027. Client is concerned about reinvestment options given the current rate environment. Explored options: RBI Floating Rate Bond, Senior Citizen Savings Scheme (SCSS), and high-rated Corporate FD. Client is eligible for SCSS (age 67). Recommended SCSS given 8.2% rate and sovereign safety.",
+        "sentiment": "neutral",
+        "key_points_discussed": [
+          "NCD maturity: INR 10.1L in Sept 2027",
+          "SCSS eligibility confirmed — rate 8.2% p.a.",
+          "Sovereign RBI bond at 7.35% discussed",
+          "Corporate FD at 7.8-8.0% discussed"
+        ],
+        "outcome": "Client to decide on reinvestment option by Oct 2026",
+        "follow_up_required": true,
+        "follow_up_date": "2026-10-01",
+        "follow_up_action": "Send comparative analysis of SCSS vs RBI bond vs Corporate FD",
+        "action_items": [
+          "Prepare reinvestment options comparison report",
+          "Check SCSS investment limit for client"
+        ],
+        "rm_notes": "Client relies heavily on fixed income for monthly cash flow. SCSS is the best fit."
+      },
+      {
+        "conversation_id": "CONV-20020002",
+        "date": "2026-06-28",
+        "channel": "in_person",
+        "duration_minutes": 40,
+        "topic": "Card Dispute Resolution",
+        "summary": "Client visited branch regarding an unauthorized debit card transaction of INR 4,850. Dispute raised and escalated to cards team. Provisional credit of INR 4,850 provided while investigation is ongoing.",
+        "sentiment": "negative",
+        "key_points_discussed": [
+          "Unauthorized transaction of INR 4,850 on 26-Jun-2026",
+          "Card blocked and new card ordered",
+          "Dispute raised — reference SR-200201"
+        ],
+        "outcome": "Dispute resolved — INR 4,850 credited back on 5-Jul-2026",
+        "follow_up_required": false,
+        "follow_up_date": null,
+        "action_items": [],
+        "rm_notes": "Client was initially distressed. Satisfaction restored after resolution."
+      },
+      {
+        "conversation_id": "CONV-20020003",
+        "date": "2026-05-05",
+        "channel": "phone",
+        "duration_minutes": 18,
+        "topic": "Monthly Income Planning",
+        "summary": "Client requested analysis of portfolio's monthly income generation capability. Current income (dividends + interest + distributions) averages INR 16,700/month. Client desires INR 20,000/month to cover living expenses. Gap of INR 3,300/month identified. Suggested Systematic Withdrawal Plan (SWP) from liquid fund.",
+        "sentiment": "neutral",
+        "key_points_discussed": [
+          "Current monthly income from portfolio: INR 16,700",
+          "Target monthly income: INR 20,000",
+          "Gap of INR 3,300 to be bridged via SWP",
+          "SWP from HDFC Liquid Fund recommended"
+        ],
+        "outcome": "SWP of INR 3,300/month initiated from HDFC Liquid Fund",
+        "follow_up_required": false,
+        "follow_up_date": null,
+        "action_items": [
+          "Set up SWP of INR 3,300 per month from HDFC Liquid Fund",
+          "Monitor SWP sustainability quarterly"
+        ],
+        "rm_notes": "Client depends on portfolio for retirement income. Capital preservation is the priority."
+      },
+      {
+        "conversation_id": "CONV-20020004",
+        "date": "2026-03-15",
+        "channel": "email",
+        "duration_minutes": null,
+        "topic": "FY2025-26 Tax Statement",
+        "summary": "Sent capital gains statement, interest income summary, and TDS certificate for FY2025-26. Confirmed TDS of INR 11,430 was deducted, which exceeds estimated tax liability — refund of ~INR 3,000 is expected.",
+        "sentiment": "positive",
+        "key_points_discussed": [
+          "TDS deducted: INR 11,430",
+          "Estimated tax liability: INR 8,400",
+          "Expected refund: ~INR 3,000"
+        ],
+        "outcome": "Documents sent; client acknowledged receipt",
+        "follow_up_required": false,
+        "follow_up_date": null,
+        "action_items": [],
+        "rm_notes": null
+      }
+    ],
+    "suggestions_provided": [
+      {
+        "suggestion_id": "SUGG-20020001",
+        "date": "2026-07-12",
+        "type": "product_recommendation",
+        "category": "fixed_income",
+        "instrument": "Senior Citizen Savings Scheme (SCSS)",
+        "description": "Invest NCD maturity proceeds of INR 10L in SCSS when it matures in Sept 2027. SCSS offers 8.2% p.a., quarterly payouts, and sovereign guarantee.",
+        "rationale": "Client age (67) qualifies for SCSS. 8.2% rate exceeds most debt alternatives. Quarterly payouts supplement monthly cash flow.",
+        "suggested_amount": 1000000,
+        "status": "pending",
+        "client_response": "Considering",
+        "outcome": null
+      },
+      {
+        "suggestion_id": "SUGG-20020002",
+        "date": "2026-05-05",
+        "type": "product_recommendation",
+        "category": "systematic_plan",
+        "instrument": "HDFC Liquid Fund SWP",
+        "description": "Set up Systematic Withdrawal Plan of INR 3,300/month from HDFC Liquid Fund to bridge the monthly income gap.",
+        "rationale": "SWP provides regular income without liquidating long-term holdings. Tax efficient as each withdrawal is a mix of capital and gain.",
+        "suggested_amount": 3300,
+        "status": "accepted",
+        "client_response": "Executed",
+        "outcome": "SWP set up on 6-May-2026. Running successfully."
+      },
+      {
+        "suggestion_id": "SUGG-20020003",
+        "date": "2026-01-20",
+        "type": "risk_review",
+        "category": "portfolio_risk",
+        "description": "Annual risk profile review — risk profile remains appropriate as conservative given retirement status and income dependency.",
+        "rationale": "No change in financial circumstances warranting risk profile upgrade. Capital preservation remains priority.",
+        "suggested_amount": null,
+        "status": "accepted",
+        "client_response": "Confirmed",
+        "outcome": "Risk profile retained as conservative."
+      },
+      {
+        "suggestion_id": "SUGG-20020004",
+        "date": "2025-11-10",
+        "type": "rebalancing",
+        "category": "asset_allocation",
+        "description": "Reduce equity allocation from 25% to 20% and move proceeds to government bonds to reduce portfolio volatility ahead of uncertain global macro environment.",
+        "rationale": "Client's age and income dependency warrant lower volatility. Govt bonds at 7%+ provide stable income with zero credit risk.",
+        "suggested_amount": 320000,
+        "status": "accepted",
+        "client_response": "Executed",
+        "outcome": "Rebalancing done in Dec 2025. Portfolio volatility dropped from 8.2% to 6.1%."
+      },
+      {
+        "suggestion_id": "SUGG-20020005",
+        "date": "2025-08-15",
+        "type": "product_recommendation",
+        "category": "insurance",
+        "instrument": "Health Insurance Top-up Plan",
+        "description": "Suggested an INR 20L super top-up health insurance plan given client's age and limited existing coverage.",
+        "rationale": "Existing INR 5L mediclaim is insufficient for hospitalization costs. Medical inflation at 12% p.a.",
+        "suggested_amount": 18000,
+        "status": "rejected",
+        "client_response": "Already covered under son's family floater policy",
+        "outcome": "Suggestion declined. No action required."
+      }
+    ],
+    "service_requests": [
+      {
+        "ticket_id": "SR-200201",
+        "date": "2026-06-28",
+        "type": "dispute_resolution",
+        "description": "Unauthorized debit card transaction of INR 4,850",
+        "status": "resolved",
+        "resolution_date": "2026-07-05",
+        "resolution_notes": "Chargeback processed. INR 4,850 credited back."
+      },
+      {
+        "ticket_id": "SR-200202",
+        "date": "2026-03-15",
+        "type": "tax_documents",
+        "description": "FY2025-26 capital gains and TDS certificate request",
+        "status": "resolved",
+        "resolution_date": "2026-03-15",
+        "resolution_notes": "Documents emailed same day."
+      }
+    ],
+    "compliance_flags": [],
+    "tags": ["retirement_income", "capital_preservation", "scss_eligible", "swp_active", "conservative_investor"],
+    "alerts": [
+      "Bond maturity in Sept 2027 — reinvestment planning ongoing",
+      "SCSS recommendation pending client decision by Oct 2026",
+      "SWP running — monitor HDFC Liquid Fund AUM quarterly"
+    ]
+  },
+
+  {
+    "customer_id": "CUST-3003",
+    "customer_profile": {
+      "name": "Ananya Reddy",
+      "email": "ananya.reddy@email.com",
+      "phone": "+91-98300-33003",
+      "date_of_birth": "1988-07-14",
+      "segment": "Ultra-HNI",
+      "sub_segment": "Discretionary Portfolio Management",
+      "kyc_status": "verified",
+      "kyc_last_updated": "2026-02-01",
+      "preferred_contact_method": "video_call",
+      "preferred_contact_time": "17:00-19:00 IST",
+      "language_preference": "English",
+      "city": "Hyderabad",
+      "address": "Villa 7, Jubilee Hills, Hyderabad 500033"
+    },
+    "relationship_manager": {
+      "name": "Vikram Singh",
+      "employee_id": "RM-503",
+      "email": "vikram.singh@bank.com",
+      "phone": "+91-40-6600-3503",
+      "designation": "Private Wealth Manager",
+      "branch": "Hyderabad Wealth Management Centre"
+    },
+    "account_metadata": {
+      "account_since": "2021-11-01",
+      "lifetime_value": 12800000,
+      "nps_score": 10,
+      "churn_risk": "very_low",
+      "satisfaction_rating": "highly_satisfied",
+      "last_interaction_date": "2026-07-15",
+      "total_interactions_ytd": 22,
+      "total_suggestions_given": 18,
+      "suggestions_accepted": 15
+    },
+    "conversation_history": [
+      {
+        "conversation_id": "CONV-30030001",
+        "date": "2026-07-15",
+        "channel": "video_call",
+        "duration_minutes": 55,
+        "topic": "Derivatives Hedge Review & LOC Monitoring",
+        "summary": "Monthly review call. Discussed expiry of Nifty Put options on 28-Aug-2026. Hedge effectiveness reviewed — the put options have lost 50.6% in value as market rallied, but served their protective purpose in June's 6% correction. Discussed whether to roll over hedge or reduce it. Also reviewed LOC utilization at 45% — RM flagged LTV covenant monitoring required if market falls >15%.",
+        "sentiment": "positive",
+        "key_points_discussed": [
+          "Nifty Put option P&L: -INR 2.15L (hedge cost)",
+          "June market correction protection confirmed: saved ~INR 18L drawdown",
+          "Decision: Roll over hedge at lower notional (30% reduction)",
+          "LOC LTV at 25.7% — well within 50% limit",
+          "Monthly performance: +4.8% vs Nifty +3.1%"
+        ],
+        "outcome": "Agreed to roll over hedge at 70% notional; RM to execute",
+        "follow_up_required": true,
+        "follow_up_date": "2026-08-20",
+        "follow_up_action": "Confirm hedge rollover execution; send monthly performance report",
+        "action_items": [
+          "Roll over Nifty Put option hedge at 70% notional",
+          "Send monthly performance attribution report"
+        ],
+        "rm_notes": "Client is highly sophisticated — comfortable with derivatives strategy. Very performance focused."
+      },
+      {
+        "conversation_id": "CONV-30030002",
+        "date": "2026-07-01",
+        "channel": "email",
+        "duration_minutes": null,
+        "topic": "InvIT Distribution Receipt Confirmation",
+        "summary": "Client confirmed receipt of IRB InvIT quarterly distribution of INR 55,700. Asked about InvIT distribution tax treatment. Explained that InvIT distributions have a mixed tax treatment: interest component is taxable as 'other income', capital return is non-taxable until cost base is fully recovered.",
+        "sentiment": "neutral",
+        "key_points_discussed": [
+          "IRB InvIT distribution received: INR 55,700",
+          "Tax treatment explained: interest portion taxable, capital return non-taxable"
+        ],
+        "outcome": "Clarification provided; client satisfied",
+        "follow_up_required": false,
+        "follow_up_date": null,
+        "action_items": [
+          "Include InvIT tax breakdown in next year's tax summary"
+        ],
+        "rm_notes": null
+      },
+      {
+        "conversation_id": "CONV-30030003",
+        "date": "2026-06-10",
+        "channel": "video_call",
+        "duration_minutes": 70,
+        "topic": "Pre-IPO Investment Opportunity",
+        "summary": "Presented a Pre-IPO investment opportunity in a fintech startup (Series C, valued at INR 1,200 Cr). Client expressed strong interest. Discussed lock-in period (18-24 months), liquidity risk, and potential upside (2-3x based on comparable IPO multiples). Recommended allocation of 3-4% of portfolio (INR 1.05-1.40 Cr).",
+        "sentiment": "positive",
+        "key_points_discussed": [
+          "Pre-IPO: Fintech Series C at INR 1,200 Cr valuation",
+          "Expected IPO timeline: 18-24 months",
+          "Potential upside: 2-3x",
+          "Recommended allocation: 3-4% (~INR 1.05-1.40 Cr)"
+        ],
+        "outcome": "Client agreed to invest INR 1.05 Cr; paperwork initiated",
+        "follow_up_required": true,
+        "follow_up_date": "2026-07-10",
+        "follow_up_action": "Complete DPIIT/SEBI registered AIF subscription documents",
+        "action_items": [
+          "Send subscription agreement for AIF",
+          "Complete KYC for AIF category III"
+        ],
+        "rm_notes": "Client has high risk tolerance and is excited about startup exposure. Good for relationship deepening."
+      },
+      {
+        "conversation_id": "CONV-30030004",
+        "date": "2026-05-12",
+        "channel": "in_person",
+        "duration_minutes": 90,
+        "topic": "Annual Wealth Review — FY2026-27 Planning",
+        "summary": "Comprehensive annual review. Portfolio has grown from INR 2.75 Cr (invested) to INR 3.5 Cr (current). YTD return: 31.4%. Reviewed goals: daughter's higher education fund (INR 5 Cr by 2030), retirement corpus (INR 20 Cr by 2045). Reviewed estate planning — discussed drafting a will and nominee updates.",
+        "sentiment": "positive",
+        "key_points_discussed": [
+          "Portfolio AUM: INR 3.5 Cr, up 27.27% from cost",
+          "Goals: Education fund INR 5 Cr by 2030; Retirement INR 20 Cr by 2045",
+          "Estate planning: Will drafting recommended",
+          "Nominee update required for 2 holdings"
+        ],
+        "outcome": "Annual review completed; goals formalized; estate planning initiated",
+        "follow_up_required": true,
+        "follow_up_date": "2026-06-30",
+        "follow_up_action": "Connect client with estate planning legal partner",
+        "action_items": [
+          "Update nominees for INS-303 and INS-306",
+          "Schedule call with estate planning specialist",
+          "Create goal-based sub-portfolio allocations"
+        ],
+        "rm_notes": "Client wants to be the first among her peer group to invest in structured products — good cross-sell pipeline."
+      }
+    ],
+    "suggestions_provided": [
+      {
+        "suggestion_id": "SUGG-30030001",
+        "date": "2026-06-10",
+        "type": "product_recommendation",
+        "category": "alternatives",
+        "instrument": "Pre-IPO AIF - Fintech Series C",
+        "description": "Invest INR 1.05 Cr in a Category III AIF offering pre-IPO access to a high-growth fintech company.",
+        "rationale": "Client has appetite for illiquid, high-return alternatives. Pre-IPO participation aligns with long-term horizon and high risk tolerance.",
+        "suggested_amount": 10500000,
+        "status": "accepted",
+        "client_response": "Invested INR 1.05 Cr",
+        "outcome": "Subscription completed on 15-Jun-2026. Lock-in: 24 months."
+      },
+      {
+        "suggestion_id": "SUGG-30030002",
+        "date": "2026-05-12",
+        "type": "rebalancing",
+        "category": "portfolio_risk",
+        "description": "Establish goal-based sub-allocations: 30% earmarked for education fund (lower-risk, 4-year horizon), 60% for retirement (aggressive, 20-year horizon), 10% tactical/opportunistic.",
+        "rationale": "Formalizing goal-based allocation improves accountability and aligns risk-return tradeoffs to specific timelines.",
+        "suggested_amount": null,
+        "status": "in_progress",
+        "client_response": "Agreed in principle",
+        "outcome": "Implementation underway — sub-portfolio mapping in progress."
+      },
+      {
+        "suggestion_id": "SUGG-30030003",
+        "date": "2026-04-20",
+        "type": "tax_optimization",
+        "category": "tax",
+        "description": "Consider converting INR 2.15L derivative loss (Nifty Puts) into tax loss carryforward for offset against future speculative income.",
+        "rationale": "Derivative losses from hedging are classified as speculative losses under Indian tax law. They can offset speculative gains in the same/next year.",
+        "suggested_amount": null,
+        "status": "accepted",
+        "client_response": "Agreed — tax consultant to handle",
+        "outcome": "Documented for ITR AY2026-27 filing."
+      },
+      {
+        "suggestion_id": "SUGG-30030004",
+        "date": "2026-02-10",
+        "type": "product_recommendation",
+        "category": "structured_product",
+        "instrument": "Market-Linked Debenture (Nifty Capital Protection)",
+        "description": "Invest INR 2 Cr in a 3-year capital protection MLD linked to Nifty 50 — 100% capital protection with 80% upside participation.",
+        "rationale": "Suitable for the education fund bucket where capital preservation matters alongside growth participation.",
+        "suggested_amount": 20000000,
+        "status": "rejected",
+        "client_response": "Prefers direct equity for education bucket given 4-year horizon",
+        "outcome": "Suggestion declined. Noted for next cycle review."
+      }
+    ],
+    "service_requests": [
+      {
+        "ticket_id": "SR-300301",
+        "date": "2026-06-12",
+        "type": "AIF_subscription",
+        "description": "Category III AIF subscription for pre-IPO investment",
+        "status": "resolved",
+        "resolution_date": "2026-06-15",
+        "resolution_notes": "Subscription completed. Allotment confirmed."
+      },
+      {
+        "ticket_id": "SR-300302",
+        "date": "2026-05-14",
+        "type": "nominee_update",
+        "description": "Update nominees for mutual fund folios INS-303 and INS-306",
+        "status": "in_progress",
+        "resolution_date": null,
+        "resolution_notes": "Nominee form sent. Awaiting client signature."
+      }
+    ],
+    "compliance_flags": [
+      {
+        "flag": "AIF_KYC_Pending",
+        "description": "Category III AIF KYC documents pending final verification",
+        "raised_date": "2026-06-15",
+        "status": "in_progress"
+      }
+    ],
+    "tags": ["ultra_hni", "derivatives_user", "loc_active", "aif_investor", "estate_planning", "pre_ipo", "goal_based"],
+    "alerts": [
+      "Hedge rollover to be executed before 28-Aug-2026",
+      "AIF KYC verification pending",
+      "Nominee update forms awaiting client signature",
+      "Pre-IPO investment locked in — no liquidity for 24 months"
+    ]
+  },
+
+  {
+    "customer_id": "CUST-4004",
+    "customer_profile": {
+      "name": "Arjun Mehta",
+      "email": "arjun.mehta@email.com",
+      "phone": "+91-98400-44004",
+      "date_of_birth": "1997-02-18",
+      "segment": "Mass Affluent",
+      "sub_segment": "Young Professionals",
+      "kyc_status": "verified",
+      "kyc_last_updated": "2022-05-10",
+      "preferred_contact_method": "app_chat",
+      "preferred_contact_time": "19:00-21:00 IST",
+      "language_preference": "English",
+      "city": "Bangalore",
+      "address": "Apt 301, Brigade Metropolis, Whitefield, Bangalore 560066"
+    },
+    "relationship_manager": {
+      "name": "Meena Iyer",
+      "employee_id": "RM-504",
+      "email": "meena.iyer@bank.com",
+      "phone": "+91-80-4400-4504",
+      "designation": "Digital Relationship Manager",
+      "branch": "Digital Banking Unit"
+    },
+    "account_metadata": {
+      "account_since": "2022-05-10",
+      "lifetime_value": 185000,
+      "nps_score": 8,
+      "churn_risk": "medium",
+      "satisfaction_rating": "satisfied",
+      "last_interaction_date": "2026-07-05",
+      "total_interactions_ytd": 6,
+      "total_suggestions_given": 8,
+      "suggestions_accepted": 5
+    },
+    "conversation_history": [
+      {
+        "conversation_id": "CONV-40040001",
+        "date": "2026-07-05",
+        "channel": "app_chat",
+        "duration_minutes": 18,
+        "topic": "Crypto Allocation Review",
+        "summary": "Client raised concerns about crypto fund allocation after recent Bitcoin correction of 12%. Current allocation 8.52% is above the 5% recommendation for his risk profile. Discussed volatility risks and suggested trimming to 5%. Client hesitant to sell — believes in crypto long-term.",
+        "sentiment": "neutral",
+        "key_points_discussed": [
+          "Crypto fund down 12% in July — current value INR 72,400",
+          "Allocation 8.52% vs recommended 5%",
+          "Client bullish on Bitcoin long-term",
+          "Suggested trim to 5% — client hesitant"
+        ],
+        "outcome": "Client requested 2 weeks to monitor before deciding",
+        "follow_up_required": true,
+        "follow_up_date": "2026-07-20",
+        "follow_up_action": "Check in on crypto allocation decision",
+        "action_items": [
+          "Monitor crypto fund performance",
+          "Send educational note on portfolio allocation and risk"
+        ],
+        "rm_notes": "Gen-Z client — prefers digital communication. Very DIY oriented but open to suggestions."
+      },
+      {
+        "conversation_id": "CONV-40040002",
+        "date": "2026-06-01",
+        "channel": "app_chat",
+        "duration_minutes": 10,
+        "topic": "SIP Increase Request",
+        "summary": "Client received salary hike and wants to increase SIP from INR 10,000 to INR 15,000/month in Parag Parikh Flexi Cap Fund. Processed the SIP increase. Discussed step-up SIP option — auto-increase of 10% per year.",
+        "sentiment": "positive",
+        "key_points_discussed": [
+          "SIP increase from INR 10,000 to INR 15,000",
+          "Step-up SIP option discussed",
+          "Client chose flat INR 15,000 — will revisit step-up next year"
+        ],
+        "outcome": "SIP increased to INR 15,000/month w.e.f. July 2026",
+        "follow_up_required": false,
+        "follow_up_date": null,
+        "action_items": [
+          "Process SIP increase to INR 15,000/month",
+          "Send step-up SIP information brochure"
+        ],
+        "rm_notes": "Client is wealth accumulating — high SIP discipline is a positive sign."
+      },
+      {
+        "conversation_id": "CONV-40040003",
+        "date": "2026-04-15",
+        "channel": "video_call",
+        "duration_minutes": 30,
+        "topic": "Goal Setting — First Home Purchase",
+        "summary": "Discussed financial goal of purchasing a first home in Bangalore. Target: INR 1.2 Cr down payment in 5 years. Current portfolio INR 8.5L growing at ~19% p.a. Projected value in 5 years: ~INR 20.5L (with continued SIP). Gap of INR 99.5L identified — discussed home loan eligibility and increasing SIP.",
+        "sentiment": "positive",
+        "key_points_discussed": [
+          "Home purchase goal: INR 1.2 Cr down payment in 5 years",
+          "Current portfolio projection: ~INR 20.5L in 5 years",
+          "Gap: ~INR 99.5L — will require larger down payment via home loan",
+          "Home loan eligibility: ~INR 80-90L based on current income"
+        ],
+        "outcome": "Goal registered; SIP increase and home loan pre-assessment initiated",
+        "follow_up_required": true,
+        "follow_up_date": "2026-07-01",
+        "follow_up_action": "Share home loan eligibility certificate",
+        "action_items": [
+          "Register home purchase goal in system",
+          "Initiate home loan pre-assessment",
+          "Discuss adding dedicated home fund SIP"
+        ],
+        "rm_notes": "High cross-sell opportunity: home loan, insurance. Client is in early stages — needs hand-holding."
+      }
+    ],
+    "suggestions_provided": [
+      {
+        "suggestion_id": "SUGG-40040001",
+        "date": "2026-07-05",
+        "type": "rebalancing",
+        "category": "alternatives",
+        "description": "Trim crypto fund allocation from 8.52% to 5% of portfolio to align with risk profile recommendation.",
+        "rationale": "Crypto allocation above 5% introduces excess volatility for a moderate-aggressive risk profile. Trim reduces overall portfolio VaR.",
+        "suggested_amount": null,
+        "status": "pending",
+        "client_response": "Monitoring — will decide by 20-Jul",
+        "outcome": null
+      },
+      {
+        "suggestion_id": "SUGG-40040002",
+        "date": "2026-06-01",
+        "type": "product_recommendation",
+        "category": "systematic_plan",
+        "instrument": "Step-Up SIP",
+        "description": "Enroll in a 10% annual step-up SIP to automatically increase SIP contributions each year aligned with salary growth.",
+        "rationale": "Step-up SIP significantly enhances long-term corpus. INR 15,000/month with 10% annual step-up yields INR 42L extra over 10 years vs flat SIP.",
+        "suggested_amount": null,
+        "status": "pending",
+        "client_response": "Will consider next year",
+        "outcome": null
+      },
+      {
+        "suggestion_id": "SUGG-40040003",
+        "date": "2026-04-15",
+        "type": "product_recommendation",
+        "category": "insurance",
+        "instrument": "Term Life Insurance",
+        "description": "Recommended a INR 1 Cr pure term insurance plan (LIC/HDFC Life) given lack of existing life insurance coverage.",
+        "rationale": "No life insurance coverage identified. At age 29, term insurance is highly affordable (INR 7,000-9,000/year) and essential for financial planning.",
+        "suggested_amount": 8000,
+        "status": "accepted",
+        "client_response": "Purchased HDFC Click 2 Protect — INR 1 Cr cover",
+        "outcome": "Term plan purchased Apr 2026. Annual premium INR 7,800."
+      },
+      {
+        "suggestion_id": "SUGG-40040004",
+        "date": "2026-04-15",
+        "type": "product_recommendation",
+        "category": "goal_based",
+        "instrument": "DSP Nifty Next 50 Index Fund",
+        "description": "Recommended adding a Nifty Next 50 Index Fund as a dedicated home purchase goal fund with monthly SIP of INR 5,000.",
+        "rationale": "Separate goal-based fund helps track progress toward home down payment. Nifty Next 50 has delivered 14-16% CAGR over 10 years.",
+        "suggested_amount": 5000,
+        "status": "rejected",
+        "client_response": "Prefers to consolidate SIP in current Parag Parikh fund",
+        "outcome": "Suggestion declined. Registered as future recommendation."
+      },
+      {
+        "suggestion_id": "SUGG-40040005",
+        "date": "2025-12-10",
+        "type": "product_recommendation",
+        "category": "fixed_income",
+        "instrument": "Emergency Fund — Ultra Short Duration Fund",
+        "description": "Build 6-month emergency fund (~INR 1.5L) in an Ultra Short Duration Fund for better returns than savings account.",
+        "rationale": "Current emergency fund is in savings account at 3.5%. Ultra Short Duration Fund offers 7%+ with T+1 liquidity.",
+        "suggested_amount": 150000,
+        "status": "accepted",
+        "client_response": "Invested INR 1.5L in Aditya Birla SL Ultra Short Duration",
+        "outcome": "Emergency fund invested Dec 2025. Earning ~7.1% p.a."
+      }
+    ],
+    "service_requests": [
+      {
+        "ticket_id": "SR-400401",
+        "date": "2026-06-01",
+        "type": "sip_modification",
+        "description": "SIP increase from INR 10,000 to INR 15,000/month",
+        "status": "resolved",
+        "resolution_date": "2026-06-02",
+        "resolution_notes": "SIP increased effective July 2026 debit."
+      }
+    ],
+    "compliance_flags": [],
+    "tags": ["young_professional", "sip_investor", "crypto_holder", "goal_setting", "home_loan_pipeline", "insurance_cross_sell"],
+    "alerts": [
+      "Crypto allocation decision pending by 20-Jul-2026",
+      "Home loan pre-assessment pending",
+      "Step-up SIP follow-up due next year"
+    ]
+  },
+
+  {
+    "customer_id": "CUST-5005",
+    "customer_profile": {
+      "name": "Kavita Nambiar",
+      "email": "kavita.nambiar@email.com",
+      "phone": "+971-55-500-5005",
+      "date_of_birth": "1981-04-30",
+      "segment": "HNI",
+      "sub_segment": "NRI Wealth",
+      "kyc_status": "verified",
+      "kyc_last_updated": "2025-09-15",
+      "preferred_contact_method": "video_call",
+      "preferred_contact_time": "20:00-22:00 IST (Dubai time: 18:00-20:00 GST)",
+      "language_preference": "English",
+      "city": "Dubai, UAE",
+      "address": "Villa 28, Jumeirah 3, Dubai, UAE"
+    },
+    "relationship_manager": {
+      "name": "Deepak Joshi",
+      "employee_id": "RM-505",
+      "email": "deepak.joshi@bank.com",
+      "phone": "+91-22-6600-5505",
+      "designation": "NRI Relationship Manager",
+      "branch": "NRI Services Centre, BKC Mumbai"
+    },
+    "account_metadata": {
+      "account_since": "2020-09-15",
+      "lifetime_value": 6800000,
+      "nps_score": 9,
+      "churn_risk": "low",
+      "satisfaction_rating": "highly_satisfied",
+      "last_interaction_date": "2026-07-18",
+      "total_interactions_ytd": 11,
+      "total_suggestions_given": 10,
+      "suggestions_accepted": 8
+    },
+    "conversation_history": [
+      {
+        "conversation_id": "CONV-50050001",
+        "date": "2026-07-18",
+        "channel": "video_call",
+        "duration_minutes": 50,
+        "topic": "DTAA Documentation & NRO/NRE Routing",
+        "summary": "Quarterly NRI review call. Primary focus on DTAA documentation deadline — Form 10F and Tax Residency Certificate from UAE must be submitted before 30-Sept-2026 for the bank to apply withholding tax relief. Reviewed NRO to NRE repatriation eligibility — client has repatriation headroom of USD 1M for FY2026-27. Discussed upcoming REIT distribution routing.",
+        "sentiment": "positive",
+        "key_points_discussed": [
+          "DTAA Form 10F deadline: 30-Sept-2026",
+          "Tax Residency Certificate from UAE required",
+          "NRO→NRE repatriation headroom: USD 1M",
+          "REIT distribution routing: NRO account",
+          "Withholding tax impact if DTAA not updated: 20% vs 10%"
+        ],
+        "outcome": "Client to obtain TRC from UAE Ministry of Finance; will courier Form 10F",
+        "follow_up_required": true,
+        "follow_up_date": "2026-08-30",
+        "follow_up_action": "Follow up on DTAA document submission",
+        "action_items": [
+          "Chase Form 10F and TRC submission",
+          "Update NRO→NRE repatriation tracker",
+          "Confirm REIT distribution bank account routing"
+        ],
+        "rm_notes": "Client is highly compliant but tends to delay documentation. Must send reminder in August."
+      },
+      {
+        "conversation_id": "CONV-50050002",
+        "date": "2026-06-20",
+        "channel": "email",
+        "duration_minutes": null,
+        "topic": "NABARD Bond Coupon Receipt & Reinvestment Query",
+        "summary": "Client received NABARD Bond semi-annual coupon of INR 2.025L (INR 100,000 × 50 units × 8.10% / 2). Asked about reinvestment options for coupon proceeds. Recommended auto-reinvestment into Kotak Liquid Fund for interim parking until next review.",
+        "sentiment": "neutral",
+        "key_points_discussed": [
+          "NABARD coupon received: INR 2.025L",
+          "Reinvestment recommendation: Kotak Liquid Fund",
+          "Next strategic review: October 2026"
+        ],
+        "outcome": "Coupon parked in Kotak Liquid Fund",
+        "follow_up_required": false,
+        "follow_up_date": null,
+        "action_items": [
+          "Park INR 2.025L coupon in Kotak Liquid Fund",
+          "Review strategic reinvestment in Oct 2026"
+        ],
+        "rm_notes": null
+      },
+      {
+        "conversation_id": "CONV-50050003",
+        "date": "2026-05-08",
+        "channel": "video_call",
+        "duration_minutes": 65,
+        "topic": "Portfolio Annual Review — FY2026-27 Targets",
+        "summary": "Annual review. Portfolio AUM at INR 2.2 Cr, up 18.92% from cost. Client goals: INR 3 Cr corpus for children's education by 2030 (4 years). Portfolio currently projected at INR 3.8 Cr in 4 years at 15% CAGR — on track. Discussed increasing international allocation from 25% to 35% through global FoF. LOC usage reviewed — INR 20L utilized for property acquisition in Dubai last year.",
+        "sentiment": "positive",
+        "key_points_discussed": [
+          "Portfolio AUM: INR 2.2 Cr, target INR 3 Cr by 2030",
+          "Current projection: INR 3.8 Cr — ahead of target",
+          "Increase international allocation from 25% to 35%",
+          "LOC: INR 20L used for Dubai property — well managed",
+          "REIT distribution yield (7.2%) performing as expected"
+        ],
+        "outcome": "Agreed to increase international allocation; review FoF options",
+        "follow_up_required": true,
+        "follow_up_date": "2026-06-15",
+        "follow_up_action": "Send analysis of international FoF options for 10% additional allocation",
+        "action_items": [
+          "Analyze international FoF options for additional 10% allocation",
+          "Model portfolio at 35% international allocation",
+          "Review currency hedging requirement"
+        ],
+        "rm_notes": "Client wants to maximize global diversification given India-UAE dual residency. Currency risk is a key concern."
+      },
+      {
+        "conversation_id": "CONV-50050004",
+        "date": "2026-04-02",
+        "channel": "phone",
+        "duration_minutes": 25,
+        "topic": "LOC Utilization — Dubai Property Acquisition",
+        "summary": "Client utilized INR 20L from LOC for bridging finance for a Dubai property acquisition. Discussed repayment plan — client committed to repaying INR 10L by Sept 2026 from bonus income. Reviewed LOC LTV — remains at 18.2% (well within 40% limit).",
+        "sentiment": "positive",
+        "key_points_discussed": [
+          "LOC drawdown: INR 20L for Dubai property bridge loan",
+          "Repayment plan: INR 10L by Sept 2026 from bonus",
+          "LTV: 18.2% (limit: 40%) — comfortable",
+          "Interest cost: INR 15,000/month at 9% flat"
+        ],
+        "outcome": "LOC drawdown processed; repayment schedule documented",
+        "follow_up_required": true,
+        "follow_up_date": "2026-09-01",
+        "follow_up_action": "Confirm INR 10L LOC repayment from bonus",
+        "action_items": [
+          "Process LOC drawdown of INR 20L",
+          "Set calendar reminder for Sept 2026 repayment"
+        ],
+        "rm_notes": "Client has property in Dubai — potential for NRI mortgage referral partnership."
+      }
+    ],
+    "suggestions_provided": [
+      {
+        "suggestion_id": "SUGG-50050001",
+        "date": "2026-05-08",
+        "type": "product_recommendation",
+        "category": "international",
+        "instrument": "Motilal Oswal Nasdaq 100 FOF",
+        "description": "Increase international allocation from 25% to 35% by adding INR 2.2 Cr to Motilal Oswal Nasdaq 100 FoF. Provides US technology exposure with INR denomination.",
+        "rationale": "Client goals benefit from USD appreciation and US technology sector growth. 10% additional international allocation improves Sharpe ratio by ~0.12.",
+        "suggested_amount": 2200000,
+        "status": "in_progress",
+        "client_response": "Agreed — awaiting fund analysis",
+        "outcome": null
+      },
+      {
+        "suggestion_id": "SUGG-50050002",
+        "date": "2026-04-02",
+        "type": "rebalancing",
+        "category": "liquidity",
+        "description": "Repay INR 10L of LOC from September 2026 bonus to reduce interest cost and improve LTV headroom.",
+        "rationale": "LOC interest at 9% p.a. on INR 20L = INR 1.8L/year. Partial repayment reduces interest drag on portfolio returns.",
+        "suggested_amount": 1000000,
+        "status": "pending",
+        "client_response": "Agreed — committed to Sept 2026",
+        "outcome": null
+      },
+      {
+        "suggestion_id": "SUGG-50050003",
+        "date": "2026-03-15",
+        "type": "tax_optimization",
+        "category": "nri_tax",
+        "description": "File DTAA Form 10F and obtain UAE Tax Residency Certificate to reduce Indian withholding tax from 20% to 10% on interest and dividend income.",
+        "rationale": "India-UAE DTAA provides 50% reduction in withholding tax. On INR 4.5L annual income, tax saving of ~INR 45,000.",
+        "suggested_amount": null,
+        "status": "in_progress",
+        "client_response": "Initiating with CA",
+        "outcome": "Documents in process — deadline 30-Sept-2026."
+      },
+      {
+        "suggestion_id": "SUGG-50050004",
+        "date": "2025-11-20",
+        "type": "product_recommendation",
+        "category": "real_estate",
+        "instrument": "Nexus Select Trust REIT - Additional Units",
+        "description": "Add 2,000 units of Nexus Select Trust REIT to increase retail REIT exposure and boost distribution income.",
+        "rationale": "REIT distributions yield 7.2% — highly attractive for NRI seeking regular INR income. Distribution qualifies for DTAA benefit.",
+        "suggested_amount": 736000,
+        "status": "accepted",
+        "client_response": "Purchased 2,000 additional units",
+        "outcome": "Purchased Nov 2025 at INR 352/unit. Current P&L: +INR 32,000."
+      },
+      {
+        "suggestion_id": "SUGG-50050005",
+        "date": "2025-09-10",
+        "type": "risk_review",
+        "category": "currency_risk",
+        "description": "Review currency hedging strategy for international FoF holdings given INR/USD volatility. Suggest unhedged allocation given INR depreciation trend.",
+        "rationale": "Historical INR depreciation of 3-4% p.a. vs USD provides natural tailwind for unhedged international allocation.",
+        "suggested_amount": null,
+        "status": "accepted",
+        "client_response": "Agreed — maintain unhedged",
+        "outcome": "Portfolio continues unhedged international exposure. INR depreciation has added ~3.2% incremental return YTD."
+      }
+    ],
+    "service_requests": [
+      {
+        "ticket_id": "SR-500501",
+        "date": "2026-04-02",
+        "type": "LOC_drawdown",
+        "description": "LOC drawdown of INR 20L for Dubai property acquisition bridging",
+        "status": "resolved",
+        "resolution_date": "2026-04-03",
+        "resolution_notes": "Drawdown processed to NRO account. Funds available."
+      },
+      {
+        "ticket_id": "SR-500502",
+        "date": "2026-03-15",
+        "type": "compliance_document",
+        "description": "DTAA Form 10F submission tracking",
+        "status": "in_progress",
+        "resolution_date": null,
+        "resolution_notes": "Awaiting UAE Tax Residency Certificate from client."
+      }
+    ],
+    "compliance_flags": [
+      {
+        "flag": "DTAA_Document_Pending",
+        "description": "Form 10F and UAE TRC not yet submitted — deadline 30-Sept-2026",
+        "raised_date": "2026-06-01",
+        "status": "open"
+      }
+    ],
+    "tags": ["nri", "uae_resident", "dtaa_applicable", "loc_user", "reit_investor", "international_allocation", "compliance_watch"],
+    "alerts": [
+      "DTAA Form 10F deadline: 30-Sept-2026 — urgent follow-up required",
+      "LOC repayment of INR 10L due in September 2026",
+      "International FoF analysis pending delivery to client",
+      "NRO→NRE repatriation tracking required for FY2026-27"
+    ]
+  }
+]
