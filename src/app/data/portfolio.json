@@ -33,11 +33,26 @@
       "total_return_ytd_pct": 18.2
     },
     "asset_allocation": {
-      "equities":             { "value": 5625000, "pct": 45.0 },
-      "fixed_income":         { "value": 3750000, "pct": 30.0 },
-      "alternatives":         { "value": 625000,  "pct": 5.0  },
-      "real_estate":          { "value": 1250000, "pct": 10.0 },
-      "cash_and_equivalents": { "value": 1250000, "pct": 10.0 }
+      "equities": {
+        "value": 5625000,
+        "pct": 45.0
+      },
+      "fixed_income": {
+        "value": 3750000,
+        "pct": 30.0
+      },
+      "alternatives": {
+        "value": 625000,
+        "pct": 5.0
+      },
+      "real_estate": {
+        "value": 1250000,
+        "pct": 10.0
+      },
+      "cash_and_equivalents": {
+        "value": 1250000,
+        "pct": 10.0
+      }
     },
     "holdings": [
       {
@@ -51,17 +66,17 @@
         "exchange": "NSE",
         "currency": "INR",
         "quantity": 500,
-        "avg_cost_price": 1450.00,
-        "current_price": 1820.50,
+        "avg_cost_price": 1450.0,
+        "current_price": 1820.5,
         "current_value": 910250,
         "invested_value": 725000,
         "unrealized_pnl": 185250,
         "unrealized_pnl_pct": 25.55,
         "weight_in_portfolio_pct": 7.28,
-        "day_change": 12.30,
+        "day_change": 12.3,
         "day_change_pct": 0.68,
-        "52w_high": 1950.00,
-        "52w_low": 1280.00,
+        "52w_high": 1950.0,
+        "52w_low": 1280.0,
         "dividend_yield_pct": 1.8
       },
       {
@@ -75,17 +90,17 @@
         "exchange": "BSE",
         "currency": "INR",
         "quantity": 300,
-        "avg_cost_price": 1600.00,
-        "current_price": 1745.20,
+        "avg_cost_price": 1600.0,
+        "current_price": 1745.2,
         "current_value": 523560,
         "invested_value": 480000,
         "unrealized_pnl": 43560,
         "unrealized_pnl_pct": 9.08,
         "weight_in_portfolio_pct": 4.19,
-        "day_change": -5.40,
+        "day_change": -5.4,
         "day_change_pct": -0.31,
-        "52w_high": 1830.00,
-        "52w_low": 1410.00,
+        "52w_high": 1830.0,
+        "52w_low": 1410.0,
         "dividend_yield_pct": 1.2
       },
       {
@@ -99,8 +114,8 @@
         "exchange": "BSE_MF",
         "currency": "INR",
         "quantity": 18500,
-        "avg_cost_price": 42.50,
-        "current_price": 55.80,
+        "avg_cost_price": 42.5,
+        "current_price": 55.8,
         "current_value": 1032300,
         "invested_value": 786250,
         "unrealized_pnl": 246050,
@@ -108,8 +123,8 @@
         "weight_in_portfolio_pct": 8.26,
         "day_change": 0.25,
         "day_change_pct": 0.45,
-        "52w_high": 57.40,
-        "52w_low": 41.20,
+        "52w_high": 57.4,
+        "52w_low": 41.2,
         "dividend_yield_pct": 0.0
       },
       {
@@ -129,10 +144,10 @@
         "invested_value": 2000000,
         "unrealized_pnl": 37000,
         "unrealized_pnl_pct": 1.85,
-        "weight_in_portfolio_pct": 16.30,
+        "weight_in_portfolio_pct": 16.3,
         "coupon_rate_pct": 7.38,
         "maturity_date": "2027-04-07",
-        "yield_to_maturity_pct": 7.10,
+        "yield_to_maturity_pct": 7.1,
         "duration_years": 0.7,
         "rating": "Sovereign",
         "accrued_interest": 24600
@@ -148,7 +163,7 @@
         "exchange": "BSE_MF",
         "currency": "INR",
         "quantity": 65000,
-        "avg_cost_price": 26.80,
+        "avg_cost_price": 26.8,
         "current_price": 28.95,
         "current_value": 1881750,
         "invested_value": 1742000,
@@ -171,8 +186,8 @@
         "exchange": "NSE",
         "currency": "INR",
         "quantity": 1200,
-        "avg_cost_price": 185.00,
-        "current_price": 228.60,
+        "avg_cost_price": 185.0,
+        "current_price": 228.6,
         "current_value": 274320,
         "invested_value": 222000,
         "unrealized_pnl": 52320,
@@ -192,15 +207,15 @@
         "exchange": "NSE",
         "currency": "INR",
         "quantity": 800,
-        "avg_cost_price": 350.00,
-        "current_price": 382.50,
+        "avg_cost_price": 350.0,
+        "current_price": 382.5,
         "current_value": 306000,
         "invested_value": 280000,
         "unrealized_pnl": 26000,
         "unrealized_pnl_pct": 9.29,
         "weight_in_portfolio_pct": 2.45,
         "distribution_yield_pct": 6.8,
-        "nav": 382.50
+        "nav": 382.5
       },
       {
         "instrument_id": "INS-108",
@@ -213,8 +228,8 @@
         "exchange": "NSE",
         "currency": "INR",
         "quantity": 500,
-        "avg_cost_price": 48.00,
-        "current_price": 57.20,
+        "avg_cost_price": 48.0,
+        "current_price": 57.2,
         "current_value": 28600,
         "invested_value": 24000,
         "unrealized_pnl": 4600,
@@ -308,7 +323,11 @@
     "geographic_exposure": {
       "domestic_pct": 92.0,
       "international_pct": 8.0,
-      "top_international_regions": ["US", "Europe", "Asia ex-India"]
+      "top_international_regions": [
+        "US",
+        "Europe",
+        "Asia ex-India"
+      ]
     },
     "upcoming_events": [
       {
@@ -341,7 +360,340 @@
       "LOC utilization at 30% â€” within safe limits"
     ]
   },
-
+  {
+    "customer_id": "CUST-1002",
+    "account_details": {
+      "account_number": "ACC-10020001",
+      "account_type": "Portfolio Management Service",
+      "account_status": "active",
+      "opened_date": "2021-06-10",
+      "relationship_manager": "Asha Patel",
+      "rm_employee_id": "RM-501",
+      "custody_bank": "HDFC Bank",
+      "demat_account": "1201680000234567"
+    },
+    "customer_profile": {
+      "name": "Priya Mehta",
+      "age": 41,
+      "risk_profile": "moderate_aggressive",
+      "investment_horizon": "medium_term",
+      "kyc_status": "verified",
+      "nationality": "Indian",
+      "tax_residency": "India"
+    },
+    "portfolio_summary": {
+      "total_aum": 8500000,
+      "currency": "INR",
+      "as_of_date": "2026-07-23",
+      "invested_value": 7200000,
+      "current_value": 8500000,
+      "unrealized_pnl": 1300000,
+      "unrealized_pnl_pct": 18.06,
+      "realized_pnl_ytd": 210000,
+      "dividends_received_ytd": 68000,
+      "total_return_ytd_pct": 21.5
+    },
+    "asset_allocation": {
+      "equities": {
+        "value": 4675000,
+        "pct": 55
+      },
+      "fixed_income": {
+        "value": 1700000,
+        "pct": 20
+      },
+      "alternatives": {
+        "value": 680000,
+        "pct": 8
+      },
+      "real_estate": {
+        "value": 595000,
+        "pct": 7
+      },
+      "cash_and_equivalents": {
+        "value": 850000,
+        "pct": 10
+      }
+    },
+    "holdings": [
+      {
+        "instrument_id": "INS-201",
+        "instrument_name": "Tata Consultancy Services Ltd",
+        "instrument_type": "equity_stock",
+        "asset_class": "equities",
+        "sector": "Information Technology",
+        "sub_sector": "IT Services",
+        "isin": "INE467B01029",
+        "exchange": "NSE",
+        "currency": "INR",
+        "quantity": 200,
+        "avg_cost_price": 3200,
+        "current_price": 3850.6,
+        "current_value": 770120,
+        "invested_value": 640000,
+        "unrealized_pnl": 130120,
+        "unrealized_pnl_pct": 20.33,
+        "weight_in_portfolio_pct": 9.06,
+        "day_change": 18.5,
+        "day_change_pct": 0.48,
+        "52w_high": 4050,
+        "52w_low": 3050,
+        "dividend_yield_pct": 1.5
+      },
+      {
+        "instrument_id": "INS-202",
+        "instrument_name": "Reliance Industries Ltd",
+        "instrument_type": "equity_stock",
+        "asset_class": "equities",
+        "sector": "Energy",
+        "sub_sector": "Oil & Gas",
+        "isin": "INE002A01018",
+        "exchange": "BSE",
+        "currency": "INR",
+        "quantity": 400,
+        "avg_cost_price": 2450,
+        "current_price": 2720.3,
+        "current_value": 1088120,
+        "invested_value": 980000,
+        "unrealized_pnl": 108120,
+        "unrealized_pnl_pct": 11.03,
+        "weight_in_portfolio_pct": 12.8,
+        "day_change": -8.2,
+        "day_change_pct": -0.3,
+        "52w_high": 2900,
+        "52w_low": 2200,
+        "dividend_yield_pct": 0.4
+      },
+      {
+        "instrument_id": "INS-203",
+        "instrument_name": "Parag Parikh Flexi Cap Fund - Direct Growth",
+        "instrument_type": "mutual_fund",
+        "asset_class": "equities",
+        "sector": "Diversified",
+        "sub_sector": "Flexi Cap Fund",
+        "isin": "INF879O01019",
+        "exchange": "BSE_MF",
+        "currency": "INR",
+        "quantity": 22000,
+        "avg_cost_price": 55.0,
+        "current_price": 72.4,
+        "current_value": 1592800,
+        "invested_value": 1210000,
+        "unrealized_pnl": 382800,
+        "unrealized_pnl_pct": 31.64,
+        "weight_in_portfolio_pct": 18.74,
+        "day_change": 0.35,
+        "day_change_pct": 0.48,
+        "52w_high": 74.2,
+        "52w_low": 58.5,
+        "dividend_yield_pct": 0
+      },
+      {
+        "instrument_id": "INS-204",
+        "instrument_name": "Mirae Asset Large & Midcap Fund - Direct Growth",
+        "instrument_type": "mutual_fund",
+        "asset_class": "equities",
+        "sector": "Diversified",
+        "sub_sector": "Large & Mid Cap Fund",
+        "isin": "INF769K01DM5",
+        "exchange": "BSE_MF",
+        "currency": "INR",
+        "quantity": 12500,
+        "avg_cost_price": 88.0,
+        "current_price": 108.6,
+        "current_value": 1357500,
+        "invested_value": 1100000,
+        "unrealized_pnl": 257500,
+        "unrealized_pnl_pct": 23.41,
+        "weight_in_portfolio_pct": 15.97,
+        "day_change": 0.6,
+        "day_change_pct": 0.55,
+        "52w_high": 112.0,
+        "52w_low": 85.5,
+        "dividend_yield_pct": 0
+      },
+      {
+        "instrument_id": "INS-205",
+        "instrument_name": "7.26% GOI 2029",
+        "instrument_type": "government_bond",
+        "asset_class": "fixed_income",
+        "sector": "Sovereign",
+        "sub_sector": "Central Government Securities",
+        "isin": "IN0020230058",
+        "exchange": "NDS_OM",
+        "currency": "INR",
+        "quantity": 10,
+        "avg_cost_price": 100000,
+        "current_price": 101200,
+        "current_value": 1012000,
+        "invested_value": 1000000,
+        "unrealized_pnl": 12000,
+        "unrealized_pnl_pct": 1.2,
+        "weight_in_portfolio_pct": 11.91,
+        "coupon_rate_pct": 7.26,
+        "maturity_date": "2029-11-15",
+        "yield_to_maturity_pct": 7.0,
+        "duration_years": 3.2,
+        "rating": "Sovereign",
+        "accrued_interest": 18150
+      },
+      {
+        "instrument_id": "INS-206",
+        "instrument_name": "HDFC Corporate Bond Fund - Direct Growth",
+        "instrument_type": "mutual_fund",
+        "asset_class": "fixed_income",
+        "sector": "Debt",
+        "sub_sector": "Corporate Bond Fund",
+        "isin": "INF179K01VL1",
+        "exchange": "BSE_MF",
+        "currency": "INR",
+        "quantity": 28000,
+        "avg_cost_price": 24.5,
+        "current_price": 26.8,
+        "current_value": 750400,
+        "invested_value": 686000,
+        "unrealized_pnl": 64400,
+        "unrealized_pnl_pct": 9.39,
+        "weight_in_portfolio_pct": 8.83,
+        "day_change": 0.04,
+        "day_change_pct": 0.15,
+        "credit_quality": "AAA",
+        "modified_duration_years": 3.5
+      },
+      {
+        "instrument_id": "INS-207",
+        "instrument_name": "Silver ETF - SBI",
+        "instrument_type": "commodity_etf",
+        "asset_class": "alternatives",
+        "sector": "Commodities",
+        "sub_sector": "Precious Metals",
+        "isin": "INF204K01ZA1",
+        "exchange": "NSE",
+        "currency": "INR",
+        "quantity": 1000,
+        "avg_cost_price": 62,
+        "current_price": 72.8,
+        "current_value": 72800,
+        "invested_value": 62000,
+        "unrealized_pnl": 10800,
+        "unrealized_pnl_pct": 17.42,
+        "weight_in_portfolio_pct": 0.86,
+        "underlying_commodity": "Silver",
+        "expense_ratio_pct": 0.49
+      },
+      {
+        "instrument_id": "INS-208",
+        "instrument_name": "Nifty Midcap 150 Momentum 50 Index Fund",
+        "instrument_type": "mutual_fund",
+        "asset_class": "equities",
+        "sector": "Mid Cap",
+        "sub_sector": "Momentum Index Fund",
+        "isin": "INF179KA1UB3",
+        "exchange": "BSE_MF",
+        "currency": "INR",
+        "quantity": 8000,
+        "avg_cost_price": 16.5,
+        "current_price": 22.1,
+        "current_value": 176800,
+        "invested_value": 132000,
+        "unrealized_pnl": 44800,
+        "unrealized_pnl_pct": 33.94,
+        "weight_in_portfolio_pct": 2.08,
+        "day_change": 0.4,
+        "day_change_pct": 1.84,
+        "52w_high": 23.5,
+        "52w_low": 14.8,
+        "dividend_yield_pct": 0
+      }
+    ],
+    "performance_metrics": {
+      "ytd_return_pct": 21.5,
+      "1m_return_pct": 3.2,
+      "3m_return_pct": 8.4,
+      "6m_return_pct": 13.8,
+      "1y_return_pct": 26.2,
+      "3y_cagr_pct": 18.1,
+      "5y_cagr_pct": 15.4,
+      "benchmark": "Nifty 500 TRI",
+      "benchmark_ytd_pct": 15.8,
+      "alpha_pct": 5.7,
+      "beta": 1.08,
+      "sharpe_ratio": 1.62,
+      "sortino_ratio": 2.05,
+      "max_drawdown_pct": -11.2,
+      "volatility_annualized_pct": 15.8,
+      "information_ratio": 0.72
+    },
+    "line_of_credit": null,
+    "pnl_summary": {
+      "realized": {
+        "equities_stcg": 55000,
+        "equities_ltcg": 120000,
+        "debt_gains": 28000,
+        "commodity_gains": 7000,
+        "total_ytd": 210000,
+        "total_all_time": 680000
+      },
+      "unrealized": {
+        "total": 1300000,
+        "equities": 923340,
+        "fixed_income": 76400,
+        "alternatives": 55600,
+        "real_estate": 244660
+      },
+      "dividends": {
+        "received_ytd": 68000,
+        "received_last_12m": 82000
+      },
+      "interest_income_ytd": 95000
+    },
+    "tax_summary": {
+      "assessment_year": "AY2026-27",
+      "stcg_equity_pct": 20.0,
+      "ltcg_equity_pct": 12.5,
+      "stcg_amount": 55000,
+      "ltcg_amount": 120000,
+      "estimated_tax_liability": 26000,
+      "tds_deducted": 5200,
+      "tax_harvesting_opportunity": false,
+      "harvestable_loss_amount": 0
+    },
+    "sector_exposure": {
+      "Information Technology": 9.06,
+      "Energy": 12.8,
+      "Diversified": 36.79,
+      "Sovereign": 11.91,
+      "Debt": 8.83,
+      "Mid Cap": 2.08,
+      "Commodities": 0.86,
+      "Real Estate": 7.0,
+      "Cash": 10.0
+    },
+    "geographic_exposure": {
+      "domestic_pct": 88.0,
+      "international_pct": 12.0,
+      "top_international_regions": "US Europe"
+    },
+    "upcoming_events": [
+      {
+        "event_type": "annual_review",
+        "description": "Portfolio annual review due",
+        "date": "2026-08-15",
+        "amount": null
+      },
+      {
+        "event_type": "dividend",
+        "description": "Reliance Industries interim dividend record date",
+        "date": "2026-08-20",
+        "estimated_amount": 2400
+      }
+    ],
+    "alerts": [
+      "Portfolio beta (1.08) slightly above target — review equity allocation",
+      "Mid-cap momentum fund up 33.9% YTD — consider booking partial profits",
+      "No Line of Credit facility active — recommend review for liquidity planning"
+    ]
+  },
   {
     "customer_id": "CUST-2002",
     "account_details": {
@@ -376,11 +728,26 @@
       "total_return_ytd_pct": 8.1
     },
     "asset_allocation": {
-      "equities":             { "value": 1280000, "pct": 20.0 },
-      "fixed_income":         { "value": 3520000, "pct": 55.0 },
-      "alternatives":         { "value": 0,       "pct": 0.0  },
-      "real_estate":          { "value": 0,       "pct": 0.0  },
-      "cash_and_equivalents": { "value": 1600000, "pct": 25.0 }
+      "equities": {
+        "value": 1280000,
+        "pct": 20.0
+      },
+      "fixed_income": {
+        "value": 3520000,
+        "pct": 55.0
+      },
+      "alternatives": {
+        "value": 0,
+        "pct": 0.0
+      },
+      "real_estate": {
+        "value": 0,
+        "pct": 0.0
+      },
+      "cash_and_equivalents": {
+        "value": 1600000,
+        "pct": 25.0
+      }
     },
     "holdings": [
       {
@@ -394,13 +761,13 @@
         "exchange": "BSE_MF",
         "currency": "INR",
         "quantity": 42000,
-        "avg_cost_price": 18.50,
-        "current_price": 22.10,
+        "avg_cost_price": 18.5,
+        "current_price": 22.1,
         "current_value": 928200,
         "invested_value": 777000,
         "unrealized_pnl": 151200,
         "unrealized_pnl_pct": 19.46,
-        "weight_in_portfolio_pct": 14.50,
+        "weight_in_portfolio_pct": 14.5,
         "dividend_yield_pct": 3.8
       },
       {
@@ -419,7 +786,7 @@
         "current_value": 1488000,
         "invested_value": 1500000,
         "unrealized_pnl": -12000,
-        "unrealized_pnl_pct": -0.80,
+        "unrealized_pnl_pct": -0.8,
         "weight_in_portfolio_pct": 23.25,
         "coupon_rate_pct": 6.79,
         "maturity_date": "2029-11-15",
@@ -440,7 +807,7 @@
         "currency": "INR",
         "quantity": 1000,
         "avg_cost_price": 1000,
-        "current_price": 1012.50,
+        "current_price": 1012.5,
         "current_value": 1012500,
         "invested_value": 1000000,
         "unrealized_pnl": 12500,
@@ -463,8 +830,8 @@
         "exchange": "BSE_MF",
         "currency": "INR",
         "quantity": 4200,
-        "avg_cost_price": 3800.00,
-        "current_price": 3951.20,
+        "avg_cost_price": 3800.0,
+        "current_price": 3951.2,
         "current_value": 1599504,
         "invested_value": 1596000,
         "unrealized_pnl": 3504,
@@ -484,17 +851,17 @@
         "exchange": "NSE",
         "currency": "INR",
         "quantity": 150,
-        "avg_cost_price": 2350.00,
-        "current_price": 2345.00,
+        "avg_cost_price": 2350.0,
+        "current_price": 2345.0,
         "current_value": 351750,
         "invested_value": 352500,
         "unrealized_pnl": -750,
         "unrealized_pnl_pct": -0.21,
-        "weight_in_portfolio_pct": 5.50,
-        "day_change": 18.50,
+        "weight_in_portfolio_pct": 5.5,
+        "day_change": 18.5,
         "day_change_pct": 0.79,
-        "52w_high": 2880.00,
-        "52w_low": 2180.00,
+        "52w_high": 2880.0,
+        "52w_low": 2180.0,
         "dividend_yield_pct": 0.4
       }
     ],
@@ -603,7 +970,6 @@
       "TDS deducted exceeds estimated tax liability â€” refund likely"
     ]
   },
-
   {
     "customer_id": "CUST-3003",
     "account_details": {
@@ -638,11 +1004,26 @@
       "total_return_ytd_pct": 31.4
     },
     "asset_allocation": {
-      "equities":             { "value": 21000000, "pct": 60.0 },
-      "fixed_income":         { "value": 3500000,  "pct": 10.0 },
-      "alternatives":         { "value": 5250000,  "pct": 15.0 },
-      "real_estate":          { "value": 3500000,  "pct": 10.0 },
-      "cash_and_equivalents": { "value": 1750000,  "pct": 5.0  }
+      "equities": {
+        "value": 21000000,
+        "pct": 60.0
+      },
+      "fixed_income": {
+        "value": 3500000,
+        "pct": 10.0
+      },
+      "alternatives": {
+        "value": 5250000,
+        "pct": 15.0
+      },
+      "real_estate": {
+        "value": 3500000,
+        "pct": 10.0
+      },
+      "cash_and_equivalents": {
+        "value": 1750000,
+        "pct": 5.0
+      }
     },
     "holdings": [
       {
@@ -656,17 +1037,17 @@
         "exchange": "NSE",
         "currency": "INR",
         "quantity": 15000,
-        "avg_cost_price": 72.00,
-        "current_price": 248.50,
+        "avg_cost_price": 72.0,
+        "current_price": 248.5,
         "current_value": 3727500,
         "invested_value": 1080000,
         "unrealized_pnl": 2647500,
         "unrealized_pnl_pct": 245.14,
         "weight_in_portfolio_pct": 10.65,
-        "day_change": 5.20,
+        "day_change": 5.2,
         "day_change_pct": 2.13,
-        "52w_high": 285.00,
-        "52w_low": 165.00,
+        "52w_high": 285.0,
+        "52w_low": 165.0,
         "dividend_yield_pct": 0.0
       },
       {
@@ -680,17 +1061,17 @@
         "exchange": "NSE",
         "currency": "INR",
         "quantity": 1000,
-        "avg_cost_price": 3200.00,
-        "current_price": 4128.00,
+        "avg_cost_price": 3200.0,
+        "current_price": 4128.0,
         "current_value": 4128000,
         "invested_value": 3200000,
         "unrealized_pnl": 928000,
         "unrealized_pnl_pct": 29.0,
         "weight_in_portfolio_pct": 11.79,
-        "day_change": -22.50,
+        "day_change": -22.5,
         "day_change_pct": -0.54,
-        "52w_high": 4580.00,
-        "52w_low": 3020.00,
+        "52w_high": 4580.0,
+        "52w_low": 3020.0,
         "dividend_yield_pct": 1.5
       },
       {
@@ -704,8 +1085,8 @@
         "exchange": "BSE_MF",
         "currency": "INR",
         "quantity": 120000,
-        "avg_cost_price": 62.00,
-        "current_price": 105.40,
+        "avg_cost_price": 62.0,
+        "current_price": 105.4,
         "current_value": 12648000,
         "invested_value": 7440000,
         "unrealized_pnl": 5208000,
@@ -729,7 +1110,7 @@
         "invested_value": 425000,
         "unrealized_pnl": -215000,
         "unrealized_pnl_pct": -50.59,
-        "weight_in_portfolio_pct": 0.60,
+        "weight_in_portfolio_pct": 0.6,
         "strike_price": 24000,
         "expiry_date": "2026-08-28",
         "option_type": "PUT",
@@ -747,8 +1128,8 @@
         "exchange": "BSE_MF",
         "currency": "INR",
         "quantity": 85000,
-        "avg_cost_price": 19.50,
-        "current_price": 28.80,
+        "avg_cost_price": 19.5,
+        "current_price": 28.8,
         "current_value": 2448000,
         "invested_value": 1657500,
         "unrealized_pnl": 790500,
@@ -766,8 +1147,8 @@
         "exchange": "NSE",
         "currency": "INR",
         "quantity": 10000,
-        "avg_cost_price": 252.00,
-        "current_price": 271.00,
+        "avg_cost_price": 252.0,
+        "current_price": 271.0,
         "current_value": 2710000,
         "invested_value": 2520000,
         "unrealized_pnl": 190000,
@@ -786,8 +1167,8 @@
         "exchange": "BSE_MF",
         "currency": "INR",
         "quantity": 110000,
-        "avg_cost_price": 31.50,
-        "current_price": 35.10,
+        "avg_cost_price": 31.5,
+        "current_price": 35.1,
         "current_value": 3861000,
         "invested_value": 3465000,
         "unrealized_pnl": 396000,
@@ -871,7 +1252,7 @@
       "Information Technology": 11.79,
       "Consumer Discretionary": 10.65,
       "Diversified": 36.14,
-      "Derivatives": 0.60,
+      "Derivatives": 0.6,
       "Commodities": 6.99,
       "Infrastructure": 7.74,
       "Debt": 11.03,
@@ -880,7 +1261,11 @@
     "geographic_exposure": {
       "domestic_pct": 85.0,
       "international_pct": 15.0,
-      "top_international_regions": ["US", "China", "Southeast Asia"]
+      "top_international_regions": [
+        "US",
+        "China",
+        "Southeast Asia"
+      ]
     },
     "upcoming_events": [
       {
@@ -903,7 +1288,6 @@
       "Portfolio beta (1.28) is above target range â€” consider rebalancing"
     ]
   },
-
   {
     "customer_id": "CUST-4004",
     "account_details": {
@@ -938,11 +1322,26 @@
       "total_return_ytd_pct": 19.5
     },
     "asset_allocation": {
-      "equities":             { "value": 552500, "pct": 65.0 },
-      "fixed_income":         { "value": 85000,  "pct": 10.0 },
-      "alternatives":         { "value": 42500,  "pct": 5.0  },
-      "real_estate":          { "value": 0,      "pct": 0.0  },
-      "cash_and_equivalents": { "value": 170000, "pct": 20.0 }
+      "equities": {
+        "value": 552500,
+        "pct": 65.0
+      },
+      "fixed_income": {
+        "value": 85000,
+        "pct": 10.0
+      },
+      "alternatives": {
+        "value": 42500,
+        "pct": 5.0
+      },
+      "real_estate": {
+        "value": 0,
+        "pct": 0.0
+      },
+      "cash_and_equivalents": {
+        "value": 170000,
+        "pct": 20.0
+      }
     },
     "holdings": [
       {
@@ -956,8 +1355,8 @@
         "exchange": "BSE_MF",
         "currency": "INR",
         "quantity": 9500,
-        "avg_cost_price": 45.00,
-        "current_price": 72.80,
+        "avg_cost_price": 45.0,
+        "current_price": 72.8,
         "current_value": 691600,
         "invested_value": 427500,
         "unrealized_pnl": 264100,
@@ -977,12 +1376,12 @@
         "exchange": "BSE_MF",
         "currency": "INR",
         "quantity": 8500,
-        "avg_cost_price": 10.00,
+        "avg_cost_price": 10.0,
         "current_price": 10.95,
         "current_value": 93075,
         "invested_value": 85000,
         "unrealized_pnl": 8075,
-        "unrealized_pnl_pct": 9.50,
+        "unrealized_pnl_pct": 9.5,
         "weight_in_portfolio_pct": 10.95,
         "maturity_date": "2027-03-15",
         "indicative_yield_pct": 7.5
@@ -1019,7 +1418,7 @@
       "alpha_pct": 3.7,
       "beta": 1.05,
       "sharpe_ratio": 1.62,
-      "sortino_ratio": 2.10,
+      "sortino_ratio": 2.1,
       "max_drawdown_pct": -14.5,
       "volatility_annualized_pct": 16.8,
       "information_ratio": 0.72
@@ -1067,7 +1466,10 @@
     "geographic_exposure": {
       "domestic_pct": 78.0,
       "international_pct": 22.0,
-      "top_international_regions": ["US", "Europe"]
+      "top_international_regions": [
+        "US",
+        "Europe"
+      ]
     },
     "upcoming_events": [
       {
@@ -1089,7 +1491,6 @@
       "Crypto allocation (8.52%) exceeds recommended 5% for risk profile"
     ]
   },
-
   {
     "customer_id": "CUST-5005",
     "account_details": {
@@ -1128,11 +1529,26 @@
       "foreign_currency": "AED"
     },
     "asset_allocation": {
-      "equities":             { "value": 11000000, "pct": 50.0 },
-      "fixed_income":         { "value": 5500000,  "pct": 25.0 },
-      "alternatives":         { "value": 2200000,  "pct": 10.0 },
-      "real_estate":          { "value": 2200000,  "pct": 10.0 },
-      "cash_and_equivalents": { "value": 1100000,  "pct": 5.0  }
+      "equities": {
+        "value": 11000000,
+        "pct": 50.0
+      },
+      "fixed_income": {
+        "value": 5500000,
+        "pct": 25.0
+      },
+      "alternatives": {
+        "value": 2200000,
+        "pct": 10.0
+      },
+      "real_estate": {
+        "value": 2200000,
+        "pct": 10.0
+      },
+      "cash_and_equivalents": {
+        "value": 1100000,
+        "pct": 5.0
+      }
     },
     "holdings": [
       {
@@ -1146,8 +1562,8 @@
         "exchange": "BSE_MF",
         "currency": "INR",
         "quantity": 200000,
-        "avg_cost_price": 38.00,
-        "current_price": 56.70,
+        "avg_cost_price": 38.0,
+        "current_price": 56.7,
         "current_value": 11340000,
         "invested_value": 7600000,
         "unrealized_pnl": 3740000,
@@ -1171,9 +1587,9 @@
         "current_value": 5160000,
         "invested_value": 5000000,
         "unrealized_pnl": 160000,
-        "unrealized_pnl_pct": 3.20,
+        "unrealized_pnl_pct": 3.2,
         "weight_in_portfolio_pct": 23.45,
-        "coupon_rate_pct": 8.10,
+        "coupon_rate_pct": 8.1,
         "maturity_date": "2028-06-15",
         "yield_to_maturity_pct": 7.62,
         "duration_years": 1.8,
@@ -1191,8 +1607,8 @@
         "exchange": "BSE_MF",
         "currency": "INR",
         "quantity": 90000,
-        "avg_cost_price": 17.80,
-        "current_price": 23.40,
+        "avg_cost_price": 17.8,
+        "current_price": 23.4,
         "current_value": 2106000,
         "invested_value": 1602000,
         "unrealized_pnl": 504000,
@@ -1212,12 +1628,12 @@
         "exchange": "NSE",
         "currency": "INR",
         "quantity": 6000,
-        "avg_cost_price": 290.00,
-        "current_price": 368.00,
+        "avg_cost_price": 290.0,
+        "current_price": 368.0,
         "current_value": 2208000,
         "invested_value": 1740000,
         "unrealized_pnl": 468000,
-        "unrealized_pnl_pct": 26.90,
+        "unrealized_pnl_pct": 26.9,
         "weight_in_portfolio_pct": 10.04,
         "distribution_yield_pct": 7.2
       }
@@ -1304,7 +1720,12 @@
     "geographic_exposure": {
       "domestic_pct": 75.0,
       "international_pct": 25.0,
-      "top_international_regions": ["US", "Europe", "Japan", "Emerging Markets"]
+      "top_international_regions": [
+        "US",
+        "Europe",
+        "Japan",
+        "Emerging Markets"
+      ]
     },
     "upcoming_events": [
       {

@@ -54,8 +54,8 @@ def configure_logging() -> None:
             "formatters": {
                 "structured": {
                     "format": (
-                        "%(asctime)s  %(levelname)-8s  %(name)-45s  %(message)s"
-                        "  %(extra_fields)s"
+                        "%(asctime)s  %(levelname)-8s  %(short_name)-30s  "
+                        "%(message)s  %(extra_fields)s"
                     ),
                     "()": _StructuredFormatter,
                 }
@@ -104,6 +104,7 @@ class _StructuredFormatter(logging.Formatter):
     _STANDARD_KEYS: frozenset[str] = frozenset(
         {
             "name",
+            "short_name",
             "msg",
             "args",
             "levelname",
@@ -131,7 +132,13 @@ class _StructuredFormatter(logging.Formatter):
     )
 
     def format(self, record: logging.LogRecord) -> str:  # noqa: A003
-        """Format a log record, appending structured extra fields."""
+        """Format a log record, shortening logger name and appending structured extra fields."""
+        # Shorten: strip "app." prefix so "app.agents.portfolio_agent" → "agents.portfolio_agent"
+        name = record.name
+        if name.startswith("app."):
+            name = name[4:]
+        record.short_name = name[:30]
+
         extra_items = {
             k: v
             for k, v in record.__dict__.items()

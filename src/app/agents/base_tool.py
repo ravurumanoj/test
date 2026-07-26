@@ -62,7 +62,6 @@ class Tool(ABC):
     def __init__(self, config: BaseToolConfig) -> None:
         """Initialize the tool with its configuration object."""
         self.settings = config
-        logger.debug("Tool initialized", extra={"tool_class": self.__class__.__name__})
 
     # ── Identity ──────────────────────────────────────────────────────────────
 

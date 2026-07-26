@@ -85,7 +85,14 @@ class PortfolioTools(BaseDataTools):
             and ``pnl_summary``.
         """
         rec = self._find_customer(customer_id)
-        logger.info("Portfolio snapshot fetched", extra={"customer_id": customer_id})
+        logger.info(
+            "Portfolio snapshot fetched",
+            extra={
+                "customer_id": customer_id,
+                "holdings_count": len(rec.get("holdings", [])),
+                "asset_allocation_classes": list(rec.get("asset_allocation", {}).keys()),
+            },
+        )
         return {
             "customer_id": rec.get("customer_id"),
             "account_details": rec.get("account_details", {}),
@@ -111,7 +118,14 @@ class PortfolioTools(BaseDataTools):
             ``geographic_exposure``, and ``upcoming_events``.
         """
         rec = self._find_customer(customer_id)
-        logger.info("Performance view fetched", extra={"customer_id": customer_id})
+        logger.info(
+            "Performance view fetched",
+            extra={
+                "customer_id": customer_id,
+                "sector_count": len(rec.get("sector_exposure", {})),
+                "upcoming_events": len(rec.get("upcoming_events", [])),
+            },
+        )
         return {
             "customer_id": rec.get("customer_id"),
             "performance_metrics": rec.get("performance_metrics", {}),
@@ -135,7 +149,14 @@ class PortfolioTools(BaseDataTools):
             and ``alerts``.
         """
         rec = self._find_customer(customer_id)
-        logger.info("Compliance view fetched", extra={"customer_id": customer_id})
+        logger.info(
+            "Compliance view fetched",
+            extra={
+                "customer_id": customer_id,
+                "has_loc": bool(rec.get("line_of_credit")),
+                "alert_count": len(rec.get("alerts", [])),
+            },
+        )
         return {
             "customer_id": rec.get("customer_id"),
             "line_of_credit": rec.get("line_of_credit"),

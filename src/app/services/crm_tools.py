@@ -165,7 +165,16 @@ class CrmTools(BaseDataTools):
         all_suggestions: list[dict[str, Any]] = rec.get("suggestions_provided", [])
         pending = [s for s in all_suggestions if s.get("status") in ("pending", "in_progress")]
 
-        logger.info("Advisory view fetched", extra={"customer_id": customer_id})
+        logger.info(
+            "Advisory view fetched",
+            extra={
+                "customer_id": customer_id,
+                "total_suggestions": len(all_suggestions),
+                "pending_suggestions": len(pending),
+                "compliance_flags": len(rec.get("compliance_flags", [])),
+                "alerts": len(rec.get("alerts", [])),
+            },
+        )
         return {
             "customer_id": rec.get("customer_id"),
             "suggestions_provided": all_suggestions,
@@ -195,7 +204,18 @@ class CrmTools(BaseDataTools):
         pending_suggestions = [s for s in all_suggestions if s.get("status") in ("pending", "in_progress")]
         open_sr = [r for r in rec.get("service_requests", []) if r.get("status") != "resolved"]
 
-        logger.info("Full CRM context fetched", extra={"customer_id": customer_id})
+        logger.info(
+            "Full CRM context fetched",
+            extra={
+                "customer_id": customer_id,
+                "conversation_history_count": len(rec.get("conversation_history", [])),
+                "open_service_requests": len(open_sr),
+                "total_suggestions": len(all_suggestions),
+                "pending_suggestions": len(pending_suggestions),
+                "compliance_flags": len(rec.get("compliance_flags", [])),
+                "alerts": len(rec.get("alerts", [])),
+            },
+        )
         return {
             "customer_id": rec.get("customer_id"),
             "customer_profile": rec.get("customer_profile", {}),

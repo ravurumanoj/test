@@ -85,7 +85,16 @@ class PortfolioAgent(Tool):
             ),
             parameters={
                 "type": "object",
-                "properties": {},
+                "properties": {
+                    "customer_id": {
+                        "type": "string",
+                        "description": (
+                            "The unique customer identifier to retrieve portfolio data for "
+                            "(e.g. CUST-1001). Use the customer ID provided in the system context."
+                        ),
+                    }
+                },
+                "required": ["customer_id"],
                 "additionalProperties": False,
             },
         )
@@ -115,12 +124,20 @@ class PortfolioAgent(Tool):
             arguments:    Parsed JSON arguments from the LLM function call.
             context:      Request-level context — must contain customer_id and question.
         """
-        customer_id: str = context.get("customer_id", "")
+        # Resolve customer_id: prefer the value the LLM passed in arguments
+        # (now that customer_id is a required tool parameter), fall back to
+        # the request-level context supplied by the orchestrator.
+        customer_id: str = str(arguments.get("customer_id") or context.get("customer_id", "")).strip()
         question: str = context.get("question", "")
 
         logger.info(
             "PortfolioAgent.run started",
-            extra={"tool_call_id": tool_call_id, "customer_id": customer_id},
+            extra={
+                "tool_call_id": tool_call_id,
+                "customer_id": customer_id,
+                "question": question,
+                "arguments_received": arguments,
+            },
         )
 
         # ── Data retrieval ────────────────────────────────────────────────────
@@ -128,7 +145,14 @@ class PortfolioAgent(Tool):
             portfolio_data = self.tools.get_portfolio_snapshot(customer_id)
             logger.info(
                 "PortfolioAgent: portfolio data retrieved",
-                extra={"customer_id": customer_id, "data_keys": list(portfolio_data.keys())},
+                extra={
+                    "customer_id": customer_id,
+                    "data_keys": list(portfolio_data.keys()),
+                    "record_counts": {
+                        k: len(v) if isinstance(v, list) else "scalar"
+                        for k, v in portfolio_data.items()
+                    },
+                },
             )
         except Exception as exc:
             logger.exception(
@@ -142,6 +166,15 @@ class PortfolioAgent(Tool):
             )
 
         # ── LLM summarization ─────────────────────────────────────────────────
+        logger.debug(
+            "PortfolioAgent: sending data to LLM for summarization",
+            extra={
+                "customer_id": customer_id,
+                "question": question,
+                "portfolio_data_keys": list(portfolio_data.keys()),
+                "prompt_name": "PORTFOLIO_AGENT_PROMPT",
+            },
+        )
         try:
             summary = self.unique_toolkit.execute(
                 agent_name=self.name,
@@ -150,8 +183,12 @@ class PortfolioAgent(Tool):
                 question=question,
             )
             logger.info(
-                "PortfolioAgent: summary generated",
-                extra={"customer_id": customer_id, "summary_length": len(summary)},
+                "PortfolioAgent: LLM summary received",
+                extra={
+                    "customer_id": customer_id,
+                    "summary_length": len(summary),
+                    "summary_preview": summary[:300],
+                },
             )
         except Exception as exc:
             logger.exception(
@@ -180,6 +217,7 @@ class PortfolioAgent(Tool):
                 "tool_call_id": tool_call_id,
                 "customer_id": customer_id,
                 "chunk_count": len(content_chunks),
+                "debug_info_keys": list(debug_info.keys()),
             },
         )
 

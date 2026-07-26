@@ -32,7 +32,14 @@ class UniqueAIClient:
         no additional parameters are needed here.  Callers (UniqueToolkit.execute)
         build the message list with _build_messages before invoking this method.
         """
-        logger.info("UniqueAIClient.run_completion called", extra={"agent_name": agent_name})
+        logger.info(
+            "UniqueAIClient.run_completion called",
+            extra={
+                "agent_name": agent_name,
+                "message_count": len(messages),
+                "model": self.settings.unique_model_name,
+            },
+        )
         response = self.create_completion(messages=messages)
         content = self._extract_completion_text(response)
         if not content:
@@ -42,7 +49,11 @@ class UniqueAIClient:
             )
         logger.info(
             "UniqueAIClient.run_completion completed",
-            extra={"agent_name": agent_name, "content_length": len(content)},
+            extra={
+                "agent_name": agent_name,
+                "content_length": len(content),
+                "content_preview": content[:300],
+            },
         )
         return content
 
@@ -107,7 +118,9 @@ class UniqueAIClient:
                 "model": self.settings.unique_model_name,
                 "messages_count": len(messages),
                 "has_tools": bool(tools),
+                "tool_names": [t.get("function", {}).get("name") for t in (tools or [])],
                 "has_options": bool(options),
+                "temperature": temperature,
             },
         )
 
@@ -119,7 +132,19 @@ class UniqueAIClient:
                 "Unique SDK ChatCompletion.create call failed.",
                 {"model_name": self.settings.unique_model_name},
             ) from exc
-        return self._normalize_completion_response(result)
+        normalized = self._normalize_completion_response(result)
+        content_peek = self._extract_completion_text(normalized)
+        tool_call_count = len(self.extract_tool_calls(normalized))
+        logger.debug(
+            "create_completion: SDK response received",
+            extra={
+                "model": self.settings.unique_model_name,
+                "response_has_content": bool(content_peek),
+                "content_preview": content_peek[:200],
+                "tool_call_count": tool_call_count,
+            },
+        )
+        return normalized
 
     def _configure_sdk(self, unique_sdk_module: Any) -> None:
         """Configure the imported unique_sdk module with documented credentials and proxy settings."""
@@ -182,9 +207,11 @@ class UniqueAIClient:
         if isinstance(choices, list) and choices:
             message = choices[0].get("message") if isinstance(choices[0], dict) else getattr(choices[0], "message", None)
             if isinstance(message, dict):
-                return str(message.get("content", "")).strip()
+                # Use `or ""` to treat None content (tool-call responses) as empty string.
+                return str(message.get("content") or "").strip()
             if message is not None:
-                return str(getattr(message, "content", "")).strip()
+                # Use `or ""` to treat None content (tool-call responses) as empty string.
+                return str(getattr(message, "content", None) or "").strip()
         return ""
 
     def extract_tool_calls(self, result: dict[str, Any]) -> list[dict[str, Any]]:
@@ -226,7 +253,8 @@ class UniqueAIClient:
         message = choices[0].get("message", {}) if isinstance(choices[0], dict) else {}
         if not isinstance(message, dict):
             return ""
-        return str(message.get("content", "")).strip()
+        # Use `or ""` to treat None content (tool-call responses) as empty string.
+        return str(message.get("content") or "").strip()
 
     def _normalize_completion_response(self, result: Any) -> dict[str, Any]:
         """Normalize various SDK response shapes into a dict payload."""
@@ -251,20 +279,36 @@ class UniqueAIClient:
         choices = getattr(result, "choices", None)
         if isinstance(choices, list) and choices:
             first_choice = choices[0]
-            message = first_choice.get("message") if isinstance(first_choice, dict) else getattr(first_choice, "message", None)
+            if isinstance(first_choice, dict):
+                message = first_choice.get("message")
+            else:
+                message = getattr(first_choice, "message", None)
             message_content = ""
+            message_tool_calls: list[dict[str, Any]] | None = None
             if isinstance(message, dict):
-                message_content = str(message.get("content", ""))
+                # Use `or ""` to treat None content (tool-call responses) as empty string.
+                message_content = str(message.get("content") or "")
+                message_tool_calls = message.get("tool_calls") or None
             elif message is not None:
-                message_content = str(getattr(message, "content", ""))
-            return {
-                "choices": [
-                    {
-                        "message": {
-                            "role": "assistant",
-                            "content": message_content,
-                        }
-                    }
-                ]
-            }
+                message_content = str(getattr(message, "content", None) or "")
+                raw_tool_calls = getattr(message, "tool_calls", None)
+                if raw_tool_calls:
+                    message_tool_calls = []
+                    for tc in raw_tool_calls:
+                        if isinstance(tc, dict):
+                            message_tool_calls.append(tc)
+                        else:
+                            fn = getattr(tc, "function", None)
+                            message_tool_calls.append({
+                                "id": str(getattr(tc, "id", "") or ""),
+                                "type": str(getattr(tc, "type", "function") or "function"),
+                                "function": {
+                                    "name": str(getattr(fn, "name", "") or "") if fn else "",
+                                    "arguments": str(getattr(fn, "arguments", "{}") or "{}") if fn else "{}",
+                                },
+                            })
+            normalized_message: dict[str, Any] = {"role": "assistant", "content": message_content}
+            if message_tool_calls:
+                normalized_message["tool_calls"] = message_tool_calls
+            return {"choices": [{"message": normalized_message}]}
         return {"choices": [{"message": {"role": "assistant", "content": ""}}]}

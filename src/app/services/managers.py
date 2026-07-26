@@ -216,7 +216,10 @@ class HistoryManager:
     def add_user_message(self, content: str) -> None:
         """Add a user message to the conversation history."""
         self._loop_history.append({"role": "user", "content": content})
-        logger.debug("HistoryManager: user message added", extra={"content_length": len(content)})
+        logger.debug(
+            "HistoryManager: user message added",
+            extra={"content_length": len(content), "content_preview": content[:200]},
+        )
 
     def add_assistant_message(
         self, content: str, tool_calls: list[dict[str, Any]] | None = None
@@ -232,7 +235,11 @@ class HistoryManager:
         self._loop_history.append(msg)
         logger.debug(
             "HistoryManager: assistant message added",
-            extra={"has_tool_calls": bool(tool_calls), "content_length": len(content or "")},
+            extra={
+                "has_tool_calls": bool(tool_calls),
+                "tool_call_names": [tc.get("function", {}).get("name") for tc in (tool_calls or [])],
+                "content_length": len(content or ""),
+            },
         )
 
     def add_tool_call_results(self, tool_responses: list[ToolCallResponse]) -> None:
@@ -304,7 +311,12 @@ class HistoryManager:
         if estimated_tokens <= self._max_token_budget:
             logger.debug(
                 "HistoryManager: history within token budget",
-                extra={"estimated_tokens": estimated_tokens, "budget": self._max_token_budget},
+                extra={
+                    "estimated_tokens": estimated_tokens,
+                    "budget": self._max_token_budget,
+                    "message_count": len(full_history),
+                    "roles_breakdown": {r: sum(1 for m in full_history if m.get("role") == r) for r in {"system", "user", "assistant", "tool"}},
+                },
             )
             return full_history
 

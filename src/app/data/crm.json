@@ -231,14 +231,207 @@
       }
     ],
     "compliance_flags": [],
-    "tags": ["tax_sensitive", "loc_user", "gold_interest", "mid_cap_interest", "ca_influenced"],
+    "tags": [
+      "tax_sensitive",
+      "loc_user",
+      "gold_interest",
+      "mid_cap_interest",
+      "ca_influenced"
+    ],
     "alerts": [
       "Annual review due in 10 days",
       "Follow-up pending: Mid-cap fund proposal to be sent by 20-Jul-2026",
       "ELSS SIP initiation due in September 2026"
     ]
   },
-
+  {
+    "customer_id": "CUST-1002",
+    "customer_profile": {
+      "name": "Priya Mehta",
+      "email": "priya.mehta@email.com",
+      "phone": "+91-98200-11002",
+      "date_of_birth": "1985-09-14",
+      "segment": "HNI",
+      "sub_segment": "Private Banking",
+      "kyc_status": "verified",
+      "kyc_last_updated": "2025-06-20",
+      "preferred_contact_method": "email",
+      "preferred_contact_time": "18:00-20:00 IST",
+      "language_preference": "English",
+      "city": "Bangalore",
+      "address": "Villa 34, Prestige Lakeside Habitat, Varthur, Bangalore 560087"
+    },
+    "relationship_manager": {
+      "name": "Asha Patel",
+      "employee_id": "RM-501",
+      "email": "asha.patel@bank.com",
+      "phone": "+91-22-6600-1501",
+      "designation": "Senior Relationship Manager",
+      "branch": "Powai Branch"
+    },
+    "account_metadata": {
+      "account_since": "2021-06-10",
+      "lifetime_value": 2100000,
+      "nps_score": 8,
+      "churn_risk": "low",
+      "satisfaction_rating": "satisfied",
+      "last_interaction_date": "2026-07-10",
+      "total_interactions_ytd": 9,
+      "total_suggestions_given": 7,
+      "suggestions_accepted": 5
+    },
+    "conversation_history": [
+      {
+        "conversation_id": "CONV-10020001",
+        "date": "2026-07-10",
+        "channel": "video_call",
+        "duration_minutes": 40,
+        "topic": "Mid-Year Portfolio Review",
+        "summary": "Reviewed H1 2026 portfolio performance. Portfolio returned 21.5% YTD, significantly outperforming Nifty 500 TRI benchmark of 15.8%. Client impressed with Parag Parikh Flexi Cap Fund performance. Discussed rebalancing to reduce equity beta. Client interested in adding international equity exposure through a fund-of-funds. Beta at 1.08 flagged as slightly above moderate-aggressive target.",
+        "sentiment": "positive",
+        "key_points_discussed": [
+          "YTD return: 21.5% vs benchmark 15.8%",
+          "Parag Parikh Flexi Cap Fund up 31.6%",
+          "Portfolio beta 1.08 — slightly elevated",
+          "Interest in international equity via FOF"
+        ],
+        "outcome": "Client satisfied; rebalancing proposal to be sent",
+        "follow_up_required": true,
+        "follow_up_date": "2026-07-25",
+        "follow_up_action": "Send rebalancing proposal and international FOF options",
+        "action_items": [
+          "Prepare rebalancing plan to reduce beta to 0.95",
+          "Research international FOF options (Motilal, Mirae, PGIM)"
+        ],
+        "rm_notes": "Client is tech professional — understands financial concepts well, prefers data-driven recommendations"
+      },
+      {
+        "conversation_id": "CONV-10020002",
+        "date": "2026-06-01",
+        "channel": "email",
+        "duration_minutes": null,
+        "topic": "Q1 2026 Performance Report",
+        "summary": "Sent Q1 2026 performance summary. Portfolio returned 11.2% in Q1 vs benchmark 8.4%. Client acknowledged good performance, asked about increasing SIP amounts in flexi-cap fund.",
+        "sentiment": "positive",
+        "key_points_discussed": [
+          "Q1 return: 11.2% vs benchmark 8.4%",
+          "Request to increase SIP in Parag Parikh Flexi Cap Fund"
+        ],
+        "outcome": "SIP increase to be processed next month",
+        "follow_up_required": true,
+        "follow_up_date": "2026-07-01",
+        "follow_up_action": "Process SIP amount increase for Parag Parikh Flexi Cap Fund",
+        "action_items": [
+          "Increase SIP from INR 25,000 to INR 40,000 per month starting July 2026"
+        ],
+        "rm_notes": null
+      },
+      {
+        "conversation_id": "CONV-10020003",
+        "date": "2026-03-15",
+        "channel": "phone",
+        "duration_minutes": 25,
+        "topic": "Year-End Tax Planning",
+        "summary": "Reviewed tax position for FY2025-26. STCG of INR 55,000 and LTCG of INR 120,000 identified. No tax loss harvesting opportunity available. Discussed Section 80C — client has fully utilised through EPF and PPF. Silver ETF gains discussed.",
+        "sentiment": "neutral",
+        "key_points_discussed": [
+          "STCG INR 55,000 — tax INR 11,000",
+          "LTCG INR 120,000 — tax INR 15,000",
+          "80C fully utilised via EPF and PPF",
+          "No tax harvesting opportunity"
+        ],
+        "outcome": "Tax position acknowledged; no action required",
+        "follow_up_required": false,
+        "follow_up_date": null,
+        "action_items": [],
+        "rm_notes": "Client has strong financial discipline — EPF, PPF, and now PMS all funded from salary"
+      }
+    ],
+    "suggestions_provided": [
+      {
+        "suggestion_id": "SUGG-10020001",
+        "date": "2026-07-10",
+        "type": "product_recommendation",
+        "category": "equity",
+        "instrument": "Motilal Oswal Nasdaq 100 FOF - Direct Growth",
+        "description": "Recommend adding 5% international equity exposure via Nasdaq 100 FOF to diversify geographical concentration.",
+        "rationale": "Current portfolio has 88% domestic exposure. Adding US tech exposure via Nasdaq 100 FOF improves diversification and captures USD appreciation.",
+        "suggested_amount": 425000,
+        "status": "pending",
+        "client_response": "Reviewing",
+        "outcome": null
+      },
+      {
+        "suggestion_id": "SUGG-10020002",
+        "date": "2026-07-10",
+        "type": "rebalancing",
+        "category": "asset_allocation",
+        "description": "Reduce momentum mid-cap fund allocation by 1% to bring portfolio beta from 1.08 to ~0.95.",
+        "rationale": "Momentum strategies amplify market moves. Given the strong YTD run, partial profit booking in mid-cap momentum fund reduces tail risk.",
+        "suggested_amount": 85000,
+        "status": "pending",
+        "client_response": "Reviewing",
+        "outcome": null
+      },
+      {
+        "suggestion_id": "SUGG-10020003",
+        "date": "2026-06-01",
+        "type": "product_recommendation",
+        "category": "equity",
+        "instrument": "Parag Parikh Flexi Cap Fund - Direct Growth",
+        "description": "Increase monthly SIP from INR 25,000 to INR 40,000 to capitalise on consistent outperformance.",
+        "rationale": "Fund has delivered 31.6% in portfolio since investment. Category-topping performance with low churn and value-oriented mandate makes it ideal for SIP.",
+        "suggested_amount": 15000,
+        "status": "accepted",
+        "client_response": "SIP increased effective July 2026",
+        "outcome": "SIP increased to INR 40,000/month from July 2026"
+      },
+      {
+        "suggestion_id": "SUGG-10020004",
+        "date": "2026-03-15",
+        "type": "risk_review",
+        "category": "portfolio_risk",
+        "description": "Annual risk profile review — current profile moderate-aggressive remains appropriate.",
+        "rationale": "Client income stable, investment horizon 5-7 years, risk tolerance unchanged. No profile upgrade/downgrade needed.",
+        "suggested_amount": null,
+        "status": "accepted",
+        "client_response": "Confirmed moderate-aggressive profile",
+        "outcome": "Risk profile confirmed as moderate-aggressive for FY2026-27"
+      }
+    ],
+    "service_requests": [
+      {
+        "ticket_id": "SR-100201",
+        "date": "2026-06-05",
+        "type": "SIP_modification",
+        "description": "SIP increase request for Parag Parikh Flexi Cap Fund from INR 25,000 to INR 40,000 per month",
+        "status": "resolved",
+        "resolution_date": "2026-06-10",
+        "resolution_notes": "SIP instruction updated. New amount effective from 1-Jul-2026 debit."
+      },
+      {
+        "ticket_id": "SR-100202",
+        "date": "2026-04-02",
+        "type": "statement_request",
+        "description": "FY2025-26 capital gains statement for ITR filing",
+        "status": "resolved",
+        "resolution_date": "2026-04-04",
+        "resolution_notes": "Statement generated and sent via email."
+      }
+    ],
+    "compliance_flags": [],
+    "tags": [
+      "tech_professional",
+      "sip_investor",
+      "international_interest",
+      "growth_oriented",
+      "low_churn_risk"
+    ],
+    "alerts": [
+      "Follow-up due 25-Jul-2026: Send rebalancing proposal and international FOF options",
+      "Portfolio beta 1.08 — slightly above moderate-aggressive target of 1.0"
+    ]
+  },
   {
     "customer_id": "CUST-2002",
     "customer_profile": {
@@ -448,14 +641,19 @@
       }
     ],
     "compliance_flags": [],
-    "tags": ["retirement_income", "capital_preservation", "scss_eligible", "swp_active", "conservative_investor"],
+    "tags": [
+      "retirement_income",
+      "capital_preservation",
+      "scss_eligible",
+      "swp_active",
+      "conservative_investor"
+    ],
     "alerts": [
       "Bond maturity in Sept 2027 â€” reinvestment planning ongoing",
       "SCSS recommendation pending client decision by Oct 2026",
       "SWP running â€” monitor HDFC Liquid Fund AUM quarterly"
     ]
   },
-
   {
     "customer_id": "CUST-3003",
     "customer_profile": {
@@ -668,7 +866,15 @@
         "status": "in_progress"
       }
     ],
-    "tags": ["ultra_hni", "derivatives_user", "loc_active", "aif_investor", "estate_planning", "pre_ipo", "goal_based"],
+    "tags": [
+      "ultra_hni",
+      "derivatives_user",
+      "loc_active",
+      "aif_investor",
+      "estate_planning",
+      "pre_ipo",
+      "goal_based"
+    ],
     "alerts": [
       "Hedge rollover to be executed before 28-Aug-2026",
       "AIF KYC verification pending",
@@ -676,7 +882,6 @@
       "Pre-IPO investment locked in â€” no liquidity for 24 months"
     ]
   },
-
   {
     "customer_id": "CUST-4004",
     "customer_profile": {
@@ -864,14 +1069,20 @@
       }
     ],
     "compliance_flags": [],
-    "tags": ["young_professional", "sip_investor", "crypto_holder", "goal_setting", "home_loan_pipeline", "insurance_cross_sell"],
+    "tags": [
+      "young_professional",
+      "sip_investor",
+      "crypto_holder",
+      "goal_setting",
+      "home_loan_pipeline",
+      "insurance_cross_sell"
+    ],
     "alerts": [
       "Crypto allocation decision pending by 20-Jul-2026",
       "Home loan pre-assessment pending",
       "Step-up SIP follow-up due next year"
     ]
   },
-
   {
     "customer_id": "CUST-5005",
     "customer_profile": {
@@ -1100,7 +1311,15 @@
         "status": "open"
       }
     ],
-    "tags": ["nri", "uae_resident", "dtaa_applicable", "loc_user", "reit_investor", "international_allocation", "compliance_watch"],
+    "tags": [
+      "nri",
+      "uae_resident",
+      "dtaa_applicable",
+      "loc_user",
+      "reit_investor",
+      "international_allocation",
+      "compliance_watch"
+    ],
     "alerts": [
       "DTAA Form 10F deadline: 30-Sept-2026 â€” urgent follow-up required",
       "LOC repayment of INR 10L due in September 2026",

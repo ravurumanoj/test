@@ -125,7 +125,7 @@ class RelationshipManagerOrchestrator:
             )
 
         # ── Seed history with system prompt and user message ──────────────────
-        system_prompt = self._build_system_prompt()
+        system_prompt = self._build_system_prompt(request.customer_id)
         history_manager.add_system_message(system_prompt)
         history_manager.add_user_message(request.question)
         logger.debug("Orchestrator: initial history seeded", extra={"system_prompt_length": len(system_prompt)})
@@ -353,11 +353,29 @@ class RelationshipManagerOrchestrator:
 
         Mirrors the Unique orchestrator's _plan_or_execute step.
         """
-        return self.unique_toolkit.plan_with_tools(
+        logger.debug(
+            "Orchestrator._plan_iteration: calling LLM",
+            extra={
+                "message_count": len(history_messages),
+                "tool_definition_names": [td["function"]["name"] for td in tool_definitions],
+            },
+        )
+        result = self.unique_toolkit.plan_with_tools(
             messages=history_messages,
             tool_definitions=tool_definitions,
             allow_tools=True,
         )
+        tool_calls_returned = result.get("tool_calls", [])
+        content_returned = result.get("content") or ""
+        logger.debug(
+            "Orchestrator._plan_iteration: LLM responded",
+            extra={
+                "tool_calls_count": len(tool_calls_returned),
+                "tool_calls_names": [tc.get("name") for tc in tool_calls_returned],
+                "content_preview": content_returned[:200] if content_returned else "",
+            },
+        )
+        return result
 
     # ── Tool execution ────────────────────────────────────────────────────────
 
@@ -405,7 +423,22 @@ class RelationshipManagerOrchestrator:
         try:
             arguments = json.loads(tool_call.arguments or "{}")
         except json.JSONDecodeError:
+            logger.warning(
+                "Orchestrator: failed to parse tool call arguments as JSON — using empty dict",
+                extra={"tool_name": tool_call.name, "raw_arguments": tool_call.arguments},
+            )
             arguments = {}
+
+        logger.info(
+            f">>> TOOL CALL INPUT [{tool_call.name}]",
+            extra={
+                "tool_name": tool_call.name,
+                "tool_call_id": tool_call.id,
+                "arguments": arguments,
+                "customer_id": context.get("customer_id"),
+                "question": context.get("question"),
+            },
+        )
 
         response = await tool.run(
             tool_call_id=tool_call.id,
@@ -414,13 +447,14 @@ class RelationshipManagerOrchestrator:
         )
 
         logger.info(
-            "Orchestrator: tool call completed",
+            f"<<< TOOL CALL OUTPUT [{tool_call.name}]  status={'OK' if response.successful else 'FAILED'}",
             extra={
                 "tool_name": tool_call.name,
                 "tool_call_id": tool_call.id,
                 "successful": response.successful,
-                "content_length": len(response.content),
-                "chunk_count": len(response.content_chunks or []),
+                "content_length": len(response.content or ""),
+                "content_preview": (response.content or "")[:500],
+                "error_message": response.error_message or None,
             },
         )
         return response
@@ -454,11 +488,13 @@ class RelationshipManagerOrchestrator:
 
     # ── System prompt ─────────────────────────────────────────────────────────
 
-    def _build_system_prompt(self) -> str:
+    def _build_system_prompt(self, customer_id: str) -> str:
         """Build the orchestrator system prompt with tool guidance.
 
-        Includes tool_description_for_system_prompt() from each Tool —
-        mirrors the Unique orchestrator Jinja template rendering step.
+        Includes tool_description_for_system_prompt() from each Tool and
+        embeds the current customer_id so the LLM always passes it as a
+        tool parameter.  Also includes guidance for no-data scenarios.
+        Mirrors the Unique orchestrator Jinja template rendering step.
         """
         tool_hints = "\n".join(
             f"- {tool.tool_description_for_system_prompt()}"
@@ -467,8 +503,17 @@ class RelationshipManagerOrchestrator:
         )
         prompt = (
             "You are a relationship manager orchestrator running an iterative tool loop. "
-            "Plan whether tools are needed, call available tools when required, then produce "
-            "a final concise answer. Only use facts from tool outputs — do not invent data.\n\n"
+            "Plan which tools are needed, call them, then produce a final concise answer. "
+            "Only use facts from tool outputs — do not invent data.\n\n"
+            f"Current customer ID: {customer_id}\n"
+            f"When calling any tool always pass \"customer_id\": \"{customer_id}\" in the arguments.\n\n"
+            "Handling missing or unavailable data:\n"
+            "- If a tool returns an error (customer not found, retrieval failed), acknowledge "
+            "that clearly in the final answer — do NOT retry the same failing tool.\n"
+            "- If one source is unavailable but another succeeded, summarise what is available "
+            "and note which source could not be reached.\n"
+            "- If both sources fail, respond with a helpful message explaining that no data could "
+            "be found for the given customer ID and advise verifying it.\n\n"
         )
         if tool_hints:
             prompt += f"Tool usage guidance:\n{tool_hints}\n"
@@ -524,8 +569,12 @@ class RelationshipManagerOrchestrator:
     def _combine_answers(self, agent_answers: list[AgentAnswer]) -> str:
         """Compose a fallback final answer from sub-agent outputs."""
         if not agent_answers:
-            return "I could not produce a tool-backed answer. Please try again."
-        return " ".join(answer.summary for answer in agent_answers)
+            return (
+                "I was unable to retrieve data for this customer from the available sources. "
+                "Please verify the customer ID is correct and try again. "
+                "If the issue persists, the customer record may not exist in the system."
+            )
+        return " ".join(answer.summary for answer in agent_answers if answer.summary)
 
     def _routing_from_answers(self, agent_answers: list[AgentAnswer]) -> list[str]:
         """Derive the routing decision from which agents were actually called."""

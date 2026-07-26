@@ -71,16 +71,34 @@ class UniqueToolkit:
         """
         logger.info(
             "UniqueToolkit.execute called",
-            extra={"agent_name": agent_name, "question_length": len(question)},
+            extra={
+                "agent_name": agent_name,
+                "question_length": len(question),
+                "question_preview": question[:200],
+                "context_keys": list(context.keys()),
+            },
         )
         messages = self._build_messages(prompt=prompt, question=question, context=context)
+        logger.debug(
+            "UniqueToolkit.execute: messages built",
+            extra={
+                "agent_name": agent_name,
+                "message_count": len(messages),
+                "system_prompt_length": len(messages[0]["content"]) if messages else 0,
+                "user_message_length": len(messages[1]["content"]) if len(messages) > 1 else 0,
+            },
+        )
 
         # Path 1: unique_toolkit LanguageModelService (preferred)
         toolkit_response = self._try_toolkit_completion(messages=messages)
         if toolkit_response:
             logger.info(
                 "UniqueToolkit.execute completed via unique_toolkit path",
-                extra={"agent_name": agent_name, "response_length": len(toolkit_response)},
+                extra={
+                    "agent_name": agent_name,
+                    "response_length": len(toolkit_response),
+                    "response_preview": toolkit_response[:300],
+                },
             )
             return toolkit_response
 
@@ -95,7 +113,11 @@ class UniqueToolkit:
         )
         logger.info(
             "UniqueToolkit.execute completed via unique_sdk path",
-            extra={"agent_name": agent_name, "response_length": len(result)},
+            extra={
+                "agent_name": agent_name,
+                "response_length": len(result),
+                "response_preview": result[:300],
+            },
         )
         return result
 
@@ -151,14 +173,25 @@ class UniqueToolkit:
         content = self.client._extract_completion_text(response)
         tool_calls = self.client.extract_tool_calls(response)
 
-        logger.info(
-            "UniqueToolkit.plan_with_tools completed",
-            extra={
-                "has_content": bool(content),
-                "tool_call_count": len(tool_calls),
-                "content_length": len(content or ""),
-            },
-        )
+        if tool_calls:
+            logger.info(
+                ">>> LLM planned tool calls",
+                extra={
+                    "tool_call_count": len(tool_calls),
+                    "tool_calls": [
+                        {"name": tc.get("name"), "arguments": tc.get("arguments", "{}")}
+                        for tc in tool_calls
+                    ],
+                },
+            )
+        else:
+            logger.info(
+                "UniqueToolkit.plan_with_tools: LLM returned direct answer (no tool calls)",
+                extra={
+                    "content_length": len(content or ""),
+                    "content_preview": (content or "")[:300],
+                },
+            )
 
         return {
             "content": content,
