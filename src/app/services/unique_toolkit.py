@@ -128,6 +128,7 @@ class UniqueToolkit:
         tool_definitions: list[dict[str, Any]],
         forced_tool_name: str | None = None,
         allow_tools: bool = True,
+        force_tool_use: bool = False,
     ) -> dict[str, Any]:
         """Run a planning completion that can request function tool calls.
 
@@ -149,11 +150,17 @@ class UniqueToolkit:
                     "type": "function",
                     "function": {"name": forced_tool_name},
                 }
+            elif force_tool_use:
+                # Force the LLM to call at least one tool — prevents bare direct answers
+                # on iterations where tool data is required (e.g. first iteration).
+                tool_choice = "required"
             logger.info(
                 "UniqueToolkit.plan_with_tools: calling LLM with tools enabled",
                 extra={
                     "tool_count": len(tool_definitions),
                     "forced_tool": forced_tool_name,
+                    "force_tool_use": force_tool_use,
+                    "tool_choice": tool_choice,
                     "message_count": len(messages),
                 },
             )

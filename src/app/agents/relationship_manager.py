@@ -182,9 +182,13 @@ class RelationshipManagerOrchestrator:
 
             # ── Planning step ──────────────────────────────────────────────────
             logger.info("Orchestrator: planning step — calling LLM with tool definitions")
+            # On the first iteration (no tools called yet) force tool_choice="required"
+            # so the LLM cannot skip tools and return a bare answer.
+            force_first_call = (iteration_index == 0 and len(all_agent_answers) == 0)
             planning_result = await self._plan_iteration(
                 history_messages=messages,
                 tool_definitions=tool_definitions,
+                force_tool_use=force_first_call,
             )
 
             raw_tool_calls = planning_result.get("tool_calls", [])
@@ -348,6 +352,7 @@ class RelationshipManagerOrchestrator:
         *,
         history_messages: list[dict[str, Any]],
         tool_definitions: list[dict[str, Any]],
+        force_tool_use: bool = False,
     ) -> dict[str, Any]:
         """Call the LLM to plan which tools to invoke.
 
@@ -358,12 +363,14 @@ class RelationshipManagerOrchestrator:
             extra={
                 "message_count": len(history_messages),
                 "tool_definition_names": [td["function"]["name"] for td in tool_definitions],
+                "force_tool_use": force_tool_use,
             },
         )
         result = self.unique_toolkit.plan_with_tools(
             messages=history_messages,
             tool_definitions=tool_definitions,
             allow_tools=True,
+            force_tool_use=force_tool_use,
         )
         tool_calls_returned = result.get("tool_calls", [])
         content_returned = result.get("content") or ""
@@ -507,6 +514,12 @@ class RelationshipManagerOrchestrator:
             "Only use facts from tool outputs — do not invent data.\n\n"
             f"Current customer ID: {customer_id}\n"
             f"When calling any tool always pass \"customer_id\": \"{customer_id}\" in the arguments.\n\n"
+            "CRITICAL — tool call requirement:\n"
+            "- You MUST call at least one tool before answering. Never answer directly from memory.\n"
+            "- For broad or general questions (e.g. 'what details do you have about me', "
+            "'tell me about this customer', 'give me a summary', 'what do you know'), "
+            "you MUST call BOTH portfolio_agent AND crm_agent.\n"
+            "- Only produce a final answer AFTER tool results have been returned.\n\n"
             "Handling missing or unavailable data:\n"
             "- If a tool returns an error (customer not found, retrieval failed), acknowledge "
             "that clearly in the final answer — do NOT retry the same failing tool.\n"
