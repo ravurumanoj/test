@@ -318,7 +318,7 @@ class HistoryManager:
                     "roles_breakdown": {r: sum(1 for m in full_history if m.get("role") == r) for r in {"system", "user", "assistant", "tool"}},
                 },
             )
-            return full_history
+            return self._sanitize_for_backend(full_history)
 
         # Loop Token Reducer — keep all system messages, trim oldest non-system
         system_messages = [m for m in full_history if m.get("role") == "system"]
@@ -341,7 +341,46 @@ class HistoryManager:
                 "original_estimated_tokens": estimated_tokens,
             },
         )
-        return result
+        return self._sanitize_for_backend(result)
+
+    def _sanitize_for_backend(self, messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Convert internal OpenAI-style history into Unique-backend-safe messages.
+
+        The Unique ChatCompletion API (x-api-version 2023-12-06) only accepts
+        messages with role in {system, user, assistant} and a plain ``content``
+        string. It rejects OpenAI multi-turn tool-calling shapes
+        (``role: "tool"`` messages and assistant ``tool_calls`` arrays) with a
+        400 "invalid request params" error.
+
+        To keep the agentic loop working on this backend, tool interactions are
+        flattened into plain text, all attributed to the assistant so the model
+        treats them as context it already gathered (rather than a new user turn,
+        which would cause it to re-plan and call tools again):
+          - assistant messages carrying ``tool_calls`` become a short assistant
+            note naming the tools (the ``tool_calls`` key is dropped);
+          - ``role: "tool"`` result messages become ``assistant`` messages that
+            present the retrieved data as context for the final answer.
+        """
+        safe: list[dict[str, Any]] = []
+        for msg in messages:
+            role = msg.get("role")
+            if role == "tool":
+                safe.append(
+                    {
+                        "role": "assistant",
+                        "content": f"Retrieved tool data:\n{msg.get('content', '') or ''}",
+                    }
+                )
+            elif role == "assistant" and msg.get("tool_calls"):
+                names = ", ".join(
+                    tc.get("function", {}).get("name", "") for tc in msg.get("tool_calls", [])
+                )
+                content = msg.get("content") or f"Calling tools to gather data: {names}."
+                safe.append({"role": "assistant", "content": content})
+            elif role in {"system", "user", "assistant"}:
+                safe.append({"role": role, "content": msg.get("content", "") or ""})
+            # Any other/unknown role is dropped so the backend never sees it.
+        return safe
 
     # ── Tool call persistence ─────────────────────────────────────────────────
 
