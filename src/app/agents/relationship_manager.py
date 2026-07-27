@@ -182,13 +182,9 @@ class RelationshipManagerOrchestrator:
 
             # ── Planning step ──────────────────────────────────────────────────
             logger.info("Orchestrator: planning step — calling LLM with tool definitions")
-            # On the first iteration (no tools called yet) force tool_choice="required"
-            # so the LLM cannot skip tools and return a bare answer.
-            force_first_call = (iteration_index == 0 and len(all_agent_answers) == 0)
             planning_result = await self._plan_iteration(
                 history_messages=messages,
                 tool_definitions=tool_definitions,
-                force_tool_use=force_first_call,
             )
 
             raw_tool_calls = planning_result.get("tool_calls", [])
@@ -204,6 +200,22 @@ class RelationshipManagerOrchestrator:
                     "tool_names": [tc.name for tc in tool_calls],
                 },
             )
+
+            if not tool_calls:
+                # The LLM declined to call tools. On the FIRST pass this is almost
+                # always wrong (the configured api_version 2023-12-06 cannot force
+                # tool_choice="required", so we cannot rely on the model). Fall back
+                # to deterministic keyword routing so customer data is always fetched.
+                if iteration_index == 0 and not all_agent_answers:
+                    tool_calls = self._deterministic_tool_calls(
+                        customer_id=request.customer_id,
+                        question=request.question,
+                    )
+                    logger.info(
+                        "Orchestrator: LLM returned no tool calls on first pass — "
+                        "applying deterministic routing fallback",
+                        extra={"routed_tools": [tc.name for tc in tool_calls]},
+                    )
 
             if not tool_calls:
                 # No tools requested — LLM produced a direct final answer
@@ -352,7 +364,6 @@ class RelationshipManagerOrchestrator:
         *,
         history_messages: list[dict[str, Any]],
         tool_definitions: list[dict[str, Any]],
-        force_tool_use: bool = False,
     ) -> dict[str, Any]:
         """Call the LLM to plan which tools to invoke.
 
@@ -363,14 +374,12 @@ class RelationshipManagerOrchestrator:
             extra={
                 "message_count": len(history_messages),
                 "tool_definition_names": [td["function"]["name"] for td in tool_definitions],
-                "force_tool_use": force_tool_use,
             },
         )
         result = self.unique_toolkit.plan_with_tools(
             messages=history_messages,
             tool_definitions=tool_definitions,
             allow_tools=True,
-            force_tool_use=force_tool_use,
         )
         tool_calls_returned = result.get("tool_calls", [])
         content_returned = result.get("content") or ""
@@ -546,6 +555,61 @@ class RelationshipManagerOrchestrator:
             parsed.append(ToolCall(id=call_id, name=name, arguments=arguments))
         logger.debug("Orchestrator: tool calls parsed", extra={"count": len(parsed)})
         return parsed
+
+    def _deterministic_tool_calls(self, *, customer_id: str, question: str) -> list[ToolCall]:
+        """Choose tool(s) by keyword when the LLM declines to call any.
+
+        Acts as a reliable fallback because the configured Unique api_version
+        (2023-12-06) cannot force tool_choice="required". Ensures customer data
+        is always fetched:
+          - portfolio keywords → portfolio_agent
+          - CRM keywords       → crm_agent
+          - broad / ambiguous  → BOTH agents
+        The customer_id is always injected into the arguments so the tools run.
+        """
+        text = question.lower()
+
+        portfolio_keywords = (
+            "portfolio", "holding", "holdings", "invest", "investment", "asset",
+            "allocation", "return", "returns", "p&l", "pnl", "profit", "loss",
+            "risk", "sharpe", "alpha", "aum", "performance", "position",
+            "equity", "equities", "fund", "funds", "stock", "stocks", "bond",
+            "bonds", "nav", "valuation", "gain", "gains", "yield",
+        )
+        crm_keywords = (
+            "crm", "interaction", "interactions", "service", "request", "ticket",
+            "compliance", "flag", "advisory", "suggestion", "nps", "churn",
+            "alert", "alerts", "profile", "kyc", "segment", "satisfaction",
+            "tenure", "relationship manager", "follow-up", "follow up", "meeting",
+            "call", "email", "complaint", "note", "notes",
+        )
+
+        wants_portfolio = any(kw in text for kw in portfolio_keywords)
+        wants_crm = any(kw in text for kw in crm_keywords)
+
+        if wants_portfolio and not wants_crm:
+            target_names = [self.portfolio_agent.name]
+        elif wants_crm and not wants_portfolio:
+            target_names = [self.crm_agent.name]
+        else:
+            # Broad, ambiguous, or mixed question — fetch everything.
+            target_names = [self.portfolio_agent.name, self.crm_agent.name]
+
+        arguments = json.dumps({"customer_id": customer_id})
+        calls = [
+            ToolCall(id=f"deterministic_{index}_{name}", name=name, arguments=arguments)
+            for index, name in enumerate(target_names)
+            if name in self._tools and self._tools[name].is_enabled()
+        ]
+        logger.info(
+            "Orchestrator: deterministic routing selected tools",
+            extra={
+                "wants_portfolio": wants_portfolio,
+                "wants_crm": wants_crm,
+                "selected_tools": [c.name for c in calls],
+            },
+        )
+        return calls
 
     def _filter_duplicate_tool_calls(self, tool_calls: list[ToolCall]) -> list[ToolCall]:
         """Remove duplicate (name, arguments) pairs.

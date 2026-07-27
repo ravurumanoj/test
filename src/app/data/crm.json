@@ -292,7 +292,7 @@
         "key_points_discussed": [
           "YTD return: 21.5% vs benchmark 15.8%",
           "Parag Parikh Flexi Cap Fund up 31.6%",
-          "Portfolio beta 1.08 — slightly elevated",
+          "Portfolio beta 1.08 â€” slightly elevated",
           "Interest in international equity via FOF"
         ],
         "outcome": "Client satisfied; rebalancing proposal to be sent",
@@ -303,7 +303,7 @@
           "Prepare rebalancing plan to reduce beta to 0.95",
           "Research international FOF options (Motilal, Mirae, PGIM)"
         ],
-        "rm_notes": "Client is tech professional — understands financial concepts well, prefers data-driven recommendations"
+        "rm_notes": "Client is tech professional â€” understands financial concepts well, prefers data-driven recommendations"
       },
       {
         "conversation_id": "CONV-10020002",
@@ -332,11 +332,11 @@
         "channel": "phone",
         "duration_minutes": 25,
         "topic": "Year-End Tax Planning",
-        "summary": "Reviewed tax position for FY2025-26. STCG of INR 55,000 and LTCG of INR 120,000 identified. No tax loss harvesting opportunity available. Discussed Section 80C — client has fully utilised through EPF and PPF. Silver ETF gains discussed.",
+        "summary": "Reviewed tax position for FY2025-26. STCG of INR 55,000 and LTCG of INR 120,000 identified. No tax loss harvesting opportunity available. Discussed Section 80C â€” client has fully utilised through EPF and PPF. Silver ETF gains discussed.",
         "sentiment": "neutral",
         "key_points_discussed": [
-          "STCG INR 55,000 — tax INR 11,000",
-          "LTCG INR 120,000 — tax INR 15,000",
+          "STCG INR 55,000 â€” tax INR 11,000",
+          "LTCG INR 120,000 â€” tax INR 15,000",
           "80C fully utilised via EPF and PPF",
           "No tax harvesting opportunity"
         ],
@@ -344,7 +344,7 @@
         "follow_up_required": false,
         "follow_up_date": null,
         "action_items": [],
-        "rm_notes": "Client has strong financial discipline — EPF, PPF, and now PMS all funded from salary"
+        "rm_notes": "Client has strong financial discipline â€” EPF, PPF, and now PMS all funded from salary"
       }
     ],
     "suggestions_provided": [
@@ -391,7 +391,7 @@
         "date": "2026-03-15",
         "type": "risk_review",
         "category": "portfolio_risk",
-        "description": "Annual risk profile review — current profile moderate-aggressive remains appropriate.",
+        "description": "Annual risk profile review â€” current profile moderate-aggressive remains appropriate.",
         "rationale": "Client income stable, investment horizon 5-7 years, risk tolerance unchanged. No profile upgrade/downgrade needed.",
         "suggested_amount": null,
         "status": "accepted",
@@ -429,7 +429,7 @@
     ],
     "alerts": [
       "Follow-up due 25-Jul-2026: Send rebalancing proposal and international FOF options",
-      "Portfolio beta 1.08 — slightly above moderate-aggressive target of 1.0"
+      "Portfolio beta 1.08 â€” slightly above moderate-aggressive target of 1.0"
     ]
   },
   {

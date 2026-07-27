@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import codecs
 import json
 import logging
 from pathlib import Path
@@ -13,6 +14,30 @@ from app.errors import DataAccessError
 logger = logging.getLogger(__name__)
 
 _DATA_DIR = Path(__file__).parent.parent / "data"
+
+
+def _cp1252_fallback(error: UnicodeDecodeError) -> tuple[str, int]:
+    """Decode bytes that are invalid UTF-8 as Windows-1252 instead.
+
+    Some data files were saved with mixed encoding: most characters are valid
+    UTF-8 (e.g. an em dash stored as E2 80 94) but a few stray bytes come from
+    Windows-1252 (e.g. 0x97, also an em dash). Strict UTF-8 decoding raises
+    UnicodeDecodeError on those stray bytes. This error handler maps each
+    offending byte through cp1252 so valid UTF-8 is preserved and stray bytes
+    are still recovered to the intended character.
+    """
+    bad_bytes = error.object[error.start:error.end]
+    return bad_bytes.decode("cp1252", errors="replace"), error.end
+
+
+codecs.register_error("cp1252_fallback", _cp1252_fallback)  # type: ignore[arg-type]
+
+
+def _decode_bytes(raw: bytes) -> str:
+    """Decode file bytes as UTF-8, recovering stray Windows-1252 bytes."""
+    text = raw.decode("utf-8", errors="cp1252_fallback")
+    # Strip a UTF-8 BOM if present so json.loads never sees a leading \ufeff.
+    return text.lstrip("\ufeff")
 
 
 class JsonDataLoader:
@@ -27,16 +52,22 @@ class JsonDataLoader:
         file_path = self.base_path / filename
         logger.info("Loading JSON data", extra={"file_path": str(file_path)})
         try:
-            return json.loads(file_path.read_text(encoding="utf-8"))
+            raw = file_path.read_bytes()
         except FileNotFoundError as exc:
             logger.exception("JSON data file not found")
             raise DataAccessError("Required data file was not found.", {"file_path": str(file_path)}) from exc
-        except json.JSONDecodeError as exc:
-            logger.exception("JSON data file is invalid")
-            raise DataAccessError("Data file contains invalid JSON.", {"file_path": str(file_path)}) from exc
         except OSError as exc:
             logger.exception("JSON data file could not be read")
             raise DataAccessError("Data file could not be read.", {"file_path": str(file_path)}) from exc
+
+        try:
+            return json.loads(_decode_bytes(raw))
+        except json.JSONDecodeError as exc:
+            logger.exception("JSON data file is invalid")
+            raise DataAccessError("Data file contains invalid JSON.", {"file_path": str(file_path)}) from exc
+        except (UnicodeDecodeError, ValueError) as exc:
+            logger.exception("JSON data file could not be decoded")
+            raise DataAccessError("Data file could not be decoded.", {"file_path": str(file_path)}) from exc
 
 
 class BaseDataTools:
