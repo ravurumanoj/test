@@ -19,6 +19,7 @@ from app.logging_config import configure_logging
 from app.settings import Settings
 from app.services.unique_client import UniqueAIClient
 from app.services.unique_toolkit import UniqueToolkit
+from app.services.mcp_manager import McpManager
 
 configure_logging()
 logger = logging.getLogger(__name__)
@@ -26,8 +27,25 @@ settings = Settings.from_env()
 
 unique_client = UniqueAIClient(settings=settings)
 unique_toolkit = UniqueToolkit(client=unique_client)
+
+# ── MCP Manager wiring (optional) ────────────────────────────────────────────
+# Constructed only when an MCP server URL is configured (MCP_SERVER_URL). When
+# disabled, mcp_manager stays None and the CRM agent runs exactly as before.
+mcp_manager: McpManager | None = None
+if settings.mcp_enabled and settings.mcp_server_url:
+	mcp_manager = McpManager(
+		server_url=settings.mcp_server_url,
+		auth_header=settings.mcp_auth_header,
+		auth_value=settings.mcp_auth_value,
+		timeout_seconds=settings.mcp_timeout_seconds,
+		protocol_version=settings.mcp_protocol_version,
+	)
+	logger.info("MCP Manager enabled", extra={"mcp_server_url": settings.mcp_server_url})
+else:
+	logger.info("MCP Manager disabled (no MCP_SERVER_URL configured)")
+
 portfolio_agent = PortfolioAgent(unique_toolkit=unique_toolkit)
-crm_agent = CrmAgent(unique_toolkit=unique_toolkit)
+crm_agent = CrmAgent(unique_toolkit=unique_toolkit, mcp_manager=mcp_manager)
 orchestrator = RelationshipManagerOrchestrator(
 	portfolio_agent=portfolio_agent,
 	crm_agent=crm_agent,

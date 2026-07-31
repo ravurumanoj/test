@@ -48,3 +48,17 @@ class RoutingError(AppError):
     def __init__(self, message: str, details: dict[str, Any] | None = None) -> None:
         """Initialize an orchestrator routing error."""
         super().__init__(message=message, error_code="ROUTING_ERROR", status_code=400, details=details)
+
+
+class McpIntegrationError(AppError):
+    """Raised when a Model Context Protocol (MCP) server call fails.
+
+    Kept separate from UniqueIntegrationError so MCP transport/protocol failures
+    are attributable to the external MCP server rather than the Unique AI SDK.
+    Callers (e.g. CrmAgent) catch this and degrade gracefully so a misconfigured
+    or unreachable MCP server never breaks the core CRM flow.
+    """
+
+    def __init__(self, message: str, details: dict[str, Any] | None = None) -> None:
+        """Initialize an MCP integration error."""
+        super().__init__(message=message, error_code="MCP_INTEGRATION_ERROR", status_code=502, details=details)

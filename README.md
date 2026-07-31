@@ -151,6 +151,7 @@ After the server starts:
 
 Example orchestrator request:
 
+
 ```json
 {
     "customer_id": "CUST-1001",
@@ -249,4 +250,95 @@ Returns `HTTP 404` when the customer ID is not found.
 | Quality checks | `EvaluationManager` + `Evaluation` abstract class |
 | Response enrichment | `PostprocessorManager` + `Postprocessor` abstract class |
 | Debug exposure | `DebugInfoManager.add() / get()` |
+
+---
+
+## MCP integration (CRM agent)
+
+The **CRM agent** can enrich its answer with data pulled from an external **MCP (Model
+Context Protocol) server** — for example a local server you run separately. This mirrors
+the Unique Toolkit *Tool Manager → MCP source* concept: MCP tools are discovered and
+called alongside the built-in tools, and their output flows into the same
+`ToolCallResponse` pipeline (summary + citations + debug info).
+
+MCP is **fully optional and additive**. When no MCP server URL is configured, the CRM
+agent behaves exactly as before.
+
+### How it works
+
+```
+CrmAgent.run()
+    │  1. fetch local CRM data (crm.json)                     ← unchanged
+    │  2. _augment_with_mcp(customer_id, question)            ← NEW, only if MCP configured
+    │        ├─ McpManager.list_tools()   → tools/list  (discover ALL tools on your server)
+    │        └─ McpManager.call_tool(...) → tools/call  (invoke each discovered tool)
+    │  3. merge MCP output into the LLM summarization context
+    │  4. add MCP results as citable ContentChunks + debug_info
+    ▼
+ToolCallResponse (content + content_chunks + debug_info)
+```
+
+The MCP client lives in a **separate service**, `src/app/services/mcp_manager.py`
+(`McpManager`). It speaks JSON-RPC 2.0 over the **Streamable HTTP** transport using only
+the Python standard library (`urllib`), so it adds **no new runtime dependency**. It
+handles both `application/json` and `text/event-stream` (SSE) responses and performs the
+MCP handshake (`initialize` → `notifications/initialized`) once, caching the session.
+
+### Configuration
+
+Set these environment variables (in `.env` or the shell). **Only `MCP_SERVER_URL` is
+required** — that is the one place you point the app at your MCP server:
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `MCP_SERVER_URL` | **Yes** (to enable MCP) | *(empty)* | Full URL + path of your MCP endpoint, e.g. `http://localhost:8000/mcp` |
+| `MCP_ENABLED` | No | `auto` | `auto` enables MCP whenever a URL is set. Force with `true`/`false` |
+| `MCP_AUTH_HEADER` | No | *(empty)* | Auth header name, e.g. `Authorization`. Omit if your server has no auth |
+| `MCP_AUTH_VALUE` | No | *(empty)* | Auth header value, e.g. `Bearer <token>`. Omit if your server has no auth |
+| `MCP_TIMEOUT_SECONDS` | No | `30` | Per-request timeout |
+| `MCP_PROTOCOL_VERSION` | No | `2025-06-18` | MCP protocol version sent during `initialize` |
+
+**Local, no-auth example** (leave the auth vars unset — no auth header is sent):
+
+```bash
+MCP_SERVER_URL=http://localhost:8000/mcp
+```
+
+### Working with your MCP tools
+
+- **You do NOT redefine your tools here.** They are discovered at runtime via
+  `tools/list`. Your tool definitions stay in one place: your MCP server.
+- **Different tools work automatically.** Add/remove tools on your server and they are
+  picked up with zero code changes.
+- **Argument filtering.** The CRM agent passes `{"customer_id", "question"}` to each
+  tool. `McpManager` automatically drops any argument a tool's `inputSchema` does not
+  declare, so a tool that only wants `customer_id` won't break on the extra `question`.
+  > If your tools expect a different key name (e.g. `id` or `client_id`), that key must
+  > be provided — otherwise the filter drops `customer_id` and the tool receives no
+  > useful argument.
+- **Call all vs. one tool.** By default every discovered tool is called. To pin the CRM
+  agent to a single tool, set `mcp_tool_name` on `CrmAgentConfig` in
+  `src/app/agents/crm_agent.py` (e.g. `mcp_tool_name = "get_customer_risk"`).
+
+### Fail-soft guarantee
+
+Any MCP failure (server down, timeout, bad response) is caught inside the CRM agent,
+logged, and reported via `debug_info["mcp_error"]`. The core CRM answer is always
+returned — a misconfigured or unreachable MCP server can never break the request.
+
+### Where each piece lives
+
+| Concern | File |
+|---|---|
+| MCP client / protocol | `src/app/services/mcp_manager.py` (`McpManager`) |
+| MCP config (URL, auth, timeout) | `src/app/settings.py` |
+| MCP error type | `src/app/errors.py` (`McpIntegrationError`) |
+| CRM enrichment logic | `src/app/agents/crm_agent.py` (`_augment_with_mcp`) |
+| Manager wiring (startup) | `src/app/main.py` |
+
+### Related debug fields
+
+When MCP runs, the response `debug_info` includes: `mcp_enabled`,
+`mcp_discovered_tools`, `mcp_called_tools`, and `mcp_error` (null on success).
+
 

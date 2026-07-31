@@ -31,10 +31,33 @@ class Settings:
     unique_agent_max_iterations: int
     unique_max_tool_calls_per_iteration: int
     unique_max_history_tokens: int
+    # ── MCP (Model Context Protocol) integration ─────────────────────────────
+    # All MCP settings are OPTIONAL. When mcp_server_url is empty the MCP
+    # Manager is disabled and the application behaves exactly as before.
+    mcp_enabled: bool
+    mcp_server_url: str
+    mcp_auth_header: str
+    mcp_auth_value: str
+    mcp_timeout_seconds: int
+    mcp_protocol_version: str
 
     @classmethod
     def from_env(cls) -> "Settings":
         """Build settings from environment variables with safe defaults."""
+        # ── MCP enablement resolution ────────────────────────────────────────
+        # Set MCP_SERVER_URL to point the app at YOUR running MCP server. This is
+        # the ONLY value you must change to connect a different MCP server.
+        # MCP_ENABLED accepts: true/false/1/0/yes/no/on/off, or "auto" (default)
+        # which enables MCP automatically whenever MCP_SERVER_URL is provided.
+        mcp_server_url = os.getenv("MCP_SERVER_URL", "").strip()
+        mcp_enabled_flag = os.getenv("MCP_ENABLED", "auto").strip().lower()
+        if mcp_enabled_flag in ("1", "true", "yes", "on"):
+            mcp_enabled = True
+        elif mcp_enabled_flag in ("0", "false", "no", "off"):
+            mcp_enabled = False
+        else:  # "auto" — enable only when a server URL is configured
+            mcp_enabled = bool(mcp_server_url)
+
         return cls(
             app_name=os.getenv("APP_NAME", "relationship-manager-agentic-rag-poc"),
             app_env=os.getenv("APP_ENV", "local"),
@@ -49,4 +72,13 @@ class Settings:
             unique_agent_max_iterations=int(os.getenv("UNIQUE_AGENT_MAX_ITERATIONS", "3")),
             unique_max_tool_calls_per_iteration=int(os.getenv("UNIQUE_MAX_TOOL_CALLS_PER_ITERATION", "3")),
             unique_max_history_tokens=int(os.getenv("UNIQUE_MAX_HISTORY_TOKENS", "6000")),
+            # ── MCP integration (see resolution logic above) ─────────────────
+            mcp_enabled=mcp_enabled,
+            mcp_server_url=mcp_server_url,
+            # Optional auth header sent on every MCP request, e.g.
+            #   MCP_AUTH_HEADER=Authorization  MCP_AUTH_VALUE="Bearer <token>"
+            mcp_auth_header=os.getenv("MCP_AUTH_HEADER", "").strip(),
+            mcp_auth_value=os.getenv("MCP_AUTH_VALUE", "").strip(),
+            mcp_timeout_seconds=int(os.getenv("MCP_TIMEOUT_SECONDS", "30")),
+            mcp_protocol_version=os.getenv("MCP_PROTOCOL_VERSION", "2025-06-18").strip(),
         )
