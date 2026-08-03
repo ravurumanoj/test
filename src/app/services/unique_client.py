@@ -215,14 +215,21 @@ class UniqueAIClient:
         return ""
 
     def extract_tool_calls(self, result: dict[str, Any]) -> list[dict[str, Any]]:
-        """Extract OpenAI-compatible tool calls from a completion payload."""
+        """Extract OpenAI-compatible tool calls from a completion payload.
+
+        The Unique SDK / Azure OpenAI backend can return tool calls under either
+        ``tool_calls`` (snake_case, OpenAI spec) or ``toolCalls`` (camelCase, as
+        observed in raw SDK responses).  Both are checked so tool intent is never
+        silently dropped regardless of which serialisation the backend uses.
+        """
         choices = result.get("choices", [])
         if not isinstance(choices, list) or not choices:
             return []
         message = choices[0].get("message", {}) if isinstance(choices[0], dict) else {}
         if not isinstance(message, dict):
             return []
-        tool_calls = message.get("tool_calls", [])
+        # Prefer snake_case (OpenAI spec); fall back to camelCase (Unique SDK raw response).
+        tool_calls = message.get("tool_calls") or message.get("toolCalls") or []
         if not isinstance(tool_calls, list):
             return []
         normalized: list[dict[str, Any]] = []
@@ -246,7 +253,12 @@ class UniqueAIClient:
         return normalized
 
     def _extract_from_dict(self, result: dict[str, Any]) -> str:
-        """Extract assistant text from an OpenAI-style completion payload."""
+        """Extract assistant text from an OpenAI-style completion payload.
+
+        Returns an empty string when the response is a tool-call-only response
+        (``content`` is null/absent), which is correct — the caller will then
+        detect tool calls via ``extract_tool_calls``.
+        """
         choices = result.get("choices", [])
         if not isinstance(choices, list) or not choices:
             return ""

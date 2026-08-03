@@ -45,12 +45,13 @@ else:
 	logger.info("MCP Manager disabled (no MCP_SERVER_URL configured)")
 
 portfolio_agent = PortfolioAgent(unique_toolkit=unique_toolkit)
-crm_agent = CrmAgent(unique_toolkit=unique_toolkit, mcp_manager=mcp_manager)
+crm_agent = CrmAgent(unique_toolkit=unique_toolkit)  # MCP now handled at orchestrator level
 orchestrator = RelationshipManagerOrchestrator(
 	portfolio_agent=portfolio_agent,
 	crm_agent=crm_agent,
 	unique_toolkit=unique_toolkit,
 	settings=settings,
+	mcp_manager=mcp_manager,  # MCP tools discovered and exposed to LLM on first request
 )
 
 app = FastAPI(title=settings.app_name)

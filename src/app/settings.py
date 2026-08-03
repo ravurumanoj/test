@@ -51,12 +51,12 @@ class Settings:
         # which enables MCP automatically whenever MCP_SERVER_URL is provided.
         mcp_server_url = os.getenv("MCP_SERVER_URL", "").strip()
         mcp_enabled_flag = os.getenv("MCP_ENABLED", "auto").strip().lower()
+        # Default ("auto"): enable MCP only when a server URL is configured.
+        mcp_enabled = bool(mcp_server_url)
         if mcp_enabled_flag in ("1", "true", "yes", "on"):
             mcp_enabled = True
         elif mcp_enabled_flag in ("0", "false", "no", "off"):
             mcp_enabled = False
-        else:  # "auto" — enable only when a server URL is configured
-            mcp_enabled = bool(mcp_server_url)
 
         return cls(
             app_name=os.getenv("APP_NAME", "relationship-manager-agentic-rag-poc"),

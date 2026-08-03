@@ -31,13 +31,17 @@ import asyncio
 import json
 import logging
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from app.agents.base_tool import Tool
 from app.agents.crm_agent import CrmAgent
+from app.agents.mcp_tool_wrapper import MCP_TOOL_PREFIX, McpToolWrapper
 from app.agents.portfolio_agent import PortfolioAgent
 from app.errors import RoutingError
-from app.schemas import AgentAnswer, EvaluationMetricResult, RelationshipManagerRequest, RelationshipManagerResponse, ToolCallResponse
+from app.schemas import AgentAnswer, ConversationTurn, EvaluationMetricResult, RelationshipManagerRequest, RelationshipManagerResponse, ToolCallResponse
+
+if TYPE_CHECKING:
+    from app.services.mcp_manager import McpManager
 from app.services.managers import (
     DebugInfoManager,
     EvaluationManager,
@@ -79,17 +83,77 @@ class RelationshipManagerOrchestrator:
         crm_agent: CrmAgent,
         unique_toolkit: UniqueToolkit,
         settings: Settings,
+        mcp_manager: "McpManager | None" = None,
     ) -> None:
-        """Initialize orchestrator with sub-agent tools and runtime settings."""
+        """Initialize orchestrator with sub-agent tools and runtime settings.
+
+        Args:
+            portfolio_agent: Sub-agent for portfolio/financial data.
+            crm_agent:       Sub-agent for CRM/interaction data.
+            unique_toolkit:  Facade over the Unique AI SDK.
+            settings:        Runtime settings.
+            mcp_manager:     Optional MCP Manager.  When provided and configured,
+                             MCP tools are discovered at runtime and exposed to the
+                             LLM as additional function definitions alongside the
+                             built-in sub-agents.  The LLM generates arguments from
+                             each tool's own schema — no hardcoding required.
+        """
         self.portfolio_agent = portfolio_agent
         self.crm_agent = crm_agent
         self.unique_toolkit = unique_toolkit
         self.settings = settings
+        self._mcp_manager = mcp_manager
         # Tool registry — mirrors ToolManager.get_tools()
+        # MCP tools are added lazily on the first request via _ensure_mcp_tools_loaded.
         self._tools: dict[str, Tool] = {
             portfolio_agent.name: portfolio_agent,
             crm_agent.name: crm_agent,
         }
+        self._mcp_tools_discovered: bool = False  # set True after first discovery attempt
+
+    async def _ensure_mcp_tools_loaded(self) -> None:
+        """Discover MCP tools on the first request and add them to the tool registry.
+
+        This is the standard MCP integration pattern: tools are discovered from
+        the live server, their schemas are passed verbatim to the LLM as function
+        definitions, and the LLM generates correct arguments itself.
+
+        Called once per orchestrator instance (idempotent after first success).
+        Failures are caught and logged — the app continues without MCP tools rather
+        than crashing.
+        """
+        if self._mcp_tools_discovered:
+            return
+        self._mcp_tools_discovered = True  # mark before await to avoid races
+
+        if self._mcp_manager is None or not self._mcp_manager.is_configured:
+            logger.info("Orchestrator: MCP manager not configured — skipping tool discovery")
+            return
+
+        try:
+            mcp_tools = await self._mcp_manager.list_tools()
+            for tool_info in mcp_tools:
+                wrapper = McpToolWrapper(tool_info, self._mcp_manager)
+                self._tools[wrapper.name] = wrapper
+                logger.debug(
+                    "Orchestrator: MCP tool registered",
+                    extra={"orchestrator_name": wrapper.name, "mcp_name": tool_info.name},
+                )
+            logger.info(
+                "Orchestrator: MCP tools discovered and registered",
+                extra={
+                    "mcp_tool_count": len(mcp_tools),
+                    "mcp_tool_names": [t.name for t in mcp_tools],
+                    "orchestrator_names": [f"{MCP_TOOL_PREFIX}{t.name}" for t in mcp_tools],
+                    "total_tools_now": len(self._tools),
+                    "all_tool_names": list(self._tools.keys()),
+                },
+            )
+        except Exception as exc:
+            logger.warning(
+                "Orchestrator: MCP tool discovery failed — proceeding without MCP tools",
+                extra={"error": str(exc), "mcp_server_url": getattr(self._mcp_manager, "_server_url", "unknown")},
+            )
 
     async def handle_request(self, request: RelationshipManagerRequest) -> RelationshipManagerResponse:
         """Run the iterative plan-and-execute loop aligned with Unique orchestrator semantics.
@@ -101,6 +165,9 @@ class RelationshipManagerOrchestrator:
             "Orchestrator: request received",
             extra={"customer_id": request.customer_id, "question": request.question},
         )
+
+        # Discover MCP tools on first request (idempotent, fails soft).
+        await self._ensure_mcp_tools_loaded()
 
         # ── Manager initialization (fresh per request) ────────────────────────
         history_manager = HistoryManager(max_token_budget=self.settings.unique_max_history_tokens)
@@ -117,18 +184,68 @@ class RelationshipManagerOrchestrator:
 
         logger.info("Orchestrator: all managers initialized and configured")
 
-        # ── Fresh session check — mirrors orchestrator startup indicator ────────
-        if history_manager.has_no_loop_messages():
+        # ── Fresh session vs continuing conversation ──────────────────────────
+        is_fresh_session = not bool(request.chat_history)
+        if is_fresh_session:
             logger.info(
-                "Orchestrator: fresh session detected — starting agentic loop",
+                "Orchestrator: fresh session detected — no prior history",
                 extra={"customer_id": request.customer_id},
             )
+        else:
+            logger.info(
+                "Orchestrator: resuming conversation — prior history present",
+                extra={
+                    "customer_id": request.customer_id,
+                    "prior_turns_count": len(request.chat_history),
+                    "roles_in_history": [t.role for t in request.chat_history],
+                },
+            )
 
-        # ── Seed history with system prompt and user message ──────────────────
+        # ── Seed history: system → prior turns → current question ─────────────
         system_prompt = self._build_system_prompt(request.customer_id)
         history_manager.add_system_message(system_prompt)
-        history_manager.add_user_message(request.question)
-        logger.debug("Orchestrator: initial history seeded", extra={"system_prompt_length": len(system_prompt)})
+        logger.debug(
+            "Orchestrator: system message added to history",
+            extra={"system_prompt_length": len(system_prompt)},
+        )
+
+        # Load prior conversation turns BEFORE the current question so the LLM
+        # has full context of what was already discussed in this session.
+        if request.chat_history:
+            loaded_user = 0
+            loaded_assistant = 0
+            for turn in request.chat_history:
+                if turn.role == "user":
+                    history_manager.add_user_message(turn.content, source="history")
+                    loaded_user += 1
+                elif turn.role == "assistant":
+                    history_manager.add_assistant_message(turn.content, source="history")
+                    loaded_assistant += 1
+            logger.info(
+                "Orchestrator: prior conversation history loaded into HistoryManager",
+                extra={
+                    "user_turns_loaded": loaded_user,
+                    "assistant_turns_loaded": loaded_assistant,
+                    "total_turns_loaded": loaded_user + loaded_assistant,
+                    "last_user_preview": next(
+                        (t.content[:120] for t in reversed(request.chat_history) if t.role == "user"),
+                        None,
+                    ),
+                    "last_assistant_preview": next(
+                        (t.content[:120] for t in reversed(request.chat_history) if t.role == "assistant"),
+                        None,
+                    ),
+                },
+            )
+        else:
+            logger.info("Orchestrator: no prior history to load — starting fresh")
+
+        # Add the current user question as the newest message
+        history_manager.add_user_message(request.question, source="current")
+        logger.debug(
+            "Orchestrator: current user question added to history",
+            extra={"question_length": len(request.question), "question_preview": request.question[:120]},
+        )
 
         # ── Build tool definitions from registered Tool instances ──────────────
         tool_definitions = self._get_tool_definitions()
@@ -142,6 +259,7 @@ class RelationshipManagerOrchestrator:
         final_answer: str = ""
         evaluation_results: list[EvaluationMetricResult] = []
         iteration_index: int = 0  # initialized so post-loop reference is always defined
+        total_tool_calls_executed: int = 0  # counts ALL tools (portfolio, crm, mcp__*)
         context: dict[str, Any] = {
             "customer_id": request.customer_id,
             "question": request.question,
@@ -154,7 +272,9 @@ class RelationshipManagerOrchestrator:
                 extra={
                     "iteration_index": iteration_index,
                     "max_iterations": max_iterations,
-                    "tools_called_so_far": len(all_agent_answers),
+                    # Total tool calls executed so far (portfolio + crm + mcp__* combined)
+                    "tools_called_so_far": total_tool_calls_executed,
+                    "agent_answers_so_far": len(all_agent_answers),
                 },
             )
 
@@ -213,8 +333,15 @@ class RelationshipManagerOrchestrator:
                     )
                     logger.info(
                         "Orchestrator: LLM returned no tool calls on first pass — "
-                        "applying deterministic routing fallback",
-                        extra={"routed_tools": [tc.name for tc in tool_calls]},
+                        "applying deterministic fallback routing (last resort)",
+                        extra={
+                            "fallback_reason": "llm_returned_zero_tool_calls",
+                            "routed_tools": [tc.name for tc in tool_calls],
+                            "note": (
+                                "If this triggers frequently, check unique_client.extract_tool_calls "
+                                "— the SDK may be returning toolCalls (camelCase) which must be normalised."
+                            ),
+                        },
                     )
 
             if not tool_calls:
@@ -251,7 +378,11 @@ class RelationshipManagerOrchestrator:
                 ],
             )
             history_manager.add_tool_call_results(tool_responses)
-            logger.debug("Orchestrator: HistoryManager updated with tool results")
+            logger.debug(
+                "Orchestrator: HistoryManager updated with tool results",
+                extra={"tool_response_count": len(tool_responses)},
+            )
+            total_tool_calls_executed += len(tool_responses)
 
             # 2. ReferenceManager: extract content chunks for citations
             reference_manager.extract_referenceable_chunks(tool_responses)
@@ -267,7 +398,16 @@ class RelationshipManagerOrchestrator:
             # 4. Collect AgentAnswer records for routing and response payload
             for resp in tool_responses:
                 if resp.successful:
-                    agent_name_key = resp.name.replace("_agent", "")  # "portfolio_agent" → "portfolio"
+                    # Only portfolio_agent and crm_agent contribute to AgentAnswer.
+                    # MCP tools (mcp__*) contribute content_chunks to ReferenceManager
+                    # instead — their results flow into the LLM context via history.
+                    agent_name_key = resp.name.replace("_agent", "")
+                    if agent_name_key not in ("portfolio", "crm"):
+                        logger.debug(
+                            "Orchestrator: MCP tool result recorded in history (not in agent_answers)",
+                            extra={"tool_name": resp.name},
+                        )
+                        continue
                     all_agent_answers.append(
                         AgentAnswer(
                             agent_name=agent_name_key,  # type: ignore[arg-type]
@@ -522,7 +662,10 @@ class RelationshipManagerOrchestrator:
             "Plan which tools are needed, call them, then produce a final concise answer. "
             "Only use facts from tool outputs — do not invent data.\n\n"
             f"Current customer ID: {customer_id}\n"
-            f"When calling any tool always pass \"customer_id\": \"{customer_id}\" in the arguments.\n\n"
+            f"When calling portfolio_agent or crm_agent, always pass "
+            f"\"customer_id\": \"{customer_id}\" in the arguments.\n"
+            f"When calling MCP tools (names starting with mcp__), use the exact argument "
+            f"names from the tool's own schema.  The customer's ID is {customer_id}.\n\n"
             "CRITICAL — tool call requirement:\n"
             "- You MUST call at least one tool before answering. Never answer directly from memory.\n"
             "- For broad or general questions (e.g. 'what details do you have about me', "
@@ -557,42 +700,52 @@ class RelationshipManagerOrchestrator:
         return parsed
 
     def _deterministic_tool_calls(self, *, customer_id: str, question: str) -> list[ToolCall]:
-        """Choose tool(s) by keyword when the LLM declines to call any.
+        """Choose tool(s) by keyword when the LLM genuinely declines to call any.
 
-        Acts as a reliable fallback because the configured Unique api_version
-        (2023-12-06) cannot force tool_choice="required". Ensures customer data
-        is always fetched:
-          - portfolio keywords → portfolio_agent
-          - CRM keywords       → crm_agent
-          - broad / ambiguous  → BOTH agents
-        The customer_id is always injected into the arguments so the tools run.
+        This is a TRUE last-resort fallback — it only runs when the LLM explicitly
+        returns zero tool calls (e.g. API version limitation, model refusal).  It
+        must never run in place of a valid LLM response (see Bug: camelCase parsing).
+
+        Routing rules:
+          - STRONG portfolio keywords  → portfolio_agent only
+          - STRONG CRM keywords        → crm_agent only
+          - Ambiguous / broad / mixed  → BOTH agents (safe default)
+
+        Keywords are deliberately narrow (domain-specific).  Generic words like
+        "suggest", "alert", "call", "note" are intentionally excluded because they
+        appear in everyday language and do NOT reliably indicate a specific data
+        domain — classifying them causes broad questions to be misrouted to one
+        agent, producing incomplete answers.
         """
         text = question.lower()
 
-        portfolio_keywords = (
-            "portfolio", "holding", "holdings", "invest", "investment", "asset",
-            "allocation", "return", "returns", "p&l", "pnl", "profit", "loss",
-            "risk", "sharpe", "alpha", "aum", "performance", "position",
-            "equity", "equities", "fund", "funds", "stock", "stocks", "bond",
-            "bonds", "nav", "valuation", "gain", "gains", "yield",
+        # Strong portfolio indicators — unambiguously financial/investment data
+        strong_portfolio_keywords = (
+            "portfolio", "holding", "holdings", "invest", "investment",
+            "asset", "allocation", "return", "returns", "p&l", "pnl",
+            "profit", "loss", "aum", "performance", "position",
+            "equity", "equities", "fund", "funds", "stock", "stocks",
+            "bond", "bonds", "nav", "valuation", "gain", "gains",
+            "yield", "sharpe", "alpha", "rebalance", "rebalancing",
         )
-        crm_keywords = (
-            "crm", "interaction", "interactions", "service", "request", "ticket",
-            "compliance", "flag", "advisory", "suggestion", "nps", "churn",
-            "alert", "alerts", "profile", "kyc", "segment", "satisfaction",
-            "tenure", "relationship manager", "follow-up", "follow up", "meeting",
-            "call", "email", "complaint", "note", "notes",
+        # Strong CRM indicators — unambiguously relationship/service data
+        strong_crm_keywords = (
+            "crm", "interaction", "interactions", "compliance", "kyc",
+            "nps", "churn", "service request", "service ticket",
+            "advisory suggestion", "follow-up", "follow up",
+            "conversation history", "last meeting", "last call",
         )
 
-        wants_portfolio = any(kw in text for kw in portfolio_keywords)
-        wants_crm = any(kw in text for kw in crm_keywords)
+        wants_portfolio = any(kw in text for kw in strong_portfolio_keywords)
+        wants_crm = any(kw in text for kw in strong_crm_keywords)
 
         if wants_portfolio and not wants_crm:
             target_names = [self.portfolio_agent.name]
         elif wants_crm and not wants_portfolio:
             target_names = [self.crm_agent.name]
         else:
-            # Broad, ambiguous, or mixed question — fetch everything.
+            # Broad, ambiguous, mixed, or no strong-keyword match.
+            # Safe default: fetch from ALL sources so the final answer is complete.
             target_names = [self.portfolio_agent.name, self.crm_agent.name]
 
         arguments = json.dumps({"customer_id": customer_id})

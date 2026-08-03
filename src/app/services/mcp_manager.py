@@ -442,4 +442,24 @@ class McpManager:
                     "kept_keys": sorted(filtered.keys()),
                 },
             )
+        # Warn when any required properties are absent after filtering — the tool
+        # call will fail validation, and the root cause is a naming mismatch between
+        # our argument keys and the schema (e.g. 'customer_id' vs 'customerId').
+        required_props = set(schema.get("required", []))
+        missing_required = required_props - set(filtered.keys())
+        if missing_required:
+            logger.warning(
+                "McpManager: filtered arguments are missing required schema properties — "
+                "tool call will likely fail validation; check for camelCase/snake_case mismatch",
+                extra={
+                    "tool_name": name,
+                    "missing_required": sorted(missing_required),
+                    "supplied_keys": sorted(arguments.keys()),
+                    "schema_properties": sorted(allowed),
+                    "hint": (
+                        "Ensure base_arguments include both 'customer_id' and 'customerId' "
+                        "(and 'question'/'query') so the schema filter can keep the right variant."
+                    ),
+                },
+            )
         return filtered

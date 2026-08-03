@@ -213,21 +213,37 @@ class HistoryManager:
         self._loop_history.append({"role": "system", "content": content})
         logger.debug("HistoryManager: system message added")
 
-    def add_user_message(self, content: str) -> None:
-        """Add a user message to the conversation history."""
+    def add_user_message(self, content: str, *, source: str = "current") -> None:
+        """Add a user message to the conversation history.
+
+        Args:
+            content: The user message text.
+            source:  ``"current"`` for the live question being processed;
+                     ``"history"`` when replaying a prior conversation turn.
+        """
         self._loop_history.append({"role": "user", "content": content})
         logger.debug(
             "HistoryManager: user message added",
-            extra={"content_length": len(content), "content_preview": content[:200]},
+            extra={
+                "source": source,
+                "content_length": len(content),
+                "content_preview": content[:200],
+            },
         )
 
     def add_assistant_message(
-        self, content: str, tool_calls: list[dict[str, Any]] | None = None
+        self, content: str, tool_calls: list[dict[str, Any]] | None = None, *, source: str = "current"
     ) -> None:
         """Append an assistant message with optional tool call requests.
 
         Mirrors HistoryManager._append_tool_calls_to_history() in unique_toolkit:
         tool call structs are embedded in the assistant message per OpenAI format.
+
+        Args:
+            content:    The assistant response text.
+            tool_calls: Optional tool call structs embedded in the message.
+            source:     ``"current"`` for the live loop; ``"history"`` when
+                        replaying a prior conversation turn.
         """
         msg: dict[str, Any] = {"role": "assistant", "content": content or ""}
         if tool_calls:
@@ -236,6 +252,7 @@ class HistoryManager:
         logger.debug(
             "HistoryManager: assistant message added",
             extra={
+                "source": source,
                 "has_tool_calls": bool(tool_calls),
                 "tool_call_names": [tc.get("function", {}).get("name") for tc in (tool_calls or [])],
                 "content_length": len(content or ""),
@@ -309,39 +326,67 @@ class HistoryManager:
         estimated_tokens = self._estimate_tokens(full_history)
 
         if estimated_tokens <= self._max_token_budget:
+            sanitized = self._sanitize_for_backend(full_history)
             logger.debug(
                 "HistoryManager: history within token budget",
                 extra={
                     "estimated_tokens": estimated_tokens,
                     "budget": self._max_token_budget,
-                    "message_count": len(full_history),
-                    "roles_breakdown": {r: sum(1 for m in full_history if m.get("role") == r) for r in {"system", "user", "assistant", "tool"}},
+                    # Pre-sanitisation counts (internal representation)
+                    "internal_message_count": len(full_history),
+                    "internal_roles": {r: sum(1 for m in full_history if m.get("role") == r) for r in {"system", "user", "assistant", "tool"}},
+                    # Post-sanitisation counts (what the LLM actually receives)
+                    "model_message_count": len(sanitized),
+                    "model_roles": [m.get("role") for m in sanitized],
                 },
             )
-            return self._sanitize_for_backend(full_history)
+            return sanitized
 
-        # Loop Token Reducer — keep all system messages, trim oldest non-system
+        # Loop Token Reducer — keep all system messages, trim oldest non-system.
+        # Pairs (user + immediately-following assistant) are removed together so
+        # conversation turns stay complete.  Removing only the user from a pair
+        # leaves an orphaned assistant message that can confuse the LLM.
         system_messages = [m for m in full_history if m.get("role") == "system"]
         non_system = [m for m in full_history if m.get("role") != "system"]
 
         reduced = list(non_system)
         while reduced and self._estimate_tokens(system_messages + reduced) > self._max_token_budget:
-            removed = reduced.pop(0)
-            logger.debug(
-                "HistoryManager: Loop Token Reducer removed message",
-                extra={"removed_role": removed.get("role")},
-            )
+            if (
+                len(reduced) >= 2
+                and reduced[0].get("role") == "user"
+                and reduced[1].get("role") == "assistant"
+            ):
+                # Remove the complete turn pair together.
+                u = reduced.pop(0)
+                a = reduced.pop(0)
+                logger.debug(
+                    "HistoryManager: Loop Token Reducer removed user+assistant pair",
+                    extra={
+                        "user_preview": (u.get("content") or "")[:80],
+                        "assistant_preview": (a.get("content") or "")[:80],
+                    },
+                )
+            else:
+                # Lone message (tool result, orphaned turn, etc.) — remove individually.
+                removed = reduced.pop(0)
+                logger.debug(
+                    "HistoryManager: Loop Token Reducer removed single message",
+                    extra={"role": removed.get("role")},
+                )
 
         result = system_messages + reduced
+        sanitized = self._sanitize_for_backend(result)
         logger.warning(
             "HistoryManager: history trimmed by Loop Token Reducer",
             extra={
                 "original_message_count": len(full_history),
                 "trimmed_message_count": len(result),
+                "model_message_count": len(sanitized),
+                "model_roles": [m.get("role") for m in sanitized],
                 "original_estimated_tokens": estimated_tokens,
             },
         )
-        return self._sanitize_for_backend(result)
+        return sanitized
 
     def _sanitize_for_backend(self, messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Convert internal OpenAI-style history into Unique-backend-safe messages.
@@ -353,33 +398,69 @@ class HistoryManager:
         400 "invalid request params" error.
 
         To keep the agentic loop working on this backend, tool interactions are
-        flattened into plain text, all attributed to the assistant so the model
-        treats them as context it already gathered (rather than a new user turn,
-        which would cause it to re-plan and call tools again):
-          - assistant messages carrying ``tool_calls`` become a short assistant
-            note naming the tools (the ``tool_calls`` key is dropped);
-          - ``role: "tool"`` result messages become ``assistant`` messages that
-            present the retrieved data as context for the final answer.
+        flattened into plain assistant text:
+          - An assistant message carrying ``tool_calls`` is merged with all of its
+            immediately following ``role: "tool"`` result messages into a **single**
+            assistant message.  This avoids two consecutive assistant messages
+            (which confuse the LLM) and correctly presents tool results as context
+            that was already gathered.
+          - Orphaned ``role: "tool"`` messages (not preceded by a tool_calls
+            assistant message) are also converted to assistant messages.
+          - Any other/unknown role is silently dropped.
         """
         safe: list[dict[str, Any]] = []
-        for msg in messages:
+        i = 0
+        while i < len(messages):
+            msg = messages[i]
             role = msg.get("role")
-            if role == "tool":
+
+            if role == "assistant" and msg.get("tool_calls"):
+                # Collect the tool names for a readable prefix.
+                names = ", ".join(
+                    tc.get("function", {}).get("name", "")
+                    for tc in msg.get("tool_calls", [])
+                )
+                parts: list[str] = [f"Called tools [{names}]. Retrieved data:"]
+
+                # Absorb all immediately following role:tool messages so no
+                # consecutive assistant messages appear in the sanitized history.
+                j = i + 1
+                while j < len(messages) and messages[j].get("role") == "tool":
+                    tool_content = messages[j].get("content", "") or ""
+                    if tool_content:
+                        parts.append(tool_content)
+                    j += 1
+
+                merged_content = "\n\n".join(p for p in parts if p)
+                safe.append({"role": "assistant", "content": merged_content})
+                logger.debug(
+                    "HistoryManager._sanitize: merged tool-call + tool-result(s) into single assistant message",
+                    extra={
+                        "tool_names": names,
+                        "tool_results_absorbed": j - i - 1,
+                        "merged_length": len(merged_content),
+                    },
+                )
+                i = j  # skip the tool messages already merged
+
+            elif role == "tool":
+                # Orphaned tool result — no preceding tool_calls assistant message.
                 safe.append(
                     {
                         "role": "assistant",
                         "content": f"Retrieved tool data:\n{msg.get('content', '') or ''}",
                     }
                 )
-            elif role == "assistant" and msg.get("tool_calls"):
-                names = ", ".join(
-                    tc.get("function", {}).get("name", "") for tc in msg.get("tool_calls", [])
-                )
-                content = msg.get("content") or f"Calling tools to gather data: {names}."
-                safe.append({"role": "assistant", "content": content})
+                i += 1
+
             elif role in {"system", "user", "assistant"}:
                 safe.append({"role": role, "content": msg.get("content", "") or ""})
-            # Any other/unknown role is dropped so the backend never sees it.
+                i += 1
+
+            else:
+                # Unknown role — drop silently.
+                i += 1
+
         return safe
 
     # ── Tool call persistence ─────────────────────────────────────────────────

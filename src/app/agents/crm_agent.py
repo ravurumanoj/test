@@ -7,6 +7,11 @@ Extends the abstract Tool base class so the orchestrator can:
   - Route content_chunks to ReferenceManager for source citations
   - Route debug_info to DebugInfoManager for developer inspection
 
+This agent is responsible for local CRM data retrieval and LLM summarisation
+only.  MCP tool integration now lives at the orchestrator level via
+``McpToolWrapper`` — the LLM decides which MCP tools to call and generates
+the arguments itself, so no MCP code belongs here.
+
 Backward-compatible handle() shim preserved for existing test surfaces.
 """
 
@@ -14,16 +19,13 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from app.agents.base_tool import BaseToolConfig, Tool
 from app.agents.prompts import CRM_AGENT_PROMPT
 from app.schemas import AgentAnswer, ContentChunk, ToolCallResponse, ToolDescription
 from app.services.crm_tools import CrmTools
 from app.services.unique_toolkit import UniqueToolkit
-
-if TYPE_CHECKING:  # imported for type hints only — keeps runtime coupling minimal
-    from app.services.mcp_manager import McpManager
 
 logger = logging.getLogger(__name__)
 
@@ -39,10 +41,6 @@ class CrmAgentConfig(BaseToolConfig):
     icon: str = "👤"
     is_enabled: bool = True
     is_exclusive: bool = False
-    # Optional: restrict MCP enrichment to a single named MCP tool. When empty
-    # (default) EVERY tool the MCP server advertises is called (best-effort),
-    # which is what makes this work with different MCP tools out of the box.
-    mcp_tool_name: str = ""
 
 
 class CrmAgent(Tool):
@@ -61,26 +59,17 @@ class CrmAgent(Tool):
         self,
         unique_toolkit: UniqueToolkit,
         config: CrmAgentConfig | None = None,
-        mcp_manager: "McpManager | None" = None,
     ) -> None:
         """Initialize the CRM agent with its toolkit dependency.
 
         Args:
             unique_toolkit: Facade over the Unique AI SDK/Toolkit completion layer.
             config:         Optional tool configuration (defaults applied when None).
-            mcp_manager:    Optional MCP Manager. When provided AND configured with
-                            a server URL, the agent enriches its CRM context with
-                            data returned by the MCP server's tools. When None
-                            (the default), the agent behaves exactly as before.
         """
         super().__init__(config or CrmAgentConfig())
         self.unique_toolkit = unique_toolkit
         self.tools = CrmTools()
-        self.mcp_manager = mcp_manager
-        logger.debug(
-            "CrmAgent initialized",
-            extra={"mcp_enabled": bool(mcp_manager and mcp_manager.is_configured)},
-        )
+        logger.debug("CrmAgent initialized")
 
     # ── Tool identity ─────────────────────────────────────────────────────────
 
@@ -186,16 +175,6 @@ class CrmAgent(Tool):
                 error_message=f"CRM data retrieval failed: {exc}",
             )
 
-        # ── MCP enrichment (only active when an MCP server is configured) ──────
-        # Augments the local CRM record with data returned by the standalone MCP
-        # server's tools. Completely inert when no MCP manager is injected, and
-        # fails soft (never raises) so a bad MCP server can't break the CRM flow.
-        mcp_augmentation = await self._augment_with_mcp(customer_id=customer_id, question=question)
-        if mcp_augmentation.get("enrichment"):
-            # Merge MCP output into the context handed to the LLM summarizer so the
-            # generated summary can reason over the external MCP tool results too.
-            crm_data = {**crm_data, "mcp_tools": mcp_augmentation["enrichment"]}
-
         # ── LLM summarization ─────────────────────────────────────────────────
         logger.debug(
             "CrmAgent: sending data to LLM for summarization",
@@ -234,19 +213,12 @@ class CrmAgent(Tool):
 
         # ── Build ContentChunks for ReferenceManager ──────────────────────────
         content_chunks = self._build_content_chunks(customer_id=customer_id, crm_data=crm_data)
-        # Append MCP-derived chunks so external tool output is citable too.
-        content_chunks.extend(mcp_augmentation.get("chunks", []))
 
         debug_info: dict[str, Any] = {
             "customer_id": customer_id,
             "crm_data_keys": list(crm_data.keys()),
             "summary_length": len(summary),
             "chunk_count": len(content_chunks),
-            # MCP diagnostics (present regardless of whether MCP is enabled).
-            "mcp_enabled": mcp_augmentation.get("enabled", False),
-            "mcp_discovered_tools": mcp_augmentation.get("discovered_tools", []),
-            "mcp_called_tools": mcp_augmentation.get("called", []),
-            "mcp_error": mcp_augmentation.get("error"),
         }
 
         logger.info(
@@ -307,99 +279,6 @@ class CrmAgent(Tool):
             extra={"customer_id": customer_id, "chunk_count": len(chunks)},
         )
         return chunks
-
-    # ── MCP enrichment ────────────────────────────────────────────────────────
-
-    async def _augment_with_mcp(self, customer_id: str, question: str) -> dict[str, Any]:
-        """Enrich CRM context with results from the configured MCP server's tools.
-
-        Mirrors the Unique Toolkit *Tool Manager \u2192 MCP source* pattern: the MCP
-        server's tools are discovered dynamically and invoked here. Nothing about
-        the tool names is hard-coded \u2014 whatever tools the server advertises are
-        used, so this works with *different* MCP servers/tools without code change.
-
-        This method NEVER raises: any MCP failure is logged and reported via the
-        returned ``error`` field so the core CRM flow always completes.
-
-        Returns a dict with:
-            enabled           \u2014 whether an MCP server was configured
-            discovered_tools  \u2014 names of every tool the server advertised
-            called            \u2014 names of tools actually invoked this turn
-            enrichment        \u2014 list of {tool, is_error, text} for the LLM context
-            chunks            \u2014 list[ContentChunk] built from successful results
-            error             \u2014 error string when discovery/all calls failed (else None)
-        """
-        # No manager injected, or no server URL configured \u2192 behave as before.
-        if self.mcp_manager is None or not self.mcp_manager.is_configured:
-            return {"enabled": False, "discovered_tools": [], "called": [], "enrichment": [], "chunks": []}
-
-        # 1. Discover the tools the MCP server exposes.
-        try:
-            tools = await self.mcp_manager.list_tools()
-        except Exception as exc:  # noqa: BLE001 - fail soft, keep CRM flow alive
-            logger.warning(
-                "CrmAgent: MCP tool discovery failed \u2014 continuing without MCP enrichment",
-                extra={"customer_id": customer_id, "error": str(exc)},
-            )
-            return {"enabled": True, "discovered_tools": [], "called": [], "enrichment": [], "chunks": [], "error": str(exc)}
-
-        # 2. Select which tools to call. Empty config \u2192 call all discovered tools.
-        configured_tool = (self.settings.mcp_tool_name or "").strip()
-        if configured_tool:
-            target_tools = [t for t in tools if t.name == configured_tool]
-            if not target_tools:
-                logger.warning(
-                    "CrmAgent: configured MCP tool not found on server",
-                    extra={"configured_tool": configured_tool, "available": [t.name for t in tools]},
-                )
-        else:
-            target_tools = tools
-
-        # 3. Invoke each selected tool. Arguments are filtered to each tool's own
-        #    input schema by the manager, so passing both keys is always safe.
-        base_arguments: dict[str, Any] = {"customer_id": customer_id, "question": question}
-        enrichment: list[dict[str, Any]] = []
-        chunks: list[ContentChunk] = []
-        called: list[str] = []
-        for tool in target_tools:
-            called.append(tool.name)
-            try:
-                result = await self.mcp_manager.call_tool(tool.name, base_arguments)
-            except Exception as exc:  # noqa: BLE001 - one bad tool must not abort the rest
-                logger.warning(
-                    "CrmAgent: MCP tool call failed \u2014 skipping this tool",
-                    extra={"tool_name": tool.name, "error": str(exc)},
-                )
-                enrichment.append({"tool": tool.name, "is_error": True, "text": f"MCP call failed: {exc}"})
-                continue
-
-            enrichment.append({"tool": tool.name, "is_error": result.is_error, "text": result.text})
-            if result.text and not result.is_error:
-                chunks.append(
-                    ContentChunk(
-                        id=f"mcp_{customer_id}_{tool.name}",
-                        chunk_id="0",
-                        text=result.text[:_CHUNK_MAX_CHARS],
-                        metadata={"customer_id": customer_id, "source": "mcp", "tool": tool.name},
-                    )
-                )
-
-        logger.info(
-            "CrmAgent: MCP enrichment completed",
-            extra={
-                "customer_id": customer_id,
-                "discovered_tools": [t.name for t in tools],
-                "called_tools": called,
-                "chunk_count": len(chunks),
-            },
-        )
-        return {
-            "enabled": True,
-            "discovered_tools": [t.name for t in tools],
-            "called": called,
-            "enrichment": enrichment,
-            "chunks": chunks,
-        }
 
     # ── Backward-compatible shim ──────────────────────────────────────────────
 

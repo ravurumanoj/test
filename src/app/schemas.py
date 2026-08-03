@@ -92,11 +92,31 @@ class EvaluationMetricResult(BaseModel):
 # ─── API request / response schemas ──────────────────────────────────────────
 
 
+class ConversationTurn(BaseModel):
+    """One prior turn in a multi-turn conversation.
+
+    Used by ``RelationshipManagerRequest.chat_history`` to seed the
+    HistoryManager with previous user/assistant exchanges so the orchestrator
+    maintains context across API calls.
+    """
+
+    role: Literal["user", "assistant"]
+    content: str
+
+
 class RelationshipManagerRequest(BaseModel):
     """Represent an incoming relationship manager query."""
 
     customer_id: str = Field(min_length=1, description="Customer identifier used by the sub-agents.")
     question: str = Field(min_length=3, description="Natural language question from the relationship manager.")
+    chat_history: list[ConversationTurn] = Field(
+        default_factory=list,
+        description=(
+            "Previous conversation turns (oldest first). "
+            "Pass prior user/assistant pairs so the orchestrator maintains context "
+            "across API calls.  Omit or leave empty to start a fresh session."
+        ),
+    )
 
     @field_validator("customer_id", "question")
     @classmethod
