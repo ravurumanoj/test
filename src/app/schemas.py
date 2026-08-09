@@ -109,12 +109,20 @@ class RelationshipManagerRequest(BaseModel):
 
     customer_id: str = Field(min_length=1, description="Customer identifier used by the sub-agents.")
     question: str = Field(min_length=3, description="Natural language question from the relationship manager.")
+    session_id: str = Field(
+        default="",
+        description=(
+            "Session identifier used as chatId in Unique AI for history persistence. "
+            "When empty, the server falls back to UNIQUE_DEFAULT_SESSION_ID. "
+            "Set this to the Unique chatId that represents this user's conversation thread."
+        ),
+    )
     chat_history: list[ConversationTurn] = Field(
         default_factory=list,
         description=(
-            "Previous conversation turns (oldest first). "
-            "Pass prior user/assistant pairs so the orchestrator maintains context "
-            "across API calls.  Omit or leave empty to start a fresh session."
+            "Fallback conversation history (oldest first). "
+            "Used only when Unique AI session history is unavailable or unconfigured. "
+            "Prefer session_id-based persistence for multi-turn conversations."
         ),
     )
 

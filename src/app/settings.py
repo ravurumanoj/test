@@ -31,6 +31,12 @@ class Settings:
     unique_agent_max_iterations: int
     unique_max_tool_calls_per_iteration: int
     unique_max_history_tokens: int
+    # ── Session / ChatService integration ──────────────────────────────────
+    # UNIQUE_ASSISTANT_ID — the Unique assistant (space) ID; required for
+    #   Message.create when persisting conversation turns.
+    # UNIQUE_DEFAULT_SESSION_ID — used as chatId when the request omits session_id.
+    unique_assistant_id: str
+    unique_default_session_id: str
     # ── MCP (Model Context Protocol) integration ─────────────────────────────
     # All MCP settings are OPTIONAL. When mcp_server_url is empty the MCP
     # Manager is disabled and the application behaves exactly as before.
@@ -72,6 +78,9 @@ class Settings:
             unique_agent_max_iterations=int(os.getenv("UNIQUE_AGENT_MAX_ITERATIONS", "3")),
             unique_max_tool_calls_per_iteration=int(os.getenv("UNIQUE_MAX_TOOL_CALLS_PER_ITERATION", "3")),
             unique_max_history_tokens=int(os.getenv("UNIQUE_MAX_HISTORY_TOKENS", "6000")),
+            # ── Session / ChatService integration ────────────────────────────
+            unique_assistant_id=os.getenv("UNIQUE_ASSISTANT_ID", "").strip(),
+            unique_default_session_id=os.getenv("UNIQUE_DEFAULT_SESSION_ID", "poc-demo-session-001").strip(),
             # ── MCP integration (see resolution logic above) ─────────────────
             mcp_enabled=mcp_enabled,
             mcp_server_url=mcp_server_url,

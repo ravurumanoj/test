@@ -42,6 +42,7 @@ from app.schemas import AgentAnswer, ConversationTurn, EvaluationMetricResult, R
 
 if TYPE_CHECKING:
     from app.services.mcp_manager import McpManager
+    from app.services.session_service import UniqueSessionService
 from app.services.managers import (
     DebugInfoManager,
     EvaluationManager,
@@ -84,6 +85,7 @@ class RelationshipManagerOrchestrator:
         unique_toolkit: UniqueToolkit,
         settings: Settings,
         mcp_manager: "McpManager | None" = None,
+        session_service: "UniqueSessionService | None" = None,
     ) -> None:
         """Initialize orchestrator with sub-agent tools and runtime settings.
 
@@ -97,12 +99,16 @@ class RelationshipManagerOrchestrator:
                              LLM as additional function definitions alongside the
                              built-in sub-agents.  The LLM generates arguments from
                              each tool's own schema — no hardcoding required.
+            session_service: Optional UniqueSessionService.  When provided,
+                             conversation history is loaded from and persisted to
+                             Unique AI using session_id as chatId.
         """
         self.portfolio_agent = portfolio_agent
         self.crm_agent = crm_agent
         self.unique_toolkit = unique_toolkit
         self.settings = settings
         self._mcp_manager = mcp_manager
+        self._session_service = session_service
         # Tool registry — mirrors ToolManager.get_tools()
         # MCP tools are added lazily on the first request via _ensure_mcp_tools_loaded.
         self._tools: dict[str, Tool] = {
@@ -184,24 +190,60 @@ class RelationshipManagerOrchestrator:
 
         logger.info("Orchestrator: all managers initialized and configured")
 
-        # ── Fresh session vs continuing conversation ──────────────────────────
-        is_fresh_session = not bool(request.chat_history)
+        # ── Load session history from Unique AI ───────────────────────────────
+        # session_id acts as chatId in the Unique platform.
+        # Falls back to request.chat_history when Unique AI returns nothing.
+        session_id = request.session_id or self.settings.unique_default_session_id
+        fetched_history: list[dict[str, str]] = []
+        if self._session_service is not None:
+            fetched_history = await self._session_service.load_history(session_id)
+            logger.info(
+                "Orchestrator: history fetched from Unique AI",
+                extra={"session_id": session_id, "fetched_turns": len(fetched_history)},
+            )
+
+        if not fetched_history and request.chat_history:
+            fetched_history = [{"role": t.role, "content": t.content} for t in request.chat_history]
+            logger.info(
+                "Orchestrator: using request.chat_history fallback",
+                extra={"fallback_turns": len(fetched_history)},
+            )
+
+        # Seed HistoryManager with prior turns BEFORE adding the system message so
+        # has_no_loop_messages() returns True only when no prior turns were loaded.
+        # get_history_for_model_call() always reorders system messages to the front,
+        # so LLM message ordering is correct regardless of insertion order here.
+        loaded_user = 0
+        loaded_assistant = 0
+        for msg in fetched_history:
+            if msg["role"] == "user":
+                history_manager.add_user_message(msg["content"], source="history")
+                loaded_user += 1
+            elif msg["role"] == "assistant":
+                history_manager.add_assistant_message(msg["content"], source="history")
+                loaded_assistant += 1
+
+        # has_no_loop_messages() is now True iff no prior turns were loaded — mirrors
+        # the Unique Toolkit orchestrator pattern for fresh-session detection.
+        is_fresh_session = history_manager.has_no_loop_messages()
         if is_fresh_session:
             logger.info(
                 "Orchestrator: fresh session detected — no prior history",
-                extra={"customer_id": request.customer_id},
+                extra={"customer_id": request.customer_id, "session_id": session_id},
             )
         else:
             logger.info(
-                "Orchestrator: resuming conversation — prior history present",
+                "Orchestrator: resuming conversation — prior history loaded",
                 extra={
                     "customer_id": request.customer_id,
-                    "prior_turns_count": len(request.chat_history),
-                    "roles_in_history": [t.role for t in request.chat_history],
+                    "session_id": session_id,
+                    "user_turns_loaded": loaded_user,
+                    "assistant_turns_loaded": loaded_assistant,
+                    "total_turns_loaded": loaded_user + loaded_assistant,
                 },
             )
 
-        # ── Seed history: system → prior turns → current question ─────────────
+        # ── Add system prompt then current question ───────────────────────────
         system_prompt = self._build_system_prompt(request.customer_id)
         history_manager.add_system_message(system_prompt)
         logger.debug(
@@ -209,38 +251,6 @@ class RelationshipManagerOrchestrator:
             extra={"system_prompt_length": len(system_prompt)},
         )
 
-        # Load prior conversation turns BEFORE the current question so the LLM
-        # has full context of what was already discussed in this session.
-        if request.chat_history:
-            loaded_user = 0
-            loaded_assistant = 0
-            for turn in request.chat_history:
-                if turn.role == "user":
-                    history_manager.add_user_message(turn.content, source="history")
-                    loaded_user += 1
-                elif turn.role == "assistant":
-                    history_manager.add_assistant_message(turn.content, source="history")
-                    loaded_assistant += 1
-            logger.info(
-                "Orchestrator: prior conversation history loaded into HistoryManager",
-                extra={
-                    "user_turns_loaded": loaded_user,
-                    "assistant_turns_loaded": loaded_assistant,
-                    "total_turns_loaded": loaded_user + loaded_assistant,
-                    "last_user_preview": next(
-                        (t.content[:120] for t in reversed(request.chat_history) if t.role == "user"),
-                        None,
-                    ),
-                    "last_assistant_preview": next(
-                        (t.content[:120] for t in reversed(request.chat_history) if t.role == "assistant"),
-                        None,
-                    ),
-                },
-            )
-        else:
-            logger.info("Orchestrator: no prior history to load — starting fresh")
-
-        # Add the current user question as the newest message
         history_manager.add_user_message(request.question, source="current")
         logger.debug(
             "Orchestrator: current user question added to history",
@@ -447,11 +457,32 @@ class RelationshipManagerOrchestrator:
         if not final_answer:
             final_answer = self._combine_answers(all_agent_answers)
 
+        # ── Inject reference citations from ReferenceManager ──────────────────
+        references_section = self._build_references_section(reference_manager)
+        if references_section:
+            final_answer += references_section
+            logger.info(
+                "Orchestrator: reference citations appended to final answer",
+                extra={"reference_count": len(reference_manager.get_chunks())},
+            )
+
         logger.info(
             "Orchestrator: running EvaluationManager",
             extra={"final_answer_length": len(final_answer)},
         )
         evaluation_results = await evaluation_manager.run_evaluations(final_answer)
+
+        # ── Persist turn to Unique AI before postprocessors add the disclaimer ─
+        if self._session_service is not None:
+            await self._session_service.save_turn(
+                session_id=session_id,
+                user_message=request.question,
+                assistant_message=final_answer,
+            )
+            logger.info(
+                "Orchestrator: conversation turn persisted to Unique AI",
+                extra={"session_id": session_id},
+            )
 
         logger.info(
             "Orchestrator: running PostprocessorManager",
@@ -805,6 +836,27 @@ class RelationshipManagerOrchestrator:
                 "If the issue persists, the customer record may not exist in the system."
             )
         return " ".join(answer.summary for answer in agent_answers if answer.summary)
+
+    def _build_references_section(self, reference_manager: ReferenceManager) -> str:
+        """Build a formatted sources block from ReferenceManager chunks.
+
+        Uses build_reference_map() to assign sequential [1], [2], ... numbers
+        across all chunks collected from every tool call in this request.
+        """
+        ref_map = reference_manager.build_reference_map()
+        if not ref_map:
+            return ""
+        lines = ["\n\n**Sources:**"]
+        for ref_num, chunk in ref_map.items():
+            source = chunk.metadata.get("source", "")
+            section = chunk.metadata.get("section", "")
+            label = f"{source} · {section}" if source and section else chunk.id
+            lines.append(f"[{ref_num}] {label}")
+        logger.debug(
+            "Orchestrator: reference section built",
+            extra={"reference_count": len(ref_map)},
+        )
+        return "\n".join(lines)
 
     def _routing_from_answers(self, agent_answers: list[AgentAnswer]) -> list[str]:
         """Derive the routing decision from which agents were actually called."""

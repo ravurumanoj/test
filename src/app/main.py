@@ -19,6 +19,7 @@ from app.logging_config import configure_logging
 from app.settings import Settings
 from app.services.unique_client import UniqueAIClient
 from app.services.unique_toolkit import UniqueToolkit
+from app.services.session_service import UniqueSessionService
 from app.services.mcp_manager import McpManager
 
 configure_logging()
@@ -27,6 +28,14 @@ settings = Settings.from_env()
 
 unique_client = UniqueAIClient(settings=settings)
 unique_toolkit = UniqueToolkit(client=unique_client)
+session_service = UniqueSessionService(client=unique_client)
+logger.info(
+    "UniqueSessionService initialized",
+    extra={
+        "default_session_id": settings.unique_default_session_id,
+        "assistant_id_configured": bool(settings.unique_assistant_id),
+    },
+)
 
 # ── MCP Manager wiring (optional) ────────────────────────────────────────────
 # Constructed only when an MCP server URL is configured (MCP_SERVER_URL). When
@@ -52,6 +61,7 @@ orchestrator = RelationshipManagerOrchestrator(
 	unique_toolkit=unique_toolkit,
 	settings=settings,
 	mcp_manager=mcp_manager,  # MCP tools discovered and exposed to LLM on first request
+	session_service=session_service,
 )
 
 app = FastAPI(title=settings.app_name)
