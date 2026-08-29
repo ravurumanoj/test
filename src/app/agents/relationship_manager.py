@@ -20,9 +20,10 @@ PostprocessorManager — appends FinancialDisclaimerPostprocessor to final answe
 
 Tool wiring
 -----------
-PortfolioAgent and CrmAgent are registered as Tool subclasses.
+Every underlying data API (portfolio + CRM) is registered as its own DataQueryTool.
 The orchestrator exposes their tool_description() as LLM function definitions,
-executes them via run(), and feeds ToolCallResponse into all managers.
+executes them via run(), and feeds ToolCallResponse into all managers. The LLM
+decides which tool(s) to call — no hardcoded per-domain routing.
 """
 
 from __future__ import annotations
@@ -30,13 +31,12 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 from app.agents.base_tool import Tool
-from app.agents.crm_agent import CrmAgent
 from app.agents.mcp_tool_wrapper import MCP_TOOL_PREFIX, McpToolWrapper
-from app.agents.portfolio_agent import PortfolioAgent
 from app.errors import RoutingError
 from app.schemas import AgentAnswer, ConversationTurn, EvaluationMetricResult, RelationshipManagerRequest, RelationshipManagerResponse, ToolCallResponse
 
@@ -80,41 +80,42 @@ class RelationshipManagerOrchestrator:
 
     def __init__(
         self,
-        portfolio_agent: PortfolioAgent,
-        crm_agent: CrmAgent,
+        tools: Sequence[Tool],
         unique_toolkit: UniqueToolkit,
         settings: Settings,
         mcp_manager: "McpManager | None" = None,
         session_service: "UniqueSessionService | None" = None,
     ) -> None:
-        """Initialize orchestrator with sub-agent tools and runtime settings.
+        """Initialize orchestrator with the data tools and runtime settings.
 
         Args:
-            portfolio_agent: Sub-agent for portfolio/financial data.
-            crm_agent:       Sub-agent for CRM/interaction data.
+            tools:           The data-query tools (portfolio + CRM) exposed to the LLM.
+                             Each is a Tool with a ``domain`` used for AgentAnswer routing.
             unique_toolkit:  Facade over the Unique AI SDK.
             settings:        Runtime settings.
             mcp_manager:     Optional MCP Manager.  When provided and configured,
                              MCP tools are discovered at runtime and exposed to the
                              LLM as additional function definitions alongside the
-                             built-in sub-agents.  The LLM generates arguments from
+                             built-in tools.  The LLM generates arguments from
                              each tool's own schema — no hardcoding required.
             session_service: Optional UniqueSessionService.  When provided,
                              conversation history is loaded from and persisted to
                              Unique AI using session_id as chatId.
         """
-        self.portfolio_agent = portfolio_agent
-        self.crm_agent = crm_agent
         self.unique_toolkit = unique_toolkit
         self.settings = settings
         self._mcp_manager = mcp_manager
         self._session_service = session_service
         # Tool registry — mirrors ToolManager.get_tools()
         # MCP tools are added lazily on the first request via _ensure_mcp_tools_loaded.
-        self._tools: dict[str, Tool] = {
-            portfolio_agent.name: portfolio_agent,
-            crm_agent.name: crm_agent,
-        }
+        self._tools: dict[str, Tool] = {tool.name: tool for tool in tools}
+        logger.info(
+            "Orchestrator: data tools registered",
+            extra={
+                "tool_names": list(self._tools.keys()),
+                "domains": sorted({t.domain for t in self._tools.values() if t.domain}),
+            },
+        )
         self._mcp_tools_discovered: bool = False  # set True after first discovery attempt
 
     async def _ensure_mcp_tools_loaded(self) -> None:
@@ -196,7 +197,12 @@ class RelationshipManagerOrchestrator:
         session_id = request.session_id or self.settings.unique_default_session_id
         fetched_history: list[dict[str, str]] = []
         if self._session_service is not None:
-            fetched_history = await self._session_service.load_history(session_id)
+            fetched_history = await self._session_service.load_history(
+                session_id,
+                user_id=request.auth_user_id,
+                company_id=request.auth_company_id,
+                assistant_id=request.assistant_id,
+            )
             logger.info(
                 "Orchestrator: history fetched from Unique AI",
                 extra={"session_id": session_id, "fetched_turns": len(fetched_history)},
@@ -270,6 +276,7 @@ class RelationshipManagerOrchestrator:
         evaluation_results: list[EvaluationMetricResult] = []
         iteration_index: int = 0  # initialized so post-loop reference is always defined
         total_tool_calls_executed: int = 0  # counts ALL tools (portfolio, crm, mcp__*)
+        triggered_tool_names: list[str] = []  # every tool name triggered, in call order
         context: dict[str, Any] = {
             "customer_id": request.customer_id,
             "question": request.question,
@@ -393,6 +400,15 @@ class RelationshipManagerOrchestrator:
                 extra={"tool_response_count": len(tool_responses)},
             )
             total_tool_calls_executed += len(tool_responses)
+            triggered_tool_names.extend(tc.name for tc in tool_calls)
+            logger.info(
+                "Orchestrator: tools triggered this iteration",
+                extra={
+                    "iteration_index": iteration_index,
+                    "iteration_tools": [tc.name for tc in tool_calls],
+                    "all_tools_triggered_so_far": triggered_tool_names,
+                },
+            )
 
             # 2. ReferenceManager: extract content chunks for citations
             reference_manager.extract_referenceable_chunks(tool_responses)
@@ -408,19 +424,22 @@ class RelationshipManagerOrchestrator:
             # 4. Collect AgentAnswer records for routing and response payload
             for resp in tool_responses:
                 if resp.successful:
-                    # Only portfolio_agent and crm_agent contribute to AgentAnswer.
-                    # MCP tools (mcp__*) contribute content_chunks to ReferenceManager
-                    # instead — their results flow into the LLM context via history.
-                    agent_name_key = resp.name.replace("_agent", "")
-                    if agent_name_key not in ("portfolio", "crm"):
+                    # A tool contributes an AgentAnswer only when it maps to a sub-agent
+                    # domain (portfolio/crm). MCP tools (domain "") contribute
+                    # content_chunks to ReferenceManager instead — their results flow
+                    # into the LLM context via history.
+                    tool = self._tools.get(resp.name)
+                    domain = tool.domain if tool is not None else ""
+                    if domain not in ("portfolio", "crm"):
                         logger.debug(
-                            "Orchestrator: MCP tool result recorded in history (not in agent_answers)",
-                            extra={"tool_name": resp.name},
+                            "Orchestrator: non-domain tool result recorded in history (not in agent_answers)",
+                            extra={"tool_name": resp.name, "domain": domain},
                         )
                         continue
                     all_agent_answers.append(
                         AgentAnswer(
-                            agent_name=agent_name_key,  # type: ignore[arg-type]
+                            agent_name=domain,  # type: ignore[arg-type]
+                            tool_name=resp.name,
                             summary=resp.content,
                             # retrieved_context is intentionally empty here — actual customer
                             # data lives in resp.content (summary) and resp.content_chunks
@@ -430,7 +449,11 @@ class RelationshipManagerOrchestrator:
                     )
                     logger.info(
                         "Orchestrator: agent answer collected",
-                        extra={"agent_name": agent_name_key, "summary_length": len(resp.content)},
+                        extra={
+                            "agent_name": domain,
+                            "tool_name": resp.name,
+                            "summary_length": len(resp.content),
+                        },
                     )
                 else:
                     logger.warning(
@@ -473,14 +496,23 @@ class RelationshipManagerOrchestrator:
         evaluation_results = await evaluation_manager.run_evaluations(final_answer)
 
         # ── Persist turn to Unique AI before postprocessors add the disclaimer ─
-        if self._session_service is not None:
+        if self._session_service is not None and request.persist_turn:
             await self._session_service.save_turn(
                 session_id=session_id,
                 user_message=request.question,
                 assistant_message=final_answer,
+                user_id=request.auth_user_id,
+                company_id=request.auth_company_id,
+                assistant_id=request.assistant_id,
             )
             logger.info(
                 "Orchestrator: conversation turn persisted to Unique AI",
+                extra={"session_id": session_id},
+            )
+        elif not request.persist_turn:
+            logger.info(
+                "Orchestrator: skipping turn persistence (persist_turn=False; "
+                "webhook flow writes the assistant message directly)",
                 extra={"session_id": session_id},
             )
 
@@ -493,6 +525,7 @@ class RelationshipManagerOrchestrator:
         # ── Tool call persistence (mirrors Unique Toolkit pattern) ─────────────
         persisted_tools = history_manager.extract_message_tools()
         debug_info_manager.add("persisted_tool_calls", persisted_tools)
+        debug_info_manager.add("triggered_tool_names", triggered_tool_names)
         debug_info_manager.add("reference_chunk_count", len(reference_manager.get_chunks()))
         debug_info_manager.add("total_iterations", iteration_index + 1)
         debug_info_manager.add(
@@ -693,15 +726,21 @@ class RelationshipManagerOrchestrator:
             "Plan which tools are needed, call them, then produce a final concise answer. "
             "Only use facts from tool outputs — do not invent data.\n\n"
             f"Current customer ID: {customer_id}\n"
-            f"When calling portfolio_agent or crm_agent, always pass "
+            f"When calling any customer-specific tool, always pass "
             f"\"customer_id\": \"{customer_id}\" in the arguments.\n"
             f"When calling MCP tools (names starting with mcp__), use the exact argument "
             f"names from the tool's own schema.  The customer's ID is {customer_id}.\n\n"
+            "Tool selection:\n"
+            "- Choose the specific tool(s) whose description best matches the question. "
+            "You may call several tools when a question spans multiple areas.\n"
+            "- Portfolio detail tools cover: current position/holdings, performance/returns, "
+            "and compliance (credit/tax). CRM detail tools cover: profile/KYC, interactions/"
+            "history, and advisory/suggestions.\n\n"
             "CRITICAL — tool call requirement:\n"
             "- You MUST call at least one tool before answering. Never answer directly from memory.\n"
             "- For broad or general questions (e.g. 'what details do you have about me', "
-            "'tell me about this customer', 'give me a summary', 'what do you know'), "
-            "you MUST call BOTH portfolio_agent AND crm_agent.\n"
+            "'tell me about this customer', 'give me a summary', 'what do you know'), call the "
+            "core portfolio AND CRM tools needed to cover the customer's position and profile.\n"
             "- Only produce a final answer AFTER tool results have been returned.\n\n"
             "Handling missing or unavailable data:\n"
             "- If a tool returns an error (customer not found, retrieval failed), acknowledge "
@@ -731,67 +770,79 @@ class RelationshipManagerOrchestrator:
         return parsed
 
     def _deterministic_tool_calls(self, *, customer_id: str, question: str) -> list[ToolCall]:
-        """Choose tool(s) by keyword when the LLM genuinely declines to call any.
+        """Choose granular tool(s) by keyword when the LLM genuinely declines to call any.
 
-        This is a TRUE last-resort fallback — it only runs when the LLM explicitly
-        returns zero tool calls (e.g. API version limitation, model refusal).  It
-        must never run in place of a valid LLM response (see Bug: camelCase parsing).
+        This is a TRUE last-resort safety net — it only runs when the LLM explicitly
+        returns zero tool calls (e.g. API version limitation, model refusal). It must
+        never run in place of a valid LLM response.
 
-        Routing rules:
-          - STRONG portfolio keywords  → portfolio_agent only
-          - STRONG CRM keywords        → crm_agent only
-          - Ambiguous / broad / mixed  → BOTH agents (safe default)
-
-        Keywords are deliberately narrow (domain-specific).  Generic words like
-        "suggest", "alert", "call", "note" are intentionally excluded because they
-        appear in everyday language and do NOT reliably indicate a specific data
-        domain — classifying them causes broad questions to be misrouted to one
-        agent, producing incomplete answers.
+        Routing maps keywords to the SPECIFIC granular tool that serves them, so the
+        right API is fetched (e.g. a "performance" question routes to
+        portfolio_performance, not the generic snapshot). When nothing matches, it
+        falls back to the two core per-customer views (snapshot + profile) so the
+        answer is never empty. Only tools that are actually registered and enabled
+        are selected, so this adapts automatically to the configured tool set.
         """
         text = question.lower()
 
-        # Strong portfolio indicators — unambiguously financial/investment data
-        strong_portfolio_keywords = (
-            "portfolio", "holding", "holdings", "invest", "investment",
-            "asset", "allocation", "return", "returns", "p&l", "pnl",
-            "profit", "loss", "aum", "performance", "position",
-            "equity", "equities", "fund", "funds", "stock", "stocks",
-            "bond", "bonds", "nav", "valuation", "gain", "gains",
-            "yield", "sharpe", "alpha", "rebalance", "rebalancing",
-        )
-        # Strong CRM indicators — unambiguously relationship/service data
-        strong_crm_keywords = (
-            "crm", "interaction", "interactions", "compliance", "kyc",
-            "nps", "churn", "service request", "service ticket",
-            "advisory suggestion", "follow-up", "follow up",
-            "conversation history", "last meeting", "last call",
-        )
+        # Ordered keyword → granular tool routing. First match per tool wins; a
+        # question may select several tools across domains.
+        keyword_routes: list[tuple[str, tuple[str, ...]]] = [
+            ("portfolio_performance", (
+                "performance", "return", "returns", "alpha", "sharpe", "benchmark",
+                "yield", "sector", "geographic", "exposure", "upcoming event",
+            )),
+            ("portfolio_compliance", (
+                "line of credit", "loc", "tax", "portfolio alert",
+            )),
+            ("portfolio_snapshot", (
+                "portfolio", "holding", "holdings", "allocation", "asset", "position",
+                "p&l", "pnl", "profit", "loss", "invest", "investment", "aum",
+                "equity", "equities", "fund", "funds", "stock", "stocks", "bond", "bonds",
+            )),
+            ("portfolio_book_summary", (
+                "all customers", "book of business", "every customer", "across customers",
+                "book summary", "all portfolios",
+            )),
+            ("crm_interactions", (
+                "interaction", "interactions", "conversation", "meeting", "last call",
+                "service request", "service ticket", "follow-up", "follow up", "sentiment",
+            )),
+            ("crm_advisory", (
+                "advisory", "suggestion", "recommendation", "compliance flag",
+            )),
+            ("crm_profile", (
+                "crm", "profile", "kyc", "nps", "churn", "segment", "demographic",
+                "relationship manager", "contact",
+            )),
+            ("crm_book_summary", (
+                "all customers", "pipeline", "every customer", "across customers",
+                "book summary",
+            )),
+        ]
 
-        wants_portfolio = any(kw in text for kw in strong_portfolio_keywords)
-        wants_crm = any(kw in text for kw in strong_crm_keywords)
+        selected: list[str] = []
+        for tool_name, keywords in keyword_routes:
+            if tool_name not in self._tools or not self._tools[tool_name].is_enabled():
+                continue
+            if any(kw in text for kw in keywords) and tool_name not in selected:
+                selected.append(tool_name)
 
-        if wants_portfolio and not wants_crm:
-            target_names = [self.portfolio_agent.name]
-        elif wants_crm and not wants_portfolio:
-            target_names = [self.crm_agent.name]
-        else:
-            # Broad, ambiguous, mixed, or no strong-keyword match.
-            # Safe default: fetch from ALL sources so the final answer is complete.
-            target_names = [self.portfolio_agent.name, self.crm_agent.name]
+        if not selected:
+            # No strong keyword match — fetch the two core per-customer views so the
+            # final answer is complete across both domains.
+            for default_name in ("portfolio_snapshot", "crm_profile"):
+                if default_name in self._tools and self._tools[default_name].is_enabled():
+                    selected.append(default_name)
 
         arguments = json.dumps({"customer_id": customer_id})
         calls = [
             ToolCall(id=f"deterministic_{index}_{name}", name=name, arguments=arguments)
-            for index, name in enumerate(target_names)
-            if name in self._tools and self._tools[name].is_enabled()
+            for index, name in enumerate(selected)
         ]
         logger.info(
-            "Orchestrator: deterministic routing selected tools",
-            extra={
-                "wants_portfolio": wants_portfolio,
-                "wants_crm": wants_crm,
-                "selected_tools": [c.name for c in calls],
-            },
+            "Orchestrator: deterministic routing selected tools (LLM declined)",
+            extra={"selected_tools": [c.name for c in calls]},
         )
         return calls
 
@@ -865,9 +916,19 @@ class RelationshipManagerOrchestrator:
         return [name for name in ordered if name in unique_names]
 
     def _deduplicate_agent_answers(self, agent_answers: list[AgentAnswer]) -> list[AgentAnswer]:
-        """Keep only the last answer per agent to avoid duplicate entries in the response."""
-        latest: dict[str, AgentAnswer] = {}
+        """Keep the latest answer per (domain, tool) so each granular tool is represented once.
+
+        Multiple tools in the same domain (e.g. portfolio_snapshot + portfolio_performance)
+        are all preserved; only exact re-runs of the same tool collapse. Ordered portfolio
+        answers first, then crm, preserving tool call order within each domain.
+        """
+        latest: dict[tuple[str, str], AgentAnswer] = {}
+        order: list[tuple[str, str]] = []
         for answer in agent_answers:
-            latest[answer.agent_name] = answer
-        ordered = ["portfolio", "crm"]
-        return [latest[name] for name in ordered if name in latest]
+            key = (answer.agent_name, answer.tool_name)
+            if key not in latest:
+                order.append(key)
+            latest[key] = answer
+        domain_rank = {"portfolio": 0, "crm": 1}
+        order.sort(key=lambda k: domain_rank.get(k[0], 99))
+        return [latest[key] for key in order]

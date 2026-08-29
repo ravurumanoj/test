@@ -21,6 +21,12 @@ class Settings:
     app_name: str
     app_env: str
     log_level: str
+    # ── Log file persistence ─────────────────────────────────────────
+    # LOG_FILE — path to the rotating log file. Empty disables file logging
+    #   (console only). LOG_MAX_BYTES / LOG_BACKUP_COUNT control rotation.
+    log_file: str
+    log_max_bytes: int
+    log_backup_count: int
     unique_api_base_url: str
     unique_api_version: str
     unique_app_id: str
@@ -37,6 +43,13 @@ class Settings:
     # UNIQUE_DEFAULT_SESSION_ID — used as chatId when the request omits session_id.
     unique_assistant_id: str
     unique_default_session_id: str
+    # ── Webhook (Unique AI space integration) ───────────────────────────────
+    # UNIQUE_WEBHOOK_ENDPOINT_SECRET — HMAC secret Unique signs each webhook with.
+    #   When empty, signature verification is skipped (POC only; log a warning).
+    # UNIQUE_DEFAULT_CUSTOMER_ID — customer_id used for webhook-driven queries when
+    #   the event payload carries no explicit customer identifier.
+    unique_webhook_endpoint_secret: str
+    unique_default_customer_id: str
     # ── MCP (Model Context Protocol) integration ─────────────────────────────
     # All MCP settings are OPTIONAL. When mcp_server_url is empty the MCP
     # Manager is disabled and the application behaves exactly as before.
@@ -68,6 +81,9 @@ class Settings:
             app_name=os.getenv("APP_NAME", "relationship-manager-agentic-rag-poc"),
             app_env=os.getenv("APP_ENV", "local"),
             log_level=os.getenv("LOG_LEVEL", "DEBUG").upper(),
+            log_file=os.getenv("LOG_FILE", "logs/app.log").strip(),
+            log_max_bytes=int(os.getenv("LOG_MAX_BYTES", str(10 * 1024 * 1024))),
+            log_backup_count=int(os.getenv("LOG_BACKUP_COUNT", "5")),
             unique_api_base_url=os.getenv("UNIQUE_API_BASE_URL", "").strip(),
             unique_api_version=os.getenv("UNIQUE_API_VERSION", "2023-12-06").strip(),
             unique_app_id=os.getenv("UNIQUE_APP_ID", "").strip(),
@@ -81,6 +97,9 @@ class Settings:
             # ── Session / ChatService integration ────────────────────────────
             unique_assistant_id=os.getenv("UNIQUE_ASSISTANT_ID", "").strip(),
             unique_default_session_id=os.getenv("UNIQUE_DEFAULT_SESSION_ID", "poc-demo-session-001").strip(),
+            # ── Webhook integration ──────────────────────────────────────────
+            unique_webhook_endpoint_secret=os.getenv("UNIQUE_WEBHOOK_ENDPOINT_SECRET", "").strip(),
+            unique_default_customer_id=os.getenv("UNIQUE_DEFAULT_CUSTOMER_ID", "CUST-1001").strip(),
             # ── MCP integration (see resolution logic above) ─────────────────
             mcp_enabled=mcp_enabled,
             mcp_server_url=mcp_server_url,

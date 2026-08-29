@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import logging
 import logging.config
+from pathlib import Path
 
 from app.settings import Settings
 
@@ -47,6 +48,27 @@ def configure_logging() -> None:
     settings = Settings.from_env()
     log_level = getattr(logging, settings.log_level, logging.DEBUG)
 
+    # Build handlers: console always; rotating file when LOG_FILE is configured.
+    handlers: dict[str, dict] = {
+        "console": {
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stdout",
+            "formatter": "structured",
+        }
+    }
+    active_handlers = ["console"]
+    if settings.log_file:
+        Path(settings.log_file).parent.mkdir(parents=True, exist_ok=True)
+        handlers["file"] = {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": settings.log_file,
+            "maxBytes": settings.log_max_bytes,
+            "backupCount": settings.log_backup_count,
+            "encoding": "utf-8",
+            "formatter": "structured",
+        }
+        active_handlers.append("file")
+
     logging.config.dictConfig(
         {
             "version": 1,
@@ -60,16 +82,10 @@ def configure_logging() -> None:
                     "()": _StructuredFormatter,
                 }
             },
-            "handlers": {
-                "console": {
-                    "class": "logging.StreamHandler",
-                    "stream": "ext://sys.stdout",
-                    "formatter": "structured",
-                }
-            },
+            "handlers": handlers,
             "root": {
                 "level": log_level,
-                "handlers": ["console"],
+                "handlers": active_handlers,
             },
             "loggers": {
                 # Application namespace — inherit root level
@@ -88,7 +104,11 @@ def configure_logging() -> None:
 
     logging.getLogger(__name__).info(
         "Logging configured",
-        extra={"log_level": settings.log_level, "app_env": settings.app_env},
+        extra={
+            "log_level": settings.log_level,
+            "app_env": settings.app_env,
+            "log_file": settings.log_file or "(console only)",
+        },
     )
 
 

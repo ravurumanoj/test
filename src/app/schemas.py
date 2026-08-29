@@ -125,6 +125,37 @@ class RelationshipManagerRequest(BaseModel):
             "Prefer session_id-based persistence for multi-turn conversations."
         ),
     )
+    persist_turn: bool = Field(
+        default=True,
+        description=(
+            "When True the orchestrator writes the user+assistant turn back to Unique AI. "
+            "Set False for webhook-driven requests, where Unique already stores the user "
+            "message and the assistant reply is written by updating the pre-created "
+            "assistant message placeholder."
+        ),
+    )
+    auth_user_id: str = Field(
+        default="",
+        description=(
+            "Unique user id to act on behalf of for SDK calls. When non-empty this "
+            "overrides UNIQUE_AUTH_USER_ID (used by the webhook to pass event.userId). "
+            "Empty falls back to the env var."
+        ),
+    )
+    auth_company_id: str = Field(
+        default="",
+        description=(
+            "Unique company id for SDK calls. Overrides UNIQUE_AUTH_COMPANY_ID when "
+            "non-empty (webhook passes event.companyId). Empty falls back to the env var."
+        ),
+    )
+    assistant_id: str = Field(
+        default="",
+        description=(
+            "Unique assistant id for SDK calls. Overrides UNIQUE_ASSISTANT_ID when "
+            "non-empty (webhook passes payload.assistantId). Empty falls back to the env var."
+        ),
+    )
 
     @field_validator("customer_id", "question")
     @classmethod
@@ -139,6 +170,10 @@ class AgentAnswer(BaseModel):
     agent_name: Literal["portfolio", "crm"]
     summary: str
     retrieved_context: dict
+    tool_name: str = Field(
+        default="",
+        description="The specific data tool that produced this answer (e.g. portfolio_performance).",
+    )
 
 
 class RelationshipManagerResponse(BaseModel):
@@ -159,3 +194,54 @@ class HealthResponse(BaseModel):
     status: str
     app_name: str
     environment: str
+
+
+# ─── Unique AI webhook schemas (space integration) ───────────────────────────
+
+
+class WebhookUserMessage(BaseModel):
+    """User message carried by a Unique webhook event."""
+
+    id: str = ""
+    text: str = ""
+    createdAt: str | None = None
+    originalText: str | None = None
+    language: str | None = None
+
+
+class WebhookAssistantMessage(BaseModel):
+    """Placeholder assistant message Unique pre-creates for us to fill in."""
+
+    id: str = ""
+    createdAt: str | None = None
+
+
+class WebhookPayload(BaseModel):
+    """Payload of a Unique ``external-module.chosen`` / ``user-message.created`` event.
+
+    Extra keys sent by Unique (name, description, toolChoices, userMetadata, ...) are
+    accepted and ignored so schema drift on their side never breaks the endpoint.
+    """
+
+    model_config = {"extra": "allow"}
+
+    chatId: str = ""
+    assistantId: str = ""
+    text: str = ""  # present on user-message.created
+    userMessage: WebhookUserMessage = Field(default_factory=WebhookUserMessage)
+    assistantMessage: WebhookAssistantMessage = Field(default_factory=WebhookAssistantMessage)
+    configuration: dict[str, Any] = Field(default_factory=dict)
+
+
+class WebhookEvent(BaseModel):
+    """Envelope of a Unique webhook delivery."""
+
+    model_config = {"extra": "allow"}
+
+    id: str = ""
+    version: str = ""
+    event: str = ""
+    createdAt: int | str | None = None
+    userId: str = ""
+    companyId: str = ""
+    payload: WebhookPayload = Field(default_factory=WebhookPayload)

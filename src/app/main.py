@@ -8,8 +8,8 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from app.agents.crm_agent import CrmAgent
-from app.agents.portfolio_agent import PortfolioAgent
+from app.agents.crm_agent import build_crm_tools
+from app.agents.portfolio_agent import build_portfolio_tools
 from app.agents.relationship_manager import RelationshipManagerOrchestrator
 from app.api.routes import create_router
 from app.api.portfolio_routes import router as portfolio_router
@@ -53,11 +53,10 @@ if settings.mcp_enabled and settings.mcp_server_url:
 else:
 	logger.info("MCP Manager disabled (no MCP_SERVER_URL configured)")
 
-portfolio_agent = PortfolioAgent(unique_toolkit=unique_toolkit)
-crm_agent = CrmAgent(unique_toolkit=unique_toolkit)  # MCP now handled at orchestrator level
+portfolio_tools = build_portfolio_tools(unique_toolkit=unique_toolkit)
+crm_tools = build_crm_tools(unique_toolkit=unique_toolkit)
 orchestrator = RelationshipManagerOrchestrator(
-	portfolio_agent=portfolio_agent,
-	crm_agent=crm_agent,
+	tools=[*portfolio_tools, *crm_tools],
 	unique_toolkit=unique_toolkit,
 	settings=settings,
 	mcp_manager=mcp_manager,  # MCP tools discovered and exposed to LLM on first request
@@ -65,7 +64,7 @@ orchestrator = RelationshipManagerOrchestrator(
 )
 
 app = FastAPI(title=settings.app_name)
-app.include_router(create_router(orchestrator=orchestrator, settings=settings))
+app.include_router(create_router(orchestrator=orchestrator, settings=settings, session_service=session_service))
 app.include_router(portfolio_router)
 app.include_router(crm_router)
 

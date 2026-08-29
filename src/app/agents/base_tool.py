@@ -77,6 +77,16 @@ class Tool(ABC):
         """Return the user-facing tool name shown in the UI."""
         return self.settings.display_name
 
+    @property
+    def domain(self) -> str:
+        """Return the business domain this tool contributes to (e.g. 'portfolio', 'crm').
+
+        Used by the orchestrator to group tool results into AgentAnswer records and
+        to derive the routing decision. Empty string means the tool does not map to
+        a sub-agent domain (e.g. MCP tools).
+        """
+        return ""
+
     def icon(self) -> str:
         """Return the UI icon character for this tool."""
         return self.settings.icon

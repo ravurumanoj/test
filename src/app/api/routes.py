@@ -7,10 +7,17 @@ import logging
 import time
 from typing import Any
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
+from fastapi.responses import JSONResponse
 
 from app.agents.relationship_manager import RelationshipManagerOrchestrator
-from app.schemas import HealthResponse, RelationshipManagerRequest, RelationshipManagerResponse
+from app.schemas import (
+    HealthResponse,
+    RelationshipManagerRequest,
+    RelationshipManagerResponse,
+    WebhookEvent,
+)
+from app.services.session_service import UniqueSessionService
 from app.settings import Settings
 
 try:
@@ -22,10 +29,20 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+# Events that carry a user message we should answer.
+_ANSWERABLE_EVENTS = frozenset(
+    {"unique.chat.external-module.chosen", "unique.chat.user-message.created"}
+)
 
-def create_router(orchestrator: RelationshipManagerOrchestrator, settings: Settings) -> APIRouter:
+
+def create_router(
+    orchestrator: RelationshipManagerOrchestrator,
+    settings: Settings,
+    session_service: UniqueSessionService | None = None,
+) -> APIRouter:
     """Create the API router with health and relationship-manager endpoints."""
     router = APIRouter()
+
 
     @router.get("/health", response_model=HealthResponse)
     async def health() -> HealthResponse:
@@ -113,5 +130,113 @@ def create_router(orchestrator: RelationshipManagerOrchestrator, settings: Setti
             },
         )
         return response
+
+    @router.post("/relationship-manager/webhook")
+    async def relationship_manager_webhook(request: Request) -> JSONResponse:
+        """Handle Unique AI space webhook events for the relationship manager module.
+
+        Unique posts an event here whenever this module is chosen in a space. The
+        UI pre-creates an empty assistant message; this handler runs the orchestrator
+        against the user's message and writes the answer back into that placeholder.
+
+        Mirrors the ``unique.chat.external-module.chosen`` flow from the Unique SDK
+        webhook guide. Always returns HTTP 200 so Unique does not mark the delivery
+        as expired; processing failures are reported in the response body.
+        """
+        raw_body = await request.body()
+        sig_header = request.headers.get("X-Unique-Signature", "")
+        timestamp = request.headers.get("X-Unique-Created-At", "")
+
+        # 1. Verify authenticity (skipped only when no secret is configured).
+        if session_service is not None:
+            try:
+                session_service.verify_webhook(raw_body, sig_header, timestamp)
+            except Exception as exc:
+                logger.warning("Webhook signature verification failed", extra={"error": str(exc)})
+                return JSONResponse(status_code=400, content={"success": False, "reason": "invalid_signature"})
+
+        # 2. Parse the envelope.
+        try:
+            event = WebhookEvent.model_validate_json(raw_body)
+        except Exception as exc:
+            logger.warning("Webhook body could not be parsed", extra={"error": str(exc)})
+            return JSONResponse(status_code=400, content={"success": False, "reason": "invalid_body"})
+
+        logger.info(
+            "Webhook event received",
+            extra={
+                "event": event.event,
+                "chat_id": event.payload.chatId,
+                "assistant_id": event.payload.assistantId,
+                "user_id": event.userId,
+                "company_id": event.companyId,
+            },
+        )
+
+        if event.event not in _ANSWERABLE_EVENTS:
+            logger.info("Webhook event ignored (not answerable)", extra={"event": event.event})
+            return JSONResponse(status_code=200, content={"success": True, "handled": False})
+
+        payload = event.payload
+        user_text = (payload.userMessage.text or payload.text).strip()
+        chat_id = payload.chatId
+        assistant_message_id = payload.assistantMessage.id
+
+        if not user_text or not chat_id:
+            logger.info(
+                "Webhook missing user text or chatId — acknowledging without action",
+                extra={"has_text": bool(user_text), "has_chat_id": bool(chat_id)},
+            )
+            return JSONResponse(status_code=200, content={"success": True, "handled": False})
+
+        # 3. Resolve the customer_id (payload configuration wins; else default).
+        customer_id = str(payload.configuration.get("customerId") or settings.unique_default_customer_id)
+
+        # 4. Run the orchestrator. persist_turn=False: Unique already stored the user
+        #    message; the assistant reply is written by updating the placeholder below.
+        #    Identity comes from the event (client) and falls back to env vars downstream.
+        rm_request = RelationshipManagerRequest(
+            customer_id=customer_id,
+            question=user_text,
+            session_id=chat_id,
+            persist_turn=False,
+            auth_user_id=event.userId,
+            auth_company_id=event.companyId,
+            assistant_id=payload.assistantId,
+        )
+        t0 = time.perf_counter()
+        try:
+            response = await orchestrator.handle_request(rm_request)
+        except Exception:
+            logger.exception("Webhook orchestrator run failed", extra={"chat_id": chat_id})
+            return JSONResponse(status_code=200, content={"success": False, "reason": "processing_error"})
+        elapsed_ms = round((time.perf_counter() - t0) * 1000)
+
+        # 5. Write the answer back into the assistant message placeholder.
+        if session_service is not None:
+            try:
+                session_service.write_assistant_message(
+                    chat_id=chat_id,
+                    message_id=assistant_message_id,
+                    text=response.final_answer,
+                    user_id=event.userId,
+                    company_id=event.companyId,
+                    assistant_id=payload.assistantId,
+                )
+            except Exception:
+                logger.exception("Webhook failed to write assistant message", extra={"chat_id": chat_id})
+                return JSONResponse(status_code=200, content={"success": False, "reason": "write_error"})
+
+        logger.info(
+            "Webhook handled",
+            extra={
+                "chat_id": chat_id,
+                "customer_id": customer_id,
+                "elapsed_ms": elapsed_ms,
+                "routing_decision": response.routing_decision,
+                "final_answer_length": len(response.final_answer),
+            },
+        )
+        return JSONResponse(status_code=200, content={"success": True, "handled": True})
 
     return router
