@@ -30,9 +30,28 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 # Events that carry a user message we should answer.
-_ANSWERABLE_EVENTS = frozenset(
-    {"unique.chat.external-module.chosen", "unique.chat.user-message.created"}
-)
+# TODO: replace these placeholder names with the real Unique event names later.
+_ANSWERABLE_EVENTS = frozenset({"module.chosen", "user.message.created"})
+
+# Sample payload shown in Swagger "Try it out" for the raw-body webhook endpoint.
+# The handler reads request.body() directly (for HMAC verification), so FastAPI
+# cannot auto-generate a schema — this example makes the endpoint testable in docs.
+_WEBHOOK_EXAMPLE: dict[str, Any] = {
+    "id": "evt_test_1",
+    "version": "1.0.0",
+    "event": "module.chosen",
+    "createdAt": 1700000000,
+    "userId": "user_abc",
+    "companyId": "company_xyz",
+    "payload": {
+        "chatId": "chat_test_123",
+        "assistantId": "assistant_test_123",
+        "text": "How is my portfolio performing this quarter?",
+        "userMessage": {"id": "msg_user_1", "text": "How is my portfolio performing this quarter?"},
+        "assistantMessage": {"id": "msg_assistant_1"},
+        "configuration": {"customerId": "CUST001"},
+    },
+}
 
 
 def create_router(
@@ -131,7 +150,20 @@ def create_router(
         )
         return response
 
-    @router.post("/relationship-manager/webhook")
+    @router.post(
+        "/relationship-manager/webhook",
+        openapi_extra={
+            "requestBody": {
+                "required": True,
+                "content": {
+                    "application/json": {
+                        "schema": {"type": "object"},
+                        "example": _WEBHOOK_EXAMPLE,
+                    }
+                },
+            }
+        },
+    )
     async def relationship_manager_webhook(request: Request) -> JSONResponse:
         """Handle Unique AI space webhook events for the relationship manager module.
 
