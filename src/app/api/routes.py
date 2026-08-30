@@ -165,15 +165,42 @@ def create_router(
         },
     )
     async def relationship_manager_webhook(request: Request) -> JSONResponse:
-        """Handle Unique AI space webhook events for the relationship manager module.
+        """Answer a chat message delivered as a webhook event and write the reply back.
 
-        Unique posts an event here whenever this module is chosen in a space. The
-        UI pre-creates an empty assistant message; this handler runs the orchestrator
-        against the user's message and writes the answer back into that placeholder.
+        **Request body (JSON).** Send the following fields:
 
-        Mirrors the ``unique.chat.external-module.chosen`` flow from the Unique SDK
-        webhook guide. Always returns HTTP 200 so Unique does not mark the delivery
-        as expired; processing failures are reported in the response body.
+        **Top level**
+        - `event` (string, required): the event type. Only `module.chosen` and
+          `user.message.created` are processed; anything else is acknowledged and
+          ignored. This tells the endpoint the message is ready to be answered.
+        - `userId` (string): the Unique user the request acts on behalf of. Used as
+          the identity for SDK calls; falls back to `UNIQUE_AUTH_USER_ID` if empty.
+        - `companyId` (string): the Unique company/tenant id for SDK calls; falls
+          back to `UNIQUE_AUTH_COMPANY_ID` if empty.
+        - `id` (string, optional): a unique identifier for this webhook delivery.
+          We log it for traceability but do not require it — send any placeholder
+          value when testing.
+        - `version`, `createdAt` (optional): delivery envelope metadata (schema
+          version and epoch timestamp). Logged but not required.
+
+        **`payload` object**
+        - `chatId` (string, required): the conversation this message belongs to. Used
+          as the session id and as the target chat when writing the answer. Without it
+          the request is acknowledged but not answered.
+        - `text` (string): the user's question/message. Either this or
+          `userMessage.text` must be non-empty — that text is what the agent answers.
+        - `assistantId` (string): the Unique assistant id for SDK calls; falls back to
+          `UNIQUE_ASSISTANT_ID` if empty.
+        - `userMessage.text` (string): alternative place for the user's message; takes
+          precedence over `payload.text` when present.
+        - `assistantMessage.id` (string): id of the empty assistant message the Unique
+          UI pre-creates. The generated answer is written into this placeholder. If
+          omitted, a new assistant message is created instead.
+        - `configuration.customerId` (string): which customer's data to query. When
+          absent we use `UNIQUE_DEFAULT_CUSTOMER_ID`.
+
+        The endpoint always returns HTTP 200 so the sender does not retry; the JSON
+        body reports whether the message was actually handled.
         """
         raw_body = await request.body()
         sig_header = request.headers.get("X-Unique-Signature", "")
