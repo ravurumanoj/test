@@ -1,4 +1,3 @@
-
 """Environment-driven application settings."""
 
 from __future__ import annotations
@@ -9,7 +8,14 @@ from pathlib import Path
 
 try:
     from dotenv import load_dotenv
-    load_dotenv(Path(__file__).resolve().parents[2] / ".env")
+
+    project_root = Path(__file__).resolve().parents[2]
+    local_env_path = project_root / ".env"
+    deployed_env_path = Path("/usr/local/config/.env")
+    environment = os.getenv("APP_ENV", "local").strip().lower()
+    env_path = local_env_path if environment == "local" else deployed_env_path
+
+    load_dotenv(env_path, override=False)
 except ImportError:
     pass
 
