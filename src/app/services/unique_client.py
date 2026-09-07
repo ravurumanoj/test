@@ -64,6 +64,8 @@ class UniqueAIClient:
         tools: list[dict[str, Any]] | None = None,
         tool_choice: dict[str, Any] | str | None = None,
         temperature: float | None = None,
+        user_id: str | None = None,
+        company_id: str | None = None,
     ) -> dict[str, Any]:
         """Run a raw completion request and return a normalized OpenAI-style payload.
         
@@ -102,10 +104,23 @@ class UniqueAIClient:
         if temperature is not None:
             options["temperature"] = temperature
 
+        # Prefer the per-request identity (resolved from the webhook event) and
+        # only fall back to the static settings when the caller doesn't supply one.
+        # Both company_id/user_id must be non-empty: unique_sdk raises ValueError
+        # when constructing its response object with an empty-string user_id.
+        resolved_company_id = (company_id or self.settings.unique_auth_company_id or "").strip()
+        resolved_user_id = (user_id or self.settings.unique_auth_user_id or "").strip()
+        if not resolved_company_id or not resolved_user_id:
+            raise UniqueIntegrationError(
+                "Missing company_id/user_id for Unique SDK call. Set UNIQUE_AUTH_COMPANY_ID and "
+                "UNIQUE_AUTH_USER_ID, or ensure the webhook event carries companyId/userId.",
+                {"has_company_id": bool(resolved_company_id), "has_user_id": bool(resolved_user_id)},
+            )
+
         # Build the params dict for the **params unpacking in create()
         params: dict[str, Any] = {
-            "company_id": self.settings.unique_auth_company_id,
-            "user_id": self.settings.unique_auth_user_id,
+            "company_id": resolved_company_id,
+            "user_id": resolved_user_id,
             "model": self.settings.unique_model_name,
             "messages": messages,
         }

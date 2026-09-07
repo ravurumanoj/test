@@ -211,7 +211,6 @@ Copy `.env.example` and fill in your Unique credentials before running non-test 
 |---|---|---|---|
 | `APP_NAME` | No | `relationship-manager-agentic-rag-poc` | Application name |
 | `APP_ENV` | No | `local` | Environment label |
-| `ENV_FILE` | No | `/usr/local/config/.env` | dotenv file path; the repository `.env` is used as a local fallback |
 
 MCP variables are documented in the [MCP integration](#mcp-integration-orchestrator-level) section.
 
@@ -220,14 +219,14 @@ MCP variables are documented in the [MCP integration](#mcp-integration-orchestra
 ## Run
 
 ```powershell
-uv run uvicorn app.main:app --reload --app-dir src
+uv run uvicorn app.main:app --reload --env-file .env --app-dir src
 ```
 
-For production, the application loads `/usr/local/config/.env` automatically. To expose
-the service outside the local machine, bind Uvicorn to all interfaces:
+For production, explicitly select the deployed environment file. To expose the service
+outside the local machine, bind Uvicorn to all interfaces:
 
 ```bash
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --app-dir src
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --env-file /usr/local/config/.env --app-dir src
 ```
 
 After the server starts:
@@ -496,3 +495,5 @@ request.
 | MCP config (URL, auth, timeout) | `src/app/settings.py` |
 | MCP error type | `src/app/errors.py` (`McpIntegrationError`) |
 | Discovery + wiring | `src/app/agents/relationship_manager.py` (`_ensure_mcp_tools_loaded`), `src/app/main.py` |
+
+ENV APP_ENV=dev

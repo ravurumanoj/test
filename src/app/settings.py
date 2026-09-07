@@ -11,11 +11,12 @@ try:
 
     project_root = Path(__file__).resolve().parents[2]
     local_env_path = project_root / ".env"
-    deployed_env_path = Path("/usr/local/config/.env")
+    # deployed_env_path = Path("/usr/local/config/.env")
     environment = os.getenv("APP_ENV", "local").strip().lower()
-    env_path = local_env_path if environment == "local" else deployed_env_path
-
-    load_dotenv(env_path, override=False)
+    # env_path = local_env_path if environment == "local" else deployed_env_path
+    if environment == "local":
+        load_dotenv(local_env_path, override=False)
+    # load_dotenv(env_path, override=False)
 except ImportError:
     pass
 

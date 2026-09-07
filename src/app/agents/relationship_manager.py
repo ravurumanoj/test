@@ -312,6 +312,8 @@ class RelationshipManagerOrchestrator:
                     messages=messages,
                     tool_definitions=[],
                     allow_tools=False,
+                    user_id=request.auth_user_id,
+                    company_id=request.auth_company_id,
                 )
                 final_answer = planning_result.get("content", "") or self._combine_answers(all_agent_answers)
                 debug_info_manager.add("loop_exit_reason", "max_iterations_reached")
@@ -322,6 +324,8 @@ class RelationshipManagerOrchestrator:
             planning_result = await self._plan_iteration(
                 history_messages=messages,
                 tool_definitions=tool_definitions,
+                user_id=request.auth_user_id,
+                company_id=request.auth_company_id,
             )
 
             raw_tool_calls = planning_result.get("tool_calls", [])
@@ -568,6 +572,8 @@ class RelationshipManagerOrchestrator:
         *,
         history_messages: list[dict[str, Any]],
         tool_definitions: list[dict[str, Any]],
+        user_id: str | None = None,
+        company_id: str | None = None,
     ) -> dict[str, Any]:
         """Call the LLM to plan which tools to invoke.
 
@@ -584,6 +590,8 @@ class RelationshipManagerOrchestrator:
             messages=history_messages,
             tool_definitions=tool_definitions,
             allow_tools=True,
+            user_id=user_id,
+            company_id=company_id,
         )
         tool_calls_returned = result.get("tool_calls", [])
         content_returned = result.get("content") or ""

@@ -128,6 +128,8 @@ class UniqueToolkit:
         tool_definitions: list[dict[str, Any]],
         forced_tool_name: str | None = None,
         allow_tools: bool = True,
+        user_id: str | None = None,
+        company_id: str | None = None,
     ) -> dict[str, Any]:
         """Run a planning completion that can request function tool calls.
 
@@ -173,6 +175,8 @@ class UniqueToolkit:
             tools=tools,
             tool_choice=tool_choice,
             temperature=0.2,
+            user_id=user_id,
+            company_id=company_id,
         )
 
         content = self.client._extract_completion_text(response)
@@ -204,7 +208,13 @@ class UniqueToolkit:
             "raw": response,
         }
 
-    def finalize_answer(self, *, messages: list[dict[str, Any]]) -> str:
+    def finalize_answer(
+        self,
+        *,
+        messages: list[dict[str, Any]],
+        user_id: str | None = None,
+        company_id: str | None = None,
+    ) -> str:
         """Generate a final answer with tools disabled for predictable loop termination.
 
         Mirrors the Unique orchestrator last-iteration no-tools mode.
@@ -218,6 +228,8 @@ class UniqueToolkit:
             tools=None,
             tool_choice=None,
             temperature=0.1,
+            user_id=user_id,
+            company_id=company_id,
         )
         answer = self.client._extract_completion_text(response)
         if answer:
