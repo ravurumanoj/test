@@ -58,6 +58,9 @@ class UniqueToolkit:
         prompt: str,
         context: dict[str, Any],
         question: str,
+        *,
+        user_id: str | None = None,
+        company_id: str | None = None,
     ) -> str:
         """Execute a sub-agent completion through Unique Toolkit or SDK.
 
@@ -90,7 +93,7 @@ class UniqueToolkit:
         )
 
         # Path 1: unique_toolkit LanguageModelService (preferred)
-        toolkit_response = self._try_toolkit_completion(messages=messages)
+        toolkit_response = self._try_toolkit_completion(messages=messages, user_id=user_id, company_id=company_id)
         if toolkit_response:
             logger.info(
                 "UniqueToolkit.execute completed via unique_toolkit path",
@@ -110,6 +113,8 @@ class UniqueToolkit:
         result = self.client.run_completion(
             agent_name=agent_name,
             messages=messages,
+            user_id=user_id,
+            company_id=company_id,
         )
         logger.info(
             "UniqueToolkit.execute completed via unique_sdk path",
@@ -266,7 +271,13 @@ class UniqueToolkit:
             },
         ]
 
-    def _try_toolkit_completion(self, messages: list[dict[str, str]]) -> str:
+    def _try_toolkit_completion(
+        self,
+        messages: list[dict[str, str]],
+        *,
+        user_id: str | None = None,
+        company_id: str | None = None,
+    ) -> str:
         """Attempt a standalone completion through the documented Unique Toolkit service.
 
         Returns an empty string if unique_toolkit is not installed or the call fails,
@@ -277,7 +288,7 @@ class UniqueToolkit:
             return ""
 
         try:
-            service = self._build_language_model_service()
+            service = self._build_language_model_service(user_id=user_id, company_id=company_id)
             complete = getattr(service, "complete", None)
             if complete is None or not callable(complete):
                 raise UniqueIntegrationError(
@@ -313,12 +324,25 @@ class UniqueToolkit:
             logger.exception("_try_toolkit_completion: exception; falling back to unique-sdk")
             return ""
 
-    def _build_language_model_service(self) -> Any:
-        """Instantiate LanguageModelService with auth IDs from runtime settings."""
+    def _build_language_model_service(
+        self,
+        *,
+        user_id: str | None = None,
+        company_id: str | None = None,
+    ) -> Any:
+        """Instantiate LanguageModelService, preferring per-request auth IDs over settings."""
+        resolved_company_id = (company_id or self.settings.unique_auth_company_id or "").strip()
+        resolved_user_id = (user_id or self.settings.unique_auth_user_id or "").strip()
+        if not resolved_company_id or not resolved_user_id:
+            raise UniqueIntegrationError(
+                "Missing company_id/user_id for Unique SDK call. Set UNIQUE_AUTH_COMPANY_ID and "
+                "UNIQUE_AUTH_USER_ID, or ensure the webhook event carries companyId/userId.",
+                {"has_company_id": bool(resolved_company_id), "has_user_id": bool(resolved_user_id)},
+            )
         try:
             return LanguageModelService(
-                company_id=self.settings.unique_auth_company_id,
-                user_id=self.settings.unique_auth_user_id,
+                company_id=resolved_company_id,
+                user_id=resolved_user_id,
             )
         except Exception as exc:
             raise UniqueIntegrationError(

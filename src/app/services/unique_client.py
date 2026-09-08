@@ -25,7 +25,14 @@ class UniqueAIClient:
         """Initialize the client with runtime settings."""
         self.settings = settings
 
-    def run_completion(self, agent_name: str, messages: list[dict[str, Any]]) -> str:
+    def run_completion(
+        self,
+        agent_name: str,
+        messages: list[dict[str, Any]],
+        *,
+        user_id: str | None = None,
+        company_id: str | None = None,
+    ) -> str:
         """Run a completion through Unique SDK and return assistant text.
 
         The messages list already encodes the prompt, context, and question so
@@ -40,7 +47,7 @@ class UniqueAIClient:
                 "model": self.settings.unique_model_name,
             },
         )
-        response = self.create_completion(messages=messages)
+        response = self.create_completion(messages=messages, user_id=user_id, company_id=company_id)
         content = self._extract_completion_text(response)
         if not content:
             raise UniqueIntegrationError(

@@ -461,6 +461,15 @@ class HistoryManager:
                 # Unknown role — drop silently.
                 i += 1
 
+        if safe and safe[-1]["role"] == "assistant":
+            safe.append(
+                {
+                    "role": "user",
+                    "content": "Continue: using the information gathered above, provide your response now.",
+                }
+            )
+            logger.debug("HistoryManager._sanitize: appended trailing user nudge after assistant message")
+
         return safe
 
     # ── Tool call persistence ─────────────────────────────────────────────────

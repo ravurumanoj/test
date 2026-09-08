@@ -191,6 +191,8 @@ class DataQueryTool(Tool):
                 prompt=self._spec.summarize_prompt,
                 context=summarize_context,
                 question=question,
+                user_id=context.get("auth_user_id"),
+                company_id=context.get("auth_company_id"),
             )
         except Exception as exc:
             logger.exception(

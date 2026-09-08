@@ -280,6 +280,8 @@ class RelationshipManagerOrchestrator:
         context: dict[str, Any] = {
             "customer_id": request.customer_id,
             "question": request.question,
+            "auth_user_id": request.auth_user_id,
+            "auth_company_id": request.auth_company_id,
         }
 
         # ── Main agentic loop ─────────────────────────────────────────────────
