@@ -268,6 +268,19 @@ def create_router(
             response = await orchestrator.handle_request(rm_request)
         except Exception:
             logger.exception("Webhook orchestrator run failed", extra={"chat_id": chat_id})
+        
+            if session_service is not None:
+                try:
+                    session_service.write_assistant_message(
+                        chat_id=chat_id,
+                        message_id=assistant_message_id,
+                        text="Sorry, something went wrong while processing your request.",
+                        user_id=event.userId,
+                        company_id=event.companyId,
+                        assistant_id=payload.assistantId,
+                    )
+                except Exception:
+                    logger.exception("Webhook: failed to clear placeholder after processing_error", extra={"chat_id": chat_id})
             return JSONResponse(status_code=200, content={"success": False, "reason": "processing_error"})
         elapsed_ms = round((time.perf_counter() - t0) * 1000)
 
