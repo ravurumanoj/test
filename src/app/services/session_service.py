@@ -20,6 +20,7 @@ the required credentials (api_key, user_id, company_id) are not configured.
 from __future__ import annotations
 
 import logging
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -201,6 +202,8 @@ class UniqueSessionService:
         """
         uid, cid, aid = self._resolve_identity(user_id, company_id, assistant_id)
         self._setup_sdk()
+    
+        now = datetime.now(timezone.utc)
         if message_id:
             _sdk.Message.modify(  # type: ignore[union-attr]
                 user_id=uid,
@@ -208,6 +211,8 @@ class UniqueSessionService:
                 id=message_id,
                 chatId=chat_id,
                 text=text,
+                stoppedStreamingAt=now,
+                completedAt=now,
             )
             logger.info(
                 "UniqueSessionService.write_assistant_message: assistant message updated",
@@ -317,6 +322,8 @@ class UniqueSessionService:
     ) -> None:
         """Create one message in the Unique chat via unique_sdk.Message.create."""
         uid, cid, aid = self._resolve_identity(user_id, company_id, assistant_id)
+       
+        completed_at = datetime.now(timezone.utc) if role == "ASSISTANT" else None
         _sdk.Message.create(  # type: ignore[union-attr]
             user_id=uid,
             company_id=cid,
@@ -324,6 +331,7 @@ class UniqueSessionService:
             assistantId=aid,
             role=role,
             text=text,
+            completedAt=completed_at,
         )
 
     def _setup_sdk(self) -> None:
