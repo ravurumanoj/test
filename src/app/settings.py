@@ -35,6 +35,7 @@ class Settings:
     log_max_bytes: int
     log_backup_count: int
     unique_api_base_url: str
+    subscriptions: tuple[str, ...] = ()
     unique_api_version: str
     unique_app_id: str
     unique_app_key: str
@@ -95,6 +96,11 @@ class Settings:
             log_max_bytes=int(os.getenv("LOG_MAX_BYTES", str(10 * 1024 * 1024))),
             log_backup_count=int(os.getenv("LOG_BACKUP_COUNT", "5")),
             unique_api_base_url=os.getenv("UNIQUE_API_BASE_URL", "").strip(),
+            subscriptions=tuple(
+                s.strip()
+                for s in os.getenv("SUBSCRIPTIONS", "").split(",")
+                if s.strip()
+            ),
             unique_api_version=os.getenv("UNIQUE_API_VERSION", "2023-12-06").strip(),
             unique_app_id=os.getenv("UNIQUE_APP_ID", "").strip(),
             unique_app_key=os.getenv("UNIQUE_APP_KEY", os.getenv("UNIQUE_API_KEY", "")).strip(),
