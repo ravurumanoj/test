@@ -1,9 +1,12 @@
-
 """FastAPI application entry point for the relationship manager POC."""
 
 from __future__ import annotations
 
+import asyncio
+import contextlib
 import logging
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
@@ -17,6 +20,7 @@ from app.api.crm_routes import router as crm_router
 from app.errors import AppError
 from app.logging_config import configure_logging
 from app.settings import Settings
+from app.sse_listener import start_sse_listener
 from app.services.unique_client import UniqueAIClient
 from app.services.unique_toolkit import UniqueToolkit
 from app.services.session_service import UniqueSessionService
@@ -42,28 +46,56 @@ logger.info(
 # disabled, mcp_manager stays None and the CRM agent runs exactly as before.
 mcp_manager: McpManager | None = None
 if settings.mcp_enabled and settings.mcp_server_url:
-	mcp_manager = McpManager(
-		server_url=settings.mcp_server_url,
-		auth_header=settings.mcp_auth_header,
-		auth_value=settings.mcp_auth_value,
-		timeout_seconds=settings.mcp_timeout_seconds,
-		protocol_version=settings.mcp_protocol_version,
-	)
-	logger.info("MCP Manager enabled", extra={"mcp_server_url": settings.mcp_server_url})
+    mcp_manager = McpManager(
+        server_url=settings.mcp_server_url,
+        auth_header=settings.mcp_auth_header,
+        auth_value=settings.mcp_auth_value,
+        timeout_seconds=settings.mcp_timeout_seconds,
+        protocol_version=settings.mcp_protocol_version,
+    )
+    logger.info("MCP Manager enabled", extra={"mcp_server_url": settings.mcp_server_url})
 else:
-	logger.info("MCP Manager disabled (no MCP_SERVER_URL configured)")
+    logger.info("MCP Manager disabled (no MCP_SERVER_URL configured)")
 
 portfolio_tools = build_portfolio_tools(unique_toolkit=unique_toolkit)
 crm_tools = build_crm_tools(unique_toolkit=unique_toolkit)
 orchestrator = RelationshipManagerOrchestrator(
-	tools=[*portfolio_tools, *crm_tools],
-	unique_toolkit=unique_toolkit,
-	settings=settings,
-	mcp_manager=mcp_manager,  # MCP tools discovered and exposed to LLM on first request
-	session_service=session_service,
+    tools=[*portfolio_tools, *crm_tools],
+    unique_toolkit=unique_toolkit,
+    settings=settings,
+    mcp_manager=mcp_manager,  # MCP tools discovered and exposed to LLM on first request
+    session_service=session_service,
 )
 
-app = FastAPI(title=settings.app_name)
+
+# ── SSE listener lifecycle ────────────────────────────────────────
+# Runs the SSE-to-webhook listener as a background task in the same process.
+# Disabled unless SSE_ENABLED=true, so existing behaviour is unchanged.
+@asynccontextmanager
+async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+    """Start/stop the SSE listde the API."""
+    sse_task: asyncio.Task | None = None
+
+    if settings.sse_enabled:
+        logger.info("Starting SSE listener task -> %s", settings.sse_webhook_url)
+        sse_task = asyncio.create_task(
+            start_sse_listener(settings.sse_webhook_url, settings.sse_max_concurrent),
+            name="sse-listener",
+        )
+    else:
+        logger.info("SSE listener disabled (SSE_ENABLED is not true)")
+
+    try:
+        yield
+    finally:
+        if sse_task is not None:
+            sse_task.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await sse_task
+            logger.info("SSE listener stopped")
+
+
+app = FastAPI(title=settings.app_name, lifespan=lifespan)            
 app.include_router(create_router(orchestrator=orchestrator, settings=settings, session_service=session_service))
 app.include_router(portfolio_router)
 app.include_router(crm_router)
@@ -71,25 +103,23 @@ app.include_router(crm_router)
 
 @app.exception_handler(AppError)
 async def handle_app_error(_: Request, exc: AppError) -> JSONResponse:
-	"""Convert known application exceptions into safe API responses."""
-	logger.error("Application error: %s", exc.message, extra={"details": exc.details})
-	return JSONResponse(
-		status_code=exc.status_code,
-		content={"error": exc.error_code, "message": exc.message, "details": exc.details},
-	)
+    """Convert known application exceptions into safe API responses."""
+    logger.error("Application error: %s", exc.message, extra={"details": exc.details})
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"error": exc.error_code, "message": exc.message, "details": exc.details},
+    )
 
 
 @app.exception_handler(Exception)
 async def handle_unexpected_error(_: Request, exc: Exception) -> JSONResponse:
-	"""Convert unexpected exceptions into a generic API error response."""
-	logger.exception("Unexpected server error")
-	return JSONResponse(
-		status_code=500,
-		content={
-			"error": "UNEXPECTED_ERROR",
-			"message": "An unexpected error occurred.",
-			"details": {"exception_type": exc.__class__.__name__},
-		},
-	)
-
-
+    """Convert unexpected exceptions into a generic API error response."""
+    logger.exception("Unexpected server error")
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": "UNEXPECTED_ERROR",
+            "message": "An unexpected error occurred.",
+            "details": {"exception_type": exc.__class__.__name__},
+        },
+    )

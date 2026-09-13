@@ -66,6 +66,9 @@ class Settings:
     mcp_auth_value: str
     mcp_timeout_seconds: int
     mcp_protocol_version: str
+    sse_enabled: bool
+    sse_webhook_url: str
+    sse_max_concurrent: int
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -116,4 +119,7 @@ class Settings:
             mcp_auth_value=os.getenv("MCP_AUTH_VALUE", "").strip(),
             mcp_timeout_seconds=int(os.getenv("MCP_TIMEOUT_SECONDS", "30")),
             mcp_protocol_version=os.getenv("MCP_PROTOCOL_VERSION", "2025-06-18").strip(),
+            sse_enabled=os.getenv("SSE_ENABLED", "true").lower() == "true",
+            sse_webhook_url=os.getenv("SSE_WEBHOOK_URL", "http://127.0.0.1:8080/relationship-manager/webhook").strip(),
+            sse_max_concurrent=int(os.getenv("SSE_MAX_CONCURRENT", "10")),
         )
