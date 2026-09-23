@@ -19,6 +19,7 @@ the required credentials (api_key, user_id, company_id) are not configured.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any
@@ -99,16 +100,22 @@ class UniqueSessionService:
 
         try:
             self._setup_sdk()
-            chat_id = self._resolve_chat_id(
-                session_id, create_if_missing=False, user_id=uid, company_id=cid, assistant_id=aid
-            )
-            if not chat_id:
-                logger.info(
-                    "UniqueSessionService.load_history: no Unique chat bound to session yet",
-                    extra={"session_id": session_id},
+
+            def _load_sync() -> list[dict[str, str]]:
+                chat_id = self._resolve_chat_id(
+                    session_id, create_if_missing=False, user_id=uid, company_id=cid, assistant_id=aid
                 )
-                return []
-            return self._load_via_message_list(session_id, chat_id, user_id=uid, company_id=cid)
+                if not chat_id:
+                    logger.info(
+                        "UniqueSessionService.load_history: no Unique chat bound to session yet",
+                        extra={"session_id": session_id},
+                    )
+                    return []
+                return self._load_via_message_list(session_id, chat_id, user_id=uid, company_id=cid)
+
+            # Run in a worker thread: these are blocking (sync) unique_sdk HTTP
+            # calls — inline they would block the event loop on every request.
+            return await asyncio.to_thread(_load_sync)
         except Exception as exc:
             logger.warning(
                 "UniqueSessionService.load_history: SDK call failed — returning empty history",
@@ -143,13 +150,19 @@ class UniqueSessionService:
 
         try:
             self._setup_sdk()
-            chat_id = self._resolve_chat_id(
-                session_id, create_if_missing=True, user_id=uid, company_id=cid, assistant_id=aid
-            )
-            for role, text in (("USER", user_message), ("ASSISTANT", assistant_message)):
-                self._create_message(
-                    chat_id=chat_id, role=role, text=text, user_id=uid, company_id=cid, assistant_id=aid
+
+            def _save_sync() -> None:
+                chat_id = self._resolve_chat_id(
+                    session_id, create_if_missing=True, user_id=uid, company_id=cid, assistant_id=aid
                 )
+                for role, text in (("USER", user_message), ("ASSISTANT", assistant_message)):
+                    self._create_message(
+                        chat_id=chat_id, role=role, text=text, user_id=uid, company_id=cid, assistant_id=aid
+                    )
+
+            # Run in a worker thread: these are blocking (sync) unique_sdk HTTP
+            # calls — inline they would block the event loop on every request.
+            await asyncio.to_thread(_save_sync)
             logger.info(
                 "UniqueSessionService.save_turn: turn persisted to Unique AI",
                 extra={

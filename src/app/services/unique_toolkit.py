@@ -302,6 +302,11 @@ class UniqueToolkit:
                     "messages": messages,
                     "model_name": self.settings.unique_model_name,
                     "temperature": 0.2,
+                    # Only applied if LanguageModelService.complete supports these
+                    # kwargs (filtered by signature) — raised so large prompts/
+                    # responses aren't cut off by low defaults.
+                    "max_tokens": self.settings.unique_llm_max_tokens,
+                    "timeout": self.settings.unique_llm_timeout_seconds,
                 },
             )
             logger.debug(

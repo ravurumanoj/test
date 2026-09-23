@@ -130,6 +130,12 @@ class UniqueAIClient:
             "user_id": resolved_user_id,
             "model": self.settings.unique_model_name,
             "messages": messages,
+            # Raised so large, data-heavy prompts/responses don't silently break:
+            #   timeout    — per-request processing allowance hint sent to the
+            #                Unique backend (ChatCompletion CreateParams.timeout)
+            #   max_tokens — output token cap, so large summaries aren't truncated
+            "timeout": self.settings.unique_llm_timeout_seconds,
+            "max_tokens": self.settings.unique_llm_max_tokens,
         }
         if options:
             params["options"] = options
@@ -143,6 +149,8 @@ class UniqueAIClient:
                 "tool_names": [t.get("function", {}).get("name") for t in (tools or [])],
                 "has_options": bool(options),
                 "temperature": temperature,
+                "timeout": self.settings.unique_llm_timeout_seconds,
+                "max_tokens": self.settings.unique_llm_max_tokens,
             },
         )
 
@@ -184,7 +192,22 @@ class UniqueAIClient:
         for attribute_name, value in optional_settings.items():
             if value and hasattr(unique_sdk_module, attribute_name):
                 setattr(unique_sdk_module, attribute_name, value)
-        
+
+        # Raise the socket-level timeout used by unique_sdk's underlying HTTP
+        # client (defaults to 600s) so large requests/responses aren't cut off
+        # at the transport layer. Only set once — unique_sdk reuses whatever
+        # is already assigned to default_http_client.
+        if getattr(unique_sdk_module, "default_http_client", None) is None and hasattr(
+            unique_sdk_module, "new_default_http_client"
+        ):
+            unique_sdk_module.default_http_client = unique_sdk_module.new_default_http_client(
+                timeout=self.settings.unique_http_client_timeout_seconds
+            )
+            logger.info(
+                "Configured unique_sdk default_http_client timeout",
+                extra={"timeout_seconds": self.settings.unique_http_client_timeout_seconds},
+            )
+
         # Configure HTTP proxies if provided in environment
         http_proxy = os.getenv("HTTP_PROXY") or os.getenv("http_proxy")
         https_proxy = os.getenv("HTTPS_PROXY") or os.getenv("https_proxy")

@@ -99,19 +99,59 @@ class ReferenceManager:
         """Initialize an empty reference store."""
         self._chunks: list[ContentChunk] = []
         self._tool_chunks: dict[str, list[ContentChunk]] = {}  # tool_call_id → chunks
+        self._seen_source_keys: set[tuple[str, str, str]] = set()  # dedupe across iterations/reruns
         self._reference_counter: int = 0
         logger.debug("ReferenceManager initialized")
+
+    @staticmethod
+    def _source_key(chunk: ContentChunk) -> tuple[str, str, str]:
+        """Return a stable identity key for a chunk's underlying source.
+
+        Keyed on (source, tool, section) from metadata rather than ``chunk.id``
+        because ids for some tools (e.g. MCP wrappers) embed a per-call
+        ``tool_call_id`` and would otherwise differ on every rerun, defeating
+        deduplication when the same tool is invoked again across loop
+        iterations or conversation turns.
+        """
+        meta = chunk.metadata or {}
+        source = str(meta.get("source", ""))
+        tool = str(meta.get("tool", ""))
+        section = str(meta.get("section", ""))
+        if not (source or tool or section):
+            return ("", "", chunk.id)
+        return (source, tool, section)
 
     def extract_referenceable_chunks(self, tool_responses: list[ToolCallResponse]) -> None:
         """Extract ContentChunks from all tool responses and register them.
 
         Mirrors ReferenceManager.extract_referenceable_chunks() in unique_toolkit.
         Multiple tools per iteration are numbered sequentially (incremental offset).
+        Chunks whose underlying source was already registered (e.g. the same
+        tool called again in a later iteration) are skipped so each source is
+        cited exactly once instead of producing duplicate citations.
         """
+        added = 0
+        skipped_duplicates = 0
         for resp in tool_responses:
             if not resp.content_chunks:
                 continue
-            self._chunks.extend(resp.content_chunks)
+            new_chunks: list[ContentChunk] = []
+            for chunk in resp.content_chunks:
+                key = self._source_key(chunk)
+                if key in self._seen_source_keys:
+                    skipped_duplicates += 1
+                    logger.debug(
+                        "ReferenceManager skipped duplicate source chunk",
+                        extra={"tool_name": resp.name, "tool_call_id": resp.id, "source_key": key},
+                    )
+                    continue
+                self._seen_source_keys.add(key)
+                new_chunks.append(chunk)
+            if new_chunks:
+                self._chunks.extend(new_chunks)
+                added += len(new_chunks)
+            # Keep the full set (including duplicates) available per tool_call_id
+            # so callers needing this specific tool's raw output still get it.
             self._tool_chunks[resp.id] = list(resp.content_chunks)
             logger.debug(
                 "ReferenceManager extracted chunks from tool",
@@ -121,6 +161,8 @@ class ReferenceManager:
             "ReferenceManager updated",
             extra={
                 "total_chunks": len(self._chunks),
+                "chunks_added": added,
+                "duplicate_chunks_skipped": skipped_duplicates,
                 "tool_responses_processed": len(tool_responses),
             },
         )
@@ -282,12 +324,25 @@ class HistoryManager:
             else:
                 content = resp.content
                 if resp.content_chunks:
-                    # Inline chunk texts so the LLM can reference them when generating
-                    chunks_text = "\n".join(
-                        f"[Source {i + 1}] {chunk.text}"
-                        for i, chunk in enumerate(resp.content_chunks)
-                    )
-                    content = f"{resp.content}\n\nSources:\n{chunks_text}" if resp.content else chunks_text
+                    # Some tools (e.g. MCP passthrough) set content_chunks to the same
+                    # raw text already present in resp.content. Only inline chunks that
+                    # add NEW information, otherwise the same payload is duplicated
+                    # back-to-back in the same tool message (and can bleed into the
+                    # final answer / citations as repeated "internal" looking text).
+                    novel_chunks = [
+                        chunk
+                        for chunk in resp.content_chunks
+                        if not resp.content or chunk.text.strip() not in resp.content
+                    ]
+                    if novel_chunks:
+                        # No bracketed "[Source N]" markers here on purpose: citation
+                        # numbering is owned exclusively by ReferenceManager/_build_
+                        # references_section AFTER the loop ends. If the LLM sees
+                        # citation-shaped syntax in tool context it may copy it verbatim
+                        # into the answer, producing a second, mismatched set of
+                        # "citations" the model invented itself.
+                        chunks_text = "\n\n".join(chunk.text for chunk in novel_chunks)
+                        content = f"{resp.content}\n\nAdditional retrieved detail:\n{chunks_text}" if resp.content else chunks_text
                 self._loop_history.append(
                     {
                         "role": "tool",

@@ -49,7 +49,7 @@ _WEBHOOK_EXAMPLE: dict[str, Any] = {
         "text": "How is my portfolio performing this quarter?",
         "userMessage": {"id": "msg_user_1", "text": "How is my portfolio performing this quarter?"},
         "assistantMessage": {"id": "msg_assistant_1"},
-        "configuration": {"customerId": "CUST001"},
+        "configuration": {"customerId": "CUST001", "portfolioId": "GO00001"},
     },
 }
 
@@ -129,6 +129,7 @@ def create_router(
             "Relationship manager query received",
             extra={
                 "customer_id": request.customer_id,
+                "portfolio_id": request.portfolio_id,
                 "question": request.question,
                 "question_length": len(request.question),
             },
@@ -198,6 +199,8 @@ def create_router(
           omitted, a new assistant message is created instead.
         - `configuration.customerId` (string): which customer's data to query. When
           absent we use `UNIQUE_DEFAULT_CUSTOMER_ID`.
+        - `configuration.portfolioId` (string): which account/portfolio statement to
+          query for the statement_* tools. When absent we use `UNIQUE_DEFAULT_PORTFOLIO_ID`.
 
         The endpoint always returns HTTP 200 so the sender does not retry; the JSON
         body reports whether the message was actually handled.
@@ -248,14 +251,16 @@ def create_router(
             )
             return JSONResponse(status_code=200, content={"success": True, "handled": False})
 
-        # 3. Resolve the customer_id (payload configuration wins; else default).
+        # 3. Resolve the customer_id and portfolio_id (payload configuration wins; else default).
         customer_id = str(payload.configuration.get("customerId") or settings.unique_default_customer_id)
+        portfolio_id = str(payload.configuration.get("portfolioId") or settings.unique_default_portfolio_id)
 
         # 4. Run the orchestrator. persist_turn=False: Unique already stored the user
         #    message; the assistant reply is written by updating the placeholder below.
         #    Identity comes from the event (client) and falls back to env vars downstream.
         rm_request = RelationshipManagerRequest(
             customer_id=customer_id,
+            portfolio_id=portfolio_id,
             question=user_text,
             session_id=chat_id,
             persist_turn=False,
@@ -304,6 +309,7 @@ def create_router(
             extra={
                 "chat_id": chat_id,
                 "customer_id": customer_id,
+                "portfolio_id": portfolio_id,
                 "elapsed_ms": elapsed_ms,
                 "routing_decision": response.routing_decision,
                 "final_answer_length": len(response.final_answer),

@@ -1,0 +1,1416 @@
+{
+  "portfolio": {
+    "portfolio_id": "GO00001",
+    "account_reference": "CH800022300001",
+    "account_number": "8000223",
+    "reference_currency": "USD",
+    "statement_type": "TITLE_PTF_STATEMENT",
+    "risk_profile": "Very Dynamic",
+    "valuation_date": "22/09/2026",
+    "generated_timestamp": "22/09/2026 09:41:10 GMT",
+    "data_quality_note": "Transcribed from OCR of scanned statement pages. Some character-level values were reconstructed from OCR patterns and are pending manual verification."
+  },
+  "summary": {
+    "total_assets": {
+      "market_value_usd": 6356135.32,
+      "pct_portfolio": 102.1,
+      "currency_allocation_pct": {
+        "USD": 70.57,
+        "NOK": 7.67,
+        "SEK": 7.6,
+        "SGD": 8.0,
+        "JPY": 3.46,
+        "HKD": 2.53,
+        "EUR": 1.12,
+        "GBP": 0.85,
+        "AUD": 0.3
+      }
+    },
+    "total_liabilities": {
+      "market_value_usd": -130610.25,
+      "pct_portfolio": -2.1,
+      "currency_allocation_pct": {
+        "USD": null,
+        "NOK": null,
+        "SEK": null,
+        "SGD": -2.1,
+        "JPY": null,
+        "HKD": null,
+        "EUR": null,
+        "GBP": null,
+        "AUD": null
+      }
+    },
+    "net_total": {
+      "market_value_usd": 6225525.07,
+      "pct_portfolio": 100.0,
+      "currency_allocation_pct": {
+        "USD": 70.57,
+        "NOK": 7.67,
+        "SEK": 7.6,
+        "SGD": 5.9,
+        "JPY": 3.46,
+        "HKD": 2.53,
+        "EUR": 1.12,
+        "GBP": 0.85,
+        "AUD": 0.3
+      }
+    },
+    "asset_line_breakdown": [
+      {
+        "market_value_usd": 5197285.67,
+        "pct_portfolio": 83.48,
+        "currency_allocation_pct": {
+          "USD": 64.34,
+          "NOK": 7.67,
+          "SEK": 7.6,
+          "SGD": 2.87,
+          "JPY": 0.68,
+          "HKD": 0.01,
+          "EUR": 0.02,
+          "GBP": 0.01,
+          "AUD": 0.3
+        }
+      },
+      {
+        "market_value_usd": 185558.34,
+        "pct_portfolio": 2.98,
+        "currency_allocation_pct": {
+          "USD": null,
+          "NOK": null,
+          "SEK": null,
+          "SGD": 2.98,
+          "JPY": null,
+          "HKD": null,
+          "EUR": null,
+          "GBP": null,
+          "AUD": null
+        }
+      },
+      {
+        "market_value_usd": 104618.52,
+        "pct_portfolio": 1.68,
+        "currency_allocation_pct": {
+          "USD": null,
+          "NOK": null,
+          "SEK": null,
+          "SGD": 1.68,
+          "JPY": null,
+          "HKD": null,
+          "EUR": null,
+          "GBP": null,
+          "AUD": null
+        }
+      },
+      {
+        "market_value_usd": 0.0,
+        "pct_portfolio": 0.0,
+        "currency_allocation_pct": {
+          "USD": 0.0,
+          "NOK": null,
+          "SEK": null,
+          "SGD": null,
+          "JPY": null,
+          "HKD": null,
+          "EUR": null,
+          "GBP": null,
+          "AUD": null
+        }
+      },
+      {
+        "market_value_usd": 438064.08,
+        "pct_portfolio": 7.04,
+        "currency_allocation_pct": {
+          "USD": 1.28,
+          "NOK": null,
+          "SEK": null,
+          "SGD": 0.2,
+          "JPY": 1.18,
+          "HKD": 2.43,
+          "EUR": 1.1,
+          "GBP": 0.84,
+          "AUD": 0.0
+        }
+      },
+      {
+        "market_value_usd": 396269.51,
+        "pct_portfolio": 6.37,
+        "currency_allocation_pct": {
+          "USD": 4.41,
+          "NOK": null,
+          "SEK": null,
+          "SGD": 0.27,
+          "JPY": 1.6,
+          "HKD": 0.09,
+          "EUR": null,
+          "GBP": null,
+          "AUD": null
+        }
+      },
+      {
+        "market_value_usd": 34339.2,
+        "pct_portfolio": 0.55,
+        "currency_allocation_pct": {
+          "USD": 0.55,
+          "NOK": null,
+          "SEK": null,
+          "SGD": null,
+          "JPY": null,
+          "HKD": null,
+          "EUR": null,
+          "GBP": null,
+          "AUD": null
+        }
+      },
+      {
+        "market_value_usd": 0.0,
+        "pct_portfolio": 0.0,
+        "currency_allocation_pct": {
+          "USD": null,
+          "NOK": null,
+          "SEK": null,
+          "SGD": null,
+          "JPY": null,
+          "HKD": null,
+          "EUR": 0.0,
+          "GBP": null,
+          "AUD": null
+        }
+      }
+    ]
+  },
+  "asset_class_totals": {
+    "CASH_AND_CURRENT_ACCOUNTS": {
+      "market_value_usd": 5197285.67,
+      "pct_portfolio": 83.48
+    },
+    "BOND": {
+      "market_value_usd": 185558.34,
+      "pct_portfolio": 2.98
+    },
+    "BOND_FUND": {
+      "market_value_usd": 104618.52,
+      "pct_portfolio": 1.68
+    },
+    "STRUCTURED_PRODUCT": {
+      "market_value_usd": 0.0,
+      "pct_portfolio": 0.0
+    },
+    "EQUITY": {
+      "market_value_usd": 438064.08,
+      "pct_portfolio": 7.04
+    },
+    "FUND_ETF": {
+      "market_value_usd": 396269.51,
+      "pct_portfolio": 6.37
+    },
+    "COMMODITY_ETF": {
+      "market_value_usd": 34339.2,
+      "pct_portfolio": 0.55
+    },
+    "PRIVATE_EQUITY_FUND": {
+      "market_value_usd": 0.0,
+      "pct_portfolio": 0.0
+    },
+    "FIXED_TERM_DEPOSIT": {
+      "market_value_usd": -130610.25,
+      "pct_portfolio": -2.1
+    }
+  },
+  "holdings": [
+    {
+      "asset_class": "CASH_AND_CURRENT_ACCOUNTS",
+      "instrument_name": "CUSTOMER CURRENT ACCOUNT",
+      "account_number": "001-000-036",
+      "currency": "AUD",
+      "amount": 23798.3,
+      "exchange_rate": 0.78525,
+      "market_value_local": 23798.3,
+      "market_value_usd": 18687.62,
+      "pct_portfolio": 0.3
+    },
+    {
+      "asset_class": "CASH_AND_CURRENT_ACCOUNTS",
+      "instrument_name": "CUSTOMER CURRENT ACCOUNT",
+      "account_number": "001-000-978",
+      "currency": "EUR",
+      "amount": 857.99,
+      "exchange_rate": 1.1979,
+      "market_value_local": 857.99,
+      "market_value_usd": 1027.79,
+      "pct_portfolio": 0.02
+    },
+    {
+      "asset_class": "CASH_AND_CURRENT_ACCOUNTS",
+      "instrument_name": "CUSTOMER CURRENT ACCOUNT",
+      "account_number": "001-000-826",
+      "currency": "GBP",
+      "amount": 360.53,
+      "exchange_rate": 1.37915,
+      "market_value_local": 360.53,
+      "market_value_usd": 497.22,
+      "pct_portfolio": 0.01
+    },
+    {
+      "asset_class": "CASH_AND_CURRENT_ACCOUNTS",
+      "instrument_name": "CUSTOMER CURRENT ACCOUNT",
+      "account_number": "001-000-344",
+      "currency": "HKD",
+      "amount": 2564.86,
+      "exchange_rate": 7.849786,
+      "market_value_local": 2564.86,
+      "market_value_usd": 326.74,
+      "pct_portfolio": 0.01
+    },
+    {
+      "asset_class": "CASH_AND_CURRENT_ACCOUNTS",
+      "instrument_name": "CUSTOMER CURRENT ACCOUNT",
+      "account_number": "001-000-392",
+      "currency": "JPY",
+      "amount": 4599857.0,
+      "exchange_rate": 108.837614,
+      "market_value_local": 4599857.0,
+      "market_value_usd": 42263.49,
+      "pct_portfolio": 0.68
+    },
+    {
+      "asset_class": "CASH_AND_CURRENT_ACCOUNTS",
+      "instrument_name": "CUSTOMER CURRENT ACCOUNT",
+      "account_number": "001-000-578",
+      "currency": "NOK",
+      "amount": 4000000.0,
+      "exchange_rate": 8.377525,
+      "market_value_local": 4000000.0,
+      "market_value_usd": 477468.0,
+      "pct_portfolio": 7.67
+    },
+    {
+      "asset_class": "CASH_AND_CURRENT_ACCOUNTS",
+      "instrument_name": "CUSTOMER CURRENT ACCOUNT",
+      "account_number": "001-000-752",
+      "currency": "SEK",
+      "amount": 4000000.0,
+      "exchange_rate": 8.455301,
+      "market_value_local": 4000000.0,
+      "market_value_usd": 473076.0,
+      "pct_portfolio": 7.6,
+      "unverified_fields": {
+        "account_number": {
+          "ocr_value": "001-000-762",
+          "reason": "digit 6 vs 5"
+        }
+      }
+    },
+    {
+      "asset_class": "CASH_AND_CURRENT_ACCOUNTS",
+      "instrument_name": "CUSTOMER CURRENT ACCOUNT",
+      "account_number": "001-000-702",
+      "currency": "SGD",
+      "amount": 238242.52,
+      "exchange_rate": 1.33485,
+      "market_value_local": 238242.52,
+      "market_value_usd": 178478.91,
+      "pct_portfolio": 2.87
+    },
+    {
+      "asset_class": "CASH_AND_CURRENT_ACCOUNTS",
+      "instrument_name": "CUSTOMER CURRENT ACCOUNT",
+      "account_number": "001-000-840",
+      "currency": "USD",
+      "amount": 5459.9,
+      "exchange_rate": 1.0,
+      "market_value_local": 5459.9,
+      "market_value_usd": 5459.9,
+      "pct_portfolio": 0.09
+    },
+    {
+      "asset_class": "CASH_AND_CURRENT_ACCOUNTS",
+      "instrument_name": "CUSTOMER CURRENT ACCOUNT",
+      "account_number": "001-000-840",
+      "currency": "USD",
+      "amount": 4000000.0,
+      "exchange_rate": 1.0,
+      "market_value_local": 4000000.0,
+      "market_value_usd": 4000000.0,
+      "pct_portfolio": 64.25
+    },
+    {
+      "asset_class": "FIXED_TERM_DEPOSIT",
+      "instrument_name": "3.1000% FIXED TERM DEPOSIT -A",
+      "reference": "C2422153",
+      "interest_rate_pct": 3.1,
+      "currency": "SGD",
+      "amount": -174345.06,
+      "commencing_date": "08/11/2023",
+      "maturity_date": "08/11/2023",
+      "market_value_local": -174345.06,
+      "accrued_interest_local": 0.0,
+      "interest_at_maturity": 207.3,
+      "exchange_rate": 1.33485,
+      "market_value_usd": -130610.25,
+      "accrued_interest_usd": 0.0,
+      "pct_portfolio": -2.1,
+      "country": "SINGAPORE DOLLAR",
+      "unverified_fields": {
+        "interest_rate_pct": {
+          "ocr_value": "3.100096",
+          "reason": "trailing digits ambiguous"
+        }
+      }
+    },
+    {
+      "asset_class": "BOND",
+      "instrument_name": "OLAM INTL LTD 4% 240226-MTN",
+      "coupon_frequency": "2020-24/02/2026",
+      "isin": "SGXF63577419",
+      "currency": "SGD",
+      "quantity": 250000.0,
+      "average_price": 100.25,
+      "average_exchange_rate": 1.3645,
+      "last_price": 99.077,
+      "last_exchange_rate": 1.33485,
+      "price_date": "14/04/2021",
+      "rating": null,
+      "unrealised_pct": -1.17,
+      "pl_pct": 2.22,
+      "market_value_local": 247692.5,
+      "accrued_interest_local": 0.0,
+      "market_value_usd": 185558.34,
+      "accrued_interest_usd": 0.0,
+      "yield_to_maturity": 0.0,
+      "duration": null,
+      "pct_portfolio": 2.98,
+      "country": "SINGAPORE DOLLAR",
+      "unverified_fields": {
+        "average_price": {
+          "ocr_value": "100.2500 appeared in last_price column",
+          "reason": "column mapping reconstructed"
+        },
+        "unrealised_pct": {
+          "ocr_value": "-117",
+          "reason": "decimal point inferred"
+        }
+      }
+    },
+    {
+      "asset_class": "BOND_FUND",
+      "instrument_name": "BLACKROCK GF-CHINA BD-A6-H-DIS-SGD",
+      "isin": "LU1847653497",
+      "currency": "SGD",
+      "quantity": 15000.0,
+      "average_price": 10.2244,
+      "average_exchange_rate": 1.3912,
+      "last_price": 9.31,
+      "last_exchange_rate": 1.33485,
+      "price_date": "26/11/2021",
+      "unrealised_pct": -8.94,
+      "pl_pct": 4.22,
+      "market_value_local": 139650.0,
+      "market_value_usd": 104618.52,
+      "accrued_interest_usd": 0.0,
+      "pct_portfolio": 1.68,
+      "country": "SINGAPORE DOLLAR"
+    },
+    {
+      "asset_class": "STRUCTURED_PRODUCT",
+      "instrument_name": "FCN NOM-PANW/GDX 12% 130121",
+      "instrument_details": [
+        "SPOT PALO ALTO NETWORKS INC 261",
+        "VANECK VECTORS GOLD MINERS ETF 40.",
+        "17STRIKE CALL 97",
+        "FREQ MONTHLY TENOR 4M"
+      ],
+      "isin": "XS2217623045",
+      "currency": "USD",
+      "quantity": 100000.0,
+      "average_price": 100.0,
+      "average_exchange_rate": 1.0,
+      "last_price": null,
+      "last_exchange_rate": 1.0,
+      "price_date": null,
+      "unrealised_pct": -100.0,
+      "pl_pct": 0.0,
+      "market_value_local": 0.0,
+      "accrued_interest_local": 0.0,
+      "market_value_usd": 0.0,
+      "accrued_interest_usd": 0.0,
+      "pct_portfolio": 0.0,
+      "unverified_fields": {
+        "instrument_name": {
+          "ocr_value": "FCN NOM-PANW/GDX 1200 130121",
+          "reason": "coupon read as 1200"
+        },
+        "isin": {
+          "ocr_value": "X52217623045",
+          "reason": "XS vs X5"
+        }
+      }
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "ALIBABA GROUP HOLDING LIMITED",
+      "ticker": "9988.HK",
+      "isin": "KYG017191142",
+      "currency": "HKD",
+      "quantity": 300.0,
+      "average_price": 199.3719,
+      "average_exchange_rate": 7.750081,
+      "last_price": 88.0,
+      "last_exchange_rate": 7.849786,
+      "price_date": "03/03/2023",
+      "unrealised_pct": -55.86,
+      "pl_pct": -1.27,
+      "market_value_local": 26400.0,
+      "market_value_usd": 3363.15,
+      "pct_portfolio": 0.05,
+      "country": "HONG KONG"
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "BANK OF CHINA LIMITED",
+      "ticker": "3988.HK",
+      "isin": "CNE1000001Z5",
+      "currency": "HKD",
+      "quantity": 60000.0,
+      "average_price": 3.0493,
+      "average_exchange_rate": 7.764919,
+      "last_price": 1.848,
+      "last_exchange_rate": 7.849786,
+      "price_date": "01/08/2022",
+      "unrealised_pct": -39.4,
+      "pl_pct": -1.08,
+      "market_value_local": 110880.0,
+      "market_value_usd": 14125.22,
+      "pct_portfolio": 0.23,
+      "country": "HONG KONG"
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "CHINA CONSTRUCTION BANK-H",
+      "ticker": "0939.HK",
+      "isin": "CNE1000002H1",
+      "currency": "HKD",
+      "quantity": 25000.0,
+      "average_price": 6.524,
+      "average_exchange_rate": 7.769743,
+      "last_price": 6.58,
+      "last_exchange_rate": 7.849786,
+      "price_date": "14/04/2021",
+      "unrealised_pct": 0.86,
+      "pl_pct": -1.02,
+      "market_value_local": 164500.0,
+      "market_value_usd": 20955.98,
+      "pct_portfolio": 0.34,
+      "country": "HONG KONG"
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "CHINA TOWER CORPORATION LIMITED-H",
+      "ticker": "0788.HK",
+      "isin": "CNE100003688",
+      "currency": "HKD",
+      "quantity": 24000.0,
+      "average_price": 1.6062,
+      "average_exchange_rate": 7.751052,
+      "last_price": 0.89,
+      "last_exchange_rate": 7.849786,
+      "price_date": "03/03/2023",
+      "unrealised_pct": -44.59,
+      "pl_pct": -1.26,
+      "market_value_local": 21360.0,
+      "market_value_usd": 2721.09,
+      "pct_portfolio": 0.04,
+      "country": "HONG KONG"
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "CK INFRASTRUCTURE HOLDINGS LTD",
+      "ticker": "1038.HK",
+      "isin": "BMG2178K1009",
+      "currency": "HKD",
+      "quantity": 1000.0,
+      "average_price": 41.7822,
+      "average_exchange_rate": 7.751046,
+      "last_price": 47.5,
+      "last_exchange_rate": 7.849786,
+      "price_date": "14/04/2021",
+      "unrealised_pct": 13.68,
+      "pl_pct": -1.26,
+      "market_value_local": 47500.0,
+      "market_value_usd": 6051.12,
+      "pct_portfolio": 0.1,
+      "country": "HONG KONG"
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "HSBC HOLDINGS PLC (HK REG)",
+      "ticker": "0005.HK",
+      "isin": "GB0005405286",
+      "currency": "HKD",
+      "quantity": 7286.0,
+      "average_price": 54.1184,
+      "average_exchange_rate": 7.786704,
+      "last_price": 56.55,
+      "last_exchange_rate": 7.849786,
+      "price_date": "21/04/2023",
+      "unrealised_pct": 4.49,
+      "pl_pct": -0.8,
+      "market_value_local": 412023.3,
+      "market_value_usd": 52488.47,
+      "pct_portfolio": 0.84,
+      "country": "HONG KONG"
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "INDUSTRIAL &COMMERCIAL BK OF CHINA",
+      "ticker": "1398.HK",
+      "isin": "CNE1000003G1",
+      "currency": "HKD",
+      "quantity": 20000.0,
+      "average_price": 4.8639,
+      "average_exchange_rate": 7.758481,
+      "last_price": 4.1,
+      "last_exchange_rate": 7.849786,
+      "price_date": "03/03/2026",
+      "unrealised_pct": -15.71,
+      "pl_pct": -1.16,
+      "market_value_local": 82000.0,
+      "market_value_usd": 10446.14,
+      "pct_portfolio": 0.17,
+      "country": "HONG KONG",
+      "unverified_fields": {
+        "instrument_name": {
+          "ocr_value": "INDUSTRIAL COMMERCIAL BK OF CHINA",
+          "reason": "ampersand spacing"
+        },
+        "isin": {
+          "ocr_value": "CNE 100000301",
+          "reason": "ISIN characters reconstructed"
+        }
+      }
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "PING AN HEALTHCARE AND TECH CO LTD",
+      "ticker": "1833.HK",
+      "isin": "KYG711391022",
+      "currency": "HKD",
+      "quantity": 600.0,
+      "average_price": 116.1022,
+      "average_exchange_rate": 7.750255,
+      "last_price": 19.18,
+      "last_exchange_rate": 7.849786,
+      "price_date": "03/03/2023",
+      "unrealised_pct": -83.48,
+      "pl_pct": -1.27,
+      "market_value_local": 11508.0,
+      "market_value_usd": 1466.03,
+      "pct_portfolio": 0.02,
+      "country": "HONG KONG"
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "PING AN INSURANCE (GP) CO OF CHINA",
+      "ticker": "2318.HK",
+      "isin": "CNE1000003X6",
+      "currency": "HKD",
+      "quantity": 2000.0,
+      "average_price": 85.0035,
+      "average_exchange_rate": 7.767746,
+      "last_price": 91.55,
+      "last_exchange_rate": 7.849786,
+      "price_date": "14/04/2021",
+      "unrealised_pct": 7.7,
+      "pl_pct": -1.05,
+      "market_value_local": 183100.0,
+      "market_value_usd": 23325.48,
+      "pct_portfolio": 0.37,
+      "country": "HONG KONG"
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "SEMICONDUCTOR MANUFACTURING INTL",
+      "ticker": "0981.HK",
+      "isin": "KYG8020E1199",
+      "currency": "HKD",
+      "quantity": 5000.0,
+      "average_price": 28.1649,
+      "average_exchange_rate": 7.750258,
+      "last_price": 26.1,
+      "last_exchange_rate": 7.849786,
+      "price_date": "14/04/2021",
+      "unrealised_pct": -7.33,
+      "pl_pct": -1.27,
+      "market_value_local": 130500.0,
+      "market_value_usd": 16624.66,
+      "pct_portfolio": 0.27,
+      "country": "HONG KONG"
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "AIRBUS SE (FP)",
+      "ticker": "AIR.PA",
+      "isin": "NL0000235190",
+      "currency": "EUR",
+      "quantity": 138.0,
+      "average_price": 76.1406,
+      "average_exchange_rate": 1.13485,
+      "last_price": 100.22,
+      "last_exchange_rate": 1.1979,
+      "price_date": "14/04/2021",
+      "unrealised_pct": 31.62,
+      "pl_pct": 5.56,
+      "market_value_local": 13830.36,
+      "market_value_usd": 16567.39,
+      "pct_portfolio": 0.27,
+      "country": "FRANCE"
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "ROYAL DUTCH SHELL PLC-B SHS (EUR)",
+      "ticker": "RDSb.AS",
+      "isin": "GB00B03MM408",
+      "currency": "EUR",
+      "quantity": 2100.0,
+      "average_price": 19.3645,
+      "average_exchange_rate": 1.119603,
+      "last_price": 15.64,
+      "last_exchange_rate": 1.1979,
+      "price_date": "14/04/2021",
+      "unrealised_pct": -19.23,
+      "pl_pct": 6.99,
+      "market_value_local": 32844.0,
+      "market_value_usd": 39343.83,
+      "pct_portfolio": 0.63,
+      "country": "NETHERLANDS",
+      "unverified_fields": {
+        "ticker": {
+          "ocr_value": "RDS AS",
+          "reason": "ticker separator inferred"
+        }
+      }
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "MERLIN PROPERTIES SOCIMI SA",
+      "ticker": null,
+      "isin": "ES0105025003",
+      "currency": "EUR",
+      "quantity": 1200.0,
+      "average_price": 8.5317,
+      "average_exchange_rate": 1.093149,
+      "last_price": 8.87,
+      "last_exchange_rate": 1.1979,
+      "price_date": "03/03/2023",
+      "unrealised_pct": 3.97,
+      "pl_pct": 9.58,
+      "market_value_local": 10644.0,
+      "market_value_usd": 12750.45,
+      "pct_portfolio": 0.2,
+      "country": "SPAIN",
+      "unverified_fields": {
+        "isin": {
+          "ocr_value": "E50105025003",
+          "reason": "ES vs E5"
+        },
+        "last_price": {
+          "ocr_value": "88700",
+          "reason": "decimal point inferred"
+        },
+        "average_exchange_rate": {
+          "ocr_value": "1.15/900",
+          "reason": "garbled, last_exchange_rate used from FX table"
+        }
+      }
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "AVIVA PLC",
+      "ticker": "AV.L",
+      "isin": "GB0002162385",
+      "currency": "GBP",
+      "quantity": 2631.0,
+      "average_price": 4.3379,
+      "average_exchange_rate": 1.245676,
+      "last_price": 4.069,
+      "last_exchange_rate": 1.37915,
+      "price_date": "14/04/2021",
+      "unrealised_pct": -6.2,
+      "pl_pct": 10.72,
+      "market_value_local": 10705.54,
+      "market_value_usd": 14764.55,
+      "pct_portfolio": 0.24,
+      "country": "UNITED KINGDOM",
+      "unverified_fields": {
+        "ticker": {
+          "ocr_value": "A/L",
+          "reason": "ticker reconstructed"
+        }
+      }
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "BP PLC",
+      "ticker": "BP.L",
+      "isin": "GB0007980591",
+      "currency": "GBP",
+      "quantity": 8843.0,
+      "average_price": 4.3624,
+      "average_exchange_rate": 1.269127,
+      "last_price": 3.0835,
+      "last_exchange_rate": 1.37915,
+      "price_date": "14/04/2021",
+      "unrealised_pct": -29.32,
+      "pl_pct": 8.67,
+      "market_value_local": 27267.39,
+      "market_value_usd": 37605.82,
+      "pct_portfolio": 0.6,
+      "country": "UNITED KINGDOM",
+      "unverified_fields": {
+        "isin": {
+          "ocr_value": "GB0007980691",
+          "reason": "digit 6 vs 5"
+        },
+        "ticker": {
+          "ocr_value": "BPL",
+          "reason": "separator inferred"
+        }
+      }
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "ITOCHU CORPORATION",
+      "ticker": "8001.T",
+      "isin": "JP3143600009",
+      "currency": "JPY",
+      "quantity": 300.0,
+      "average_price": 2817.0,
+      "average_exchange_rate": 106.08954,
+      "last_price": 3477.0,
+      "last_exchange_rate": 108.837614,
+      "price_date": "14/04/2021",
+      "unrealised_pct": 23.43,
+      "pl_pct": -2.52,
+      "market_value_local": 1043100.0,
+      "market_value_usd": 9584.0,
+      "pct_portfolio": 0.15,
+      "country": "JAPAN"
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "MARUBENI CORPORATION",
+      "ticker": "8002.T",
+      "isin": "JP3877600001",
+      "currency": "JPY",
+      "quantity": 1100.0,
+      "average_price": 656.5637,
+      "average_exchange_rate": 106.089427,
+      "last_price": 894.2,
+      "last_exchange_rate": 108.837614,
+      "price_date": "14/04/2021",
+      "unrealised_pct": 36.19,
+      "pl_pct": -2.53,
+      "market_value_local": 983620.0,
+      "market_value_usd": 9037.5,
+      "pct_portfolio": 0.15,
+      "country": "JAPAN",
+      "unverified_fields": {
+        "average_price": {
+          "ocr_value": "666.6637",
+          "reason": "leading digits ambiguous"
+        }
+      }
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "MITSUBISHI CORPORATION",
+      "ticker": "8058.T",
+      "isin": "JP3898400001",
+      "currency": "JPY",
+      "quantity": 300.0,
+      "average_price": 2648.5,
+      "average_exchange_rate": 106.08954,
+      "last_price": 3031.0,
+      "last_exchange_rate": 108.837614,
+      "price_date": "14/04/2021",
+      "unrealised_pct": 14.44,
+      "pl_pct": -2.52,
+      "market_value_local": 909300.0,
+      "market_value_usd": 8354.65,
+      "pct_portfolio": 0.13,
+      "country": "JAPAN"
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "MITSUBISHI UFJ FINANCIAL GROUP INC",
+      "ticker": "8306.T",
+      "isin": "JP3902900004",
+      "currency": "JPY",
+      "quantity": 5000.0,
+      "average_price": 494.7418,
+      "average_exchange_rate": 109.797205,
+      "last_price": 583.8,
+      "last_exchange_rate": 108.837614,
+      "price_date": "14/04/2021",
+      "unrealised_pct": 18.0,
+      "pl_pct": 0.88,
+      "market_value_local": 2919000.0,
+      "market_value_usd": 26819.77,
+      "pct_portfolio": 0.43,
+      "country": "JAPAN"
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "MITSUI & CO LTD",
+      "ticker": "8031.T",
+      "isin": "JP3893600001",
+      "currency": "JPY",
+      "quantity": 400.0,
+      "average_price": 1980.125,
+      "average_exchange_rate": 106.08954,
+      "last_price": 2283.0,
+      "last_exchange_rate": 108.837614,
+      "price_date": "14/04/2021",
+      "unrealised_pct": 15.3,
+      "pl_pct": -2.52,
+      "market_value_local": 913200.0,
+      "market_value_usd": 8390.48,
+      "pct_portfolio": 0.13,
+      "country": "JAPAN"
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "SUMITOMO CORPORATION",
+      "ticker": null,
+      "isin": "JP3404600003",
+      "currency": "JPY",
+      "quantity": 500.0,
+      "average_price": 1422.0,
+      "average_exchange_rate": 106.089427,
+      "last_price": 2421.5,
+      "last_exchange_rate": 108.837614,
+      "price_date": "03/03/2023",
+      "unrealised_pct": 70.29,
+      "pl_pct": -2.53,
+      "market_value_local": 1210750.0,
+      "market_value_usd": 11124.37,
+      "pct_portfolio": 0.18,
+      "country": "JAPAN"
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "BILIBILI INC-SPONSORED ADR",
+      "ticker": "BILI.OQ",
+      "isin": "US0900401060",
+      "currency": "USD",
+      "quantity": 200.0,
+      "average_price": 46.5525,
+      "average_exchange_rate": 1.0,
+      "last_price": 22.61,
+      "last_exchange_rate": 1.0,
+      "price_date": "03/03/2023",
+      "unrealised_pct": -51.43,
+      "pl_pct": 0.0,
+      "market_value_local": 4522.0,
+      "market_value_usd": 4522.0,
+      "pct_portfolio": 0.07,
+      "country": "UNITED STATES OF AMERICA",
+      "unverified_fields": {
+        "ticker": {
+          "ocr_value": "BILLOO",
+          "reason": "ticker reconstructed"
+        }
+      }
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "WALT DISNEY COMPANY",
+      "ticker": "DIS.N",
+      "isin": "US2546871060",
+      "currency": "USD",
+      "quantity": 400.0,
+      "average_price": 112.2095,
+      "average_exchange_rate": 1.0,
+      "last_price": 187.46,
+      "last_exchange_rate": 1.0,
+      "price_date": "14/04/2021",
+      "unrealised_pct": 67.06,
+      "pl_pct": 0.0,
+      "market_value_local": 74984.0,
+      "market_value_usd": 74984.0,
+      "pct_portfolio": 1.2,
+      "country": "UNITED STATES OF AMERICA"
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "NATIONAL AUSTRALIA BANK LIMITED",
+      "ticker": "NAB.AX",
+      "isin": "AU000000NAB4",
+      "currency": "AUD",
+      "quantity": 11.0,
+      "average_price": 15.5182,
+      "average_exchange_rate": 0.693907,
+      "last_price": 26.72,
+      "last_exchange_rate": 0.78525,
+      "price_date": "14/04/2021",
+      "unrealised_pct": 72.19,
+      "pl_pct": 13.16,
+      "market_value_local": 293.92,
+      "market_value_usd": 230.8,
+      "pct_portfolio": 0.0,
+      "country": "AUSTRALIA",
+      "unverified_fields": {
+        "ticker": {
+          "ocr_value": "NABAX",
+          "reason": "separator inferred"
+        }
+      }
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "NETLINK NBN TRUST",
+      "ticker": "NETL.SI",
+      "isin": "SG1DH9000006",
+      "currency": "SGD",
+      "quantity": 5000.0,
+      "average_price": 0.9818,
+      "average_exchange_rate": 1.416434,
+      "last_price": 0.955,
+      "last_exchange_rate": 1.33485,
+      "price_date": "14/04/2021",
+      "unrealised_pct": -2.73,
+      "pl_pct": 6.11,
+      "market_value_local": 4775.0,
+      "market_value_usd": 3577.18,
+      "pct_portfolio": 0.06,
+      "country": "SINGAPORE",
+      "unverified_fields": {
+        "ticker": {
+          "ocr_value": "NETLSI",
+          "reason": "separator inferred"
+        }
+      }
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "OVERSEA-CHINESE BANKING CORP LTD",
+      "ticker": "OCBC.SI",
+      "isin": "SG1S04926220",
+      "currency": "SGD",
+      "quantity": 1000.0,
+      "average_price": 8.9308,
+      "average_exchange_rate": 1.427852,
+      "last_price": 11.8,
+      "last_exchange_rate": 1.33485,
+      "price_date": "14/04/2021",
+      "unrealised_pct": 32.13,
+      "pl_pct": 6.97,
+      "market_value_local": 11800.0,
+      "market_value_usd": 8839.95,
+      "pct_portfolio": 0.14,
+      "country": "SINGAPORE",
+      "unverified_fields": {
+        "isin": {
+          "ocr_value": "SG1504926220",
+          "reason": "letter S vs digit 5"
+        },
+        "instrument_name": {
+          "ocr_value": "OVERSEA-CHINESE BANKING CORP ITD",
+          "reason": "LTD vs ITD"
+        },
+        "ticker": {
+          "ocr_value": "OCBC SI",
+          "reason": "separator inferred"
+        }
+      }
+    },
+    {
+      "asset_class": "EQUITY",
+      "instrument_name": "EAGLE HOSPITALITY TRUST",
+      "ticker": "EAGL.SI",
+      "isin": "SGXC28500103",
+      "currency": "USD",
+      "quantity": 30000.0,
+      "average_price": 0.7079,
+      "average_exchange_rate": 1.0,
+      "last_price": null,
+      "last_exchange_rate": 1.0,
+      "price_date": null,
+      "unrealised_pct": -100.0,
+      "pl_pct": 0.0,
+      "market_value_local": 0.0,
+      "market_value_usd": 0.0,
+      "pct_portfolio": 0.0,
+      "country": "SINGAPORE",
+      "unverified_fields": {
+        "isin": {
+          "ocr_value": "SGXC28600103",
+          "reason": "digit 6 vs 5"
+        },
+        "ticker": {
+          "ocr_value": "EAGLSI",
+          "reason": "separator inferred"
+        }
+      }
+    },
+    {
+      "asset_class": "FUND_ETF",
+      "instrument_name": "HANG SENG CHINA ENTERPRISE IDX ETF",
+      "ticker": null,
+      "isin": "HK2828013055",
+      "currency": "HKD",
+      "quantity": 600.0,
+      "average_price": 108.0866,
+      "average_exchange_rate": 7.789566,
+      "last_price": 70.3,
+      "last_exchange_rate": 7.849786,
+      "price_date": "03/03/2023",
+      "unrealised_pct": -34.96,
+      "pl_pct": -0.77,
+      "market_value_local": 42180.0,
+      "market_value_usd": 5373.39,
+      "pct_portfolio": 0.09
+    },
+    {
+      "asset_class": "FUND_ETF",
+      "instrument_name": "LUMIERE ASIA VALUE FUND-C-USD",
+      "ticker": "BLO",
+      "isin": "KYG5726W1208",
+      "currency": "USD",
+      "quantity": 151.4944,
+      "average_price": 1000.7301,
+      "average_exchange_rate": 1.0,
+      "last_price": null,
+      "last_exchange_rate": 1.0,
+      "price_date": null,
+      "unrealised_pct": -100.0,
+      "pl_pct": 0.0,
+      "market_value_local": 0.0,
+      "market_value_usd": 0.0,
+      "pct_portfolio": 0.0
+    },
+    {
+      "asset_class": "FUND_ETF",
+      "instrument_name": "UBS LUX EQ FD-CHINA OPP-P-ACC-USD",
+      "ticker": null,
+      "isin": "LU0067412154",
+      "currency": "USD",
+      "quantity": 60.0,
+      "average_price": 1740.214,
+      "average_exchange_rate": 1.0,
+      "last_price": 1610.72,
+      "last_exchange_rate": 1.0,
+      "price_date": "26/11/2021",
+      "unrealised_pct": -7.44,
+      "pl_pct": 0.0,
+      "market_value_local": 96643.2,
+      "market_value_usd": 96643.2,
+      "pct_portfolio": 1.55
+    },
+    {
+      "asset_class": "FUND_ETF",
+      "instrument_name": "UBS LUX EQ-ALL CHINA-P-ACC-USD",
+      "ticker": null,
+      "isin": "LU1807302812",
+      "currency": "USD",
+      "quantity": 1000.0,
+      "average_price": 125.7586,
+      "average_exchange_rate": 1.0,
+      "last_price": 111.81,
+      "last_exchange_rate": 1.0,
+      "price_date": "26/11/2021",
+      "unrealised_pct": -11.09,
+      "pl_pct": 0.0,
+      "market_value_local": 111810.0,
+      "market_value_usd": 111810.0,
+      "pct_portfolio": 1.8,
+      "unverified_fields": {
+        "instrument_name": {
+          "ocr_value": "UBS LUX FQ-ALL CHINA-P-ACC-USD",
+          "reason": "EQ vs FQ"
+        },
+        "unrealised_pct": {
+          "ocr_value": "11.09",
+          "reason": "sign inferred from price vs average"
+        }
+      }
+    },
+    {
+      "asset_class": "FUND_ETF",
+      "instrument_name": "SPDR STRAITS TIMES INDEX ETF",
+      "ticker": "STTF.SI",
+      "isin": "SG1W45939194",
+      "currency": "SGD",
+      "quantity": 7000.0,
+      "average_price": 2.7945,
+      "average_exchange_rate": 1.402132,
+      "last_price": 3.188,
+      "last_exchange_rate": 1.33485,
+      "price_date": "14/04/2021",
+      "unrealised_pct": 14.08,
+      "pl_pct": 5.04,
+      "market_value_local": 22316.0,
+      "market_value_usd": 16717.99,
+      "pct_portfolio": 0.27,
+      "unverified_fields": {
+        "ticker": {
+          "ocr_value": "STTFSI",
+          "reason": "separator inferred"
+        },
+        "average_exchange_rate": {
+          "ocr_value": "1,402132",
+          "reason": "comma vs decimal"
+        }
+      }
+    },
+    {
+      "asset_class": "FUND_ETF",
+      "instrument_name": "BNPP FD JP SMALL CAP-CLS-ACC-JPY",
+      "ticker": null,
+      "isin": "LU0069970746",
+      "currency": "JPY",
+      "quantity": 718.0,
+      "average_price": 14032.9081,
+      "average_exchange_rate": 108.061379,
+      "last_price": 15141.0,
+      "last_exchange_rate": 108.837614,
+      "price_date": "25/11/2021",
+      "unrealised_pct": 7.9,
+      "pl_pct": -0.71,
+      "market_value_local": 10871238.0,
+      "market_value_usd": 99884.93,
+      "pct_portfolio": 1.6
+    },
+    {
+      "asset_class": "FUND_ETF",
+      "instrument_name": "NEUBERGER BER 5G CONNECT-A-ACC-USD",
+      "ticker": null,
+      "isin": "IE00BMPRXN33",
+      "currency": "USD",
+      "quantity": 4000.0,
+      "average_price": 12.8221,
+      "average_exchange_rate": 1.0,
+      "last_price": 16.46,
+      "last_exchange_rate": 1.0,
+      "price_date": "25/11/2021",
+      "unrealised_pct": 28.37,
+      "pl_pct": 0.0,
+      "market_value_local": 65840.0,
+      "market_value_usd": 65840.0,
+      "pct_portfolio": 1.06,
+      "unverified_fields": {
+        "instrument_name": {
+          "ocr_value": "NEUBERGER BER &G CONNECT-A-ACC-USD",
+          "reason": "5G vs &G"
+        },
+        "price_date": {
+          "ocr_value": "26/11/2021",
+          "reason": "date digit ambiguous"
+        }
+      }
+    },
+    {
+      "asset_class": "COMMODITY_ETF",
+      "instrument_name": "SPDR GOLD TRUST-ETF (GLD SP)",
+      "ticker": "SGLD.SI",
+      "isin": "US78463V1070",
+      "currency": "USD",
+      "quantity": 210.0,
+      "average_price": 175.1916,
+      "average_exchange_rate": 1.0,
+      "last_price": 163.52,
+      "last_exchange_rate": 1.0,
+      "price_date": "14/04/2021",
+      "unrealised_pct": -6.66,
+      "pl_pct": 0.0,
+      "market_value_local": 34339.2,
+      "market_value_usd": 34339.2,
+      "pct_portfolio": 0.55
+    },
+    {
+      "asset_class": "PRIVATE_EQUITY_FUND",
+      "instrument_name": "IDINVEST LUX FUND-COMPARTMENT A",
+      "ticker": "BLO",
+      "isin": null,
+      "currency": "EUR",
+      "quantity": 132567.6,
+      "average_price": 1.0,
+      "average_exchange_rate": 1.232,
+      "last_price": null,
+      "last_exchange_rate": 1.1979,
+      "price_date": null,
+      "unrealised_pct": -100.0,
+      "pl_pct": -2.77,
+      "market_value_local": 0.0,
+      "market_value_usd": 0.0,
+      "pct_portfolio": 0.0
+    }
+  ],
+  "country_allocation": [
+    {
+      "country": "HONG KONG",
+      "asset_class": "EQUITY",
+      "market_value_usd": 151567.34,
+      "pct_portfolio": 2.43
+    },
+    {
+      "country": "FRANCE",
+      "asset_class": "EQUITY",
+      "market_value_usd": 16567.39,
+      "pct_portfolio": 0.27
+    },
+    {
+      "country": "NETHERLANDS",
+      "asset_class": "EQUITY",
+      "market_value_usd": 39343.83,
+      "pct_portfolio": 0.63
+    },
+    {
+      "country": "SPAIN",
+      "asset_class": "EQUITY",
+      "market_value_usd": 12750.45,
+      "pct_portfolio": 0.2
+    },
+    {
+      "country": "UNITED KINGDOM",
+      "asset_class": "EQUITY",
+      "market_value_usd": 52370.37,
+      "pct_portfolio": 0.84
+    },
+    {
+      "country": "JAPAN",
+      "asset_class": "EQUITY",
+      "market_value_usd": 73310.77,
+      "pct_portfolio": 1.18
+    },
+    {
+      "country": "UNITED STATES OF AMERICA",
+      "asset_class": "EQUITY",
+      "market_value_usd": 79506.0,
+      "pct_portfolio": 1.28
+    },
+    {
+      "country": "AUSTRALIA",
+      "asset_class": "EQUITY",
+      "market_value_usd": 230.8,
+      "pct_portfolio": 0.0
+    },
+    {
+      "country": "SINGAPORE",
+      "asset_class": "EQUITY",
+      "market_value_usd": 12417.13,
+      "pct_portfolio": 0.2
+    },
+    {
+      "country": "SINGAPORE DOLLAR",
+      "asset_class": "BOND",
+      "market_value_usd": 185558.34,
+      "pct_portfolio": 2.98
+    },
+    {
+      "country": "SINGAPORE DOLLAR",
+      "asset_class": "BOND_FUND",
+      "market_value_usd": 104618.52,
+      "pct_portfolio": 1.68
+    },
+    {
+      "country": "SINGAPORE DOLLAR",
+      "asset_class": "FIXED_TERM_DEPOSIT",
+      "market_value_usd": -130610.25,
+      "pct_portfolio": -2.1
+    }
+  ],
+  "reported_subtotals": [
+    {
+      "scope": "EUR and GBP equities (FRANCE, NETHERLANDS, SPAIN, UNITED KINGDOM)",
+      "market_value_usd": 121032.04,
+      "pct_portfolio": 1.94
+    },
+    {
+      "scope": "FUND_ETF priced in USD and HKD",
+      "market_value_usd": 213826.59,
+      "pct_portfolio": 3.43
+    },
+    {
+      "scope": "FUND_ETF priced in SGD",
+      "market_value_usd": 16717.99,
+      "pct_portfolio": 0.27
+    },
+    {
+      "scope": "FUND_ETF priced in JPY",
+      "market_value_usd": 99884.93,
+      "pct_portfolio": 1.6
+    },
+    {
+      "scope": "NEUBERGER BER 5G CONNECT-A-ACC-USD",
+      "market_value_usd": 65840.0,
+      "pct_portfolio": 1.06
+    }
+  ],
+  "off_balance_sheet": [
+    {
+      "type": "PRO_MEMORIA",
+      "instrument_name": "GLOBAL CREDIT LINE",
+      "reference": "540-111-840",
+      "currency": "USD",
+      "amount": -1500000.0,
+      "start_date": "14/02/2017"
+    }
+  ],
+  "exchange_rates": [
+    {
+      "currency": "AUD",
+      "denomination": "AUSTRALIAN DOLLAR",
+      "rate_date": "01/08/2022",
+      "estimated_rate": 0.78525
+    },
+    {
+      "currency": "EUR",
+      "denomination": "EURO",
+      "rate_date": "28/07/2026",
+      "estimated_rate": 1.1979
+    },
+    {
+      "currency": "GBP",
+      "denomination": "STERLING POUND",
+      "rate_date": "25/08/2025",
+      "estimated_rate": 1.37915
+    },
+    {
+      "currency": "HKD",
+      "denomination": "HONG KONG DOLLAR",
+      "rate_date": "25/08/2025",
+      "estimated_rate": 7.849786
+    },
+    {
+      "currency": "JPY",
+      "denomination": "YEN",
+      "rate_date": "15/04/2021",
+      "estimated_rate": 108.837614
+    },
+    {
+      "currency": "NOK",
+      "denomination": "NORVEGIAN KRONE",
+      "rate_date": "15/04/2021",
+      "estimated_rate": 8.377525
+    },
+    {
+      "currency": "SEK",
+      "denomination": "SWEDISH KRONA",
+      "rate_date": "15/04/2021",
+      "estimated_rate": 8.455301
+    },
+    {
+      "currency": "SGD",
+      "denomination": "SINGAPORE DOLLAR",
+      "rate_date": "18/02/2025",
+      "estimated_rate": 1.33485
+    },
+    {
+      "currency": "USD",
+      "denomination": "US DOLLAR",
+      "rate_date": "22/09/2026",
+      "estimated_rate": 1.0
+    }
+  ]
+}

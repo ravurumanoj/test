@@ -250,7 +250,8 @@ class RelationshipManagerOrchestrator:
             )
 
         # ── Add system prompt then current question ───────────────────────────
-        system_prompt = self._build_system_prompt(request.customer_id)
+        resolved_portfolio_id = request.portfolio_id or self.settings.unique_default_portfolio_id
+        system_prompt = self._build_system_prompt(request.customer_id, resolved_portfolio_id)
         history_manager.add_system_message(system_prompt)
         logger.debug(
             "Orchestrator: system message added to history",
@@ -279,6 +280,7 @@ class RelationshipManagerOrchestrator:
         triggered_tool_names: list[str] = []  # every tool name triggered, in call order
         context: dict[str, Any] = {
             "customer_id": request.customer_id,
+            "portfolio_id": resolved_portfolio_id,
             "question": request.question,
             "auth_user_id": request.auth_user_id,
             "auth_company_id": request.auth_company_id,
@@ -310,7 +312,11 @@ class RelationshipManagerOrchestrator:
                 # Last iteration: tools disabled — force final answer
                 # Mirrors Unique orchestrator "last iteration no-tools" mode
                 logger.info("Orchestrator: last iteration — disabling tools for final answer")
-                planning_result = self.unique_toolkit.plan_with_tools(
+                # Run in a worker thread: plan_with_tools() is a blocking (sync)
+                # HTTP call — inline it would freeze the event loop for up to
+                # UNIQUE_LLM_TIMEOUT_SECONDS on every single request.
+                planning_result = await asyncio.to_thread(
+                    self.unique_toolkit.plan_with_tools,
                     messages=messages,
                     tool_definitions=[],
                     allow_tools=False,
@@ -352,6 +358,7 @@ class RelationshipManagerOrchestrator:
                 if iteration_index == 0 and not all_agent_answers:
                     tool_calls = self._deterministic_tool_calls(
                         customer_id=request.customer_id,
+                        portfolio_id=resolved_portfolio_id,
                         question=request.question,
                     )
                     logger.info(
@@ -559,6 +566,7 @@ class RelationshipManagerOrchestrator:
 
         return RelationshipManagerResponse(
             customer_id=request.customer_id,
+            portfolio_id=context["portfolio_id"],
             question=request.question,
             routing_decision=routing_decision,
             final_answer=final_answer,
@@ -588,7 +596,11 @@ class RelationshipManagerOrchestrator:
                 "tool_definition_names": [td["function"]["name"] for td in tool_definitions],
             },
         )
-        result = self.unique_toolkit.plan_with_tools(
+        # Run in a worker thread: plan_with_tools() is a blocking (sync) HTTP
+        # call — inline it would freeze the event loop for up to
+        # UNIQUE_LLM_TIMEOUT_SECONDS on every single request.
+        result = await asyncio.to_thread(
+            self.unique_toolkit.plan_with_tools,
             messages=history_messages,
             tool_definitions=tool_definitions,
             allow_tools=True,
@@ -718,13 +730,14 @@ class RelationshipManagerOrchestrator:
 
     # ── System prompt ─────────────────────────────────────────────────────────
 
-    def _build_system_prompt(self, customer_id: str) -> str:
+    def _build_system_prompt(self, customer_id: str, portfolio_id: str = "") -> str:
         """Build the orchestrator system prompt with tool guidance.
 
         Includes tool_description_for_system_prompt() from each Tool and
-        embeds the current customer_id so the LLM always passes it as a
-        tool parameter.  Also includes guidance for no-data scenarios.
-        Mirrors the Unique orchestrator Jinja template rendering step.
+        embeds the current customer_id (and, for statement tools, portfolio_id)
+        so the LLM always passes them as tool parameters.  Also includes
+        guidance for no-data scenarios. Mirrors the Unique orchestrator Jinja
+        template rendering step.
         """
         tool_hints = "\n".join(
             f"- {tool.tool_description_for_system_prompt()}"
@@ -738,6 +751,9 @@ class RelationshipManagerOrchestrator:
             f"Current customer ID: {customer_id}\n"
             f"When calling any customer-specific tool, always pass "
             f"\"customer_id\": \"{customer_id}\" in the arguments.\n"
+            f"Current portfolio/account ID (single-account statement tools): {portfolio_id}\n"
+            f"When calling any statement_* tool, pass \"portfolio_id\": \"{portfolio_id}\" "
+            f"in the arguments (it also defaults to this value if omitted).\n"
             f"When calling MCP tools (names starting with mcp__), use the exact argument "
             f"names from the tool's own schema.  The customer's ID is {customer_id}.\n\n"
             "Tool selection:\n"
@@ -745,7 +761,10 @@ class RelationshipManagerOrchestrator:
             "You may call several tools when a question spans multiple areas.\n"
             "- Portfolio detail tools cover: current position/holdings, performance/returns, "
             "and compliance (credit/tax). CRM detail tools cover: profile/KYC, interactions/"
-            "history, and advisory/suggestions.\n\n"
+            "history, and advisory/suggestions. Statement tools (statement_overview, "
+            "statement_holdings, statement_allocation, statement_credit_fx) cover the raw "
+            "single-account statement: totals, individual holdings, asset/geo allocation, "
+            "and credit lines/FX rates.\n\n"
             "CRITICAL — tool call requirement:\n"
             "- You MUST call at least one tool before answering. Never answer directly from memory.\n"
             "- For broad or general questions (e.g. 'what details do you have about me', "
@@ -759,6 +778,30 @@ class RelationshipManagerOrchestrator:
             "and note which source could not be reached.\n"
             "- If both sources fail, respond with a helpful message explaining that no data could "
             "be found for the given customer ID and advise verifying it.\n\n"
+            "Output formatting — adapt to the question and the data (CRITICAL):\n"
+            "- Tool summaries are already pre-formatted (markdown tables / Mermaid charts) where "
+            "relevant. Preserve and reuse them as-is in your final answer instead of flattening "
+            "them back into prose.\n"
+            "- For comparisons (this vs. that, period-over-period, customer vs. benchmark, several "
+            "holdings/metrics side by side), present the comparison as a markdown table with the "
+            "compared items as columns.\n"
+            "- For a proportional breakdown that spans multiple tool results and isn't already "
+            "charted (e.g. a combined portfolio + statement allocation view), render it as a "
+            "Mermaid pie chart in a fenced ```mermaid``` block, capped at 7 slices (group the rest "
+            "into 'Other').\n"
+            "- For broad or 'tell me everything' questions spanning multiple domains, use ### "
+            "section headers per topic (e.g. ### Portfolio Snapshot, ### Client Profile, "
+            "### Recent Interactions) so the answer is scannable, each followed by its table or "
+            "chart where applicable.\n"
+            "- For a single narrow fact (e.g. 'what is the customer's NPS score'), answer in one "
+            "short sentence — do not force a table or chart onto trivial data.\n"
+            "- Never fabricate table rows, chart slices, or values that are not present in tool "
+            "outputs.\n\n"
+            "Citations:\n"
+            "- Do NOT add your own citation markers (e.g. '[1]', 'Source:', footnotes) and do NOT "
+            "quote raw JSON tool payloads verbatim. Write a plain, human-readable answer.\n"
+            "- The system automatically appends a verified 'Sources' section after your answer "
+            "based on the tools actually called — you must never generate this section yourself.\n\n"
         )
         if tool_hints:
             prompt += f"Tool usage guidance:\n{tool_hints}\n"
@@ -779,7 +822,7 @@ class RelationshipManagerOrchestrator:
         logger.debug("Orchestrator: tool calls parsed", extra={"count": len(parsed)})
         return parsed
 
-    def _deterministic_tool_calls(self, *, customer_id: str, question: str) -> list[ToolCall]:
+    def _deterministic_tool_calls(self, *, customer_id: str, portfolio_id: str, question: str) -> list[ToolCall]:
         """Choose granular tool(s) by keyword when the LLM genuinely declines to call any.
 
         This is a TRUE last-resort safety net — it only runs when the LLM explicitly
@@ -814,6 +857,23 @@ class RelationshipManagerOrchestrator:
                 "all customers", "book of business", "every customer", "across customers",
                 "book summary", "all portfolios",
             )),
+            ("statement_holdings", (
+                "holding", "holdings", "instrument", "position", "positions", "stock", "stocks",
+                "equity", "equities", "bond", "bonds", "fund", "funds", "etf", "isin", "ticker",
+            )),
+            ("statement_allocation", (
+                "allocation", "asset class", "asset-class", "geographic", "country", "exposure",
+                "subtotal", "subtotals",
+            )),
+            ("statement_credit_fx", (
+                "credit line", "credit facility", "exchange rate", "exchange rates", "fx rate",
+                "fx rates", "currency rate",
+            )),
+            ("statement_overview", (
+                "statement", "total assets", "total liabilities", "net total", "net worth",
+                "aum", "valuation", "currency allocation", "account statement", "data quality",
+                "ocr", "unverified", "risk profile",
+            )),
             ("crm_interactions", (
                 "interaction", "interactions", "conversation", "meeting", "last call",
                 "service request", "service ticket", "follow-up", "follow up", "sentiment",
@@ -839,13 +899,13 @@ class RelationshipManagerOrchestrator:
                 selected.append(tool_name)
 
         if not selected:
-            # No strong keyword match — fetch the two core per-customer views so the
+            # No strong keyword match — fetch the core per-customer/account views so the
             # final answer is complete across both domains.
-            for default_name in ("portfolio_snapshot", "crm_profile"):
+            for default_name in ("portfolio_snapshot", "statement_overview", "crm_profile"):
                 if default_name in self._tools and self._tools[default_name].is_enabled():
                     selected.append(default_name)
 
-        arguments = json.dumps({"customer_id": customer_id})
+        arguments = json.dumps({"customer_id": customer_id, "portfolio_id": portfolio_id})
         calls = [
             ToolCall(id=f"deterministic_{index}_{name}", name=name, arguments=arguments)
             for index, name in enumerate(selected)
@@ -911,7 +971,18 @@ class RelationshipManagerOrchestrator:
         for ref_num, chunk in ref_map.items():
             source = chunk.metadata.get("source", "")
             section = chunk.metadata.get("section", "")
-            label = f"{source} · {section}" if source and section else chunk.id
+            tool = chunk.metadata.get("tool", "")
+            # Build a human-readable label from metadata only — never fall back to
+            # chunk.id / tool_call_id, which are internal identifiers and must not
+            # be exposed to the end user.
+            if source and section:
+                label = f"{source} · {section}"
+            elif tool:
+                label = tool
+            elif source:
+                label = source
+            else:
+                label = "external data source"
             lines.append(f"[{ref_num}] {label}")
         logger.debug(
             "Orchestrator: reference section built",

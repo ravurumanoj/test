@@ -108,6 +108,13 @@ class RelationshipManagerRequest(BaseModel):
     """Represent an incoming relationship manager query."""
 
     customer_id: str = Field(min_length=1, description="Customer identifier used by the sub-agents.")
+    portfolio_id: str = Field(
+        default="",
+        description=(
+            "Account/portfolio identifier used by the statement tools (e.g. GO00001). "
+            "When empty, the server falls back to UNIQUE_DEFAULT_PORTFOLIO_ID."
+        ),
+    )
     question: str = Field(min_length=3, description="Natural language question from the relationship manager.")
     session_id: str = Field(
         default="",
@@ -157,7 +164,7 @@ class RelationshipManagerRequest(BaseModel):
         ),
     )
 
-    @field_validator("customer_id", "question")
+    @field_validator("customer_id", "portfolio_id", "question")
     @classmethod
     def strip_values(cls, value: str) -> str:
         """Normalize string fields before business processing."""
@@ -180,6 +187,7 @@ class RelationshipManagerResponse(BaseModel):
     """Represent the orchestrated result returned to the client."""
 
     customer_id: str
+    portfolio_id: str = ""
     question: str
     routing_decision: list[str]
     final_answer: str

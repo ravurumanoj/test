@@ -26,7 +26,10 @@ settings = Settings.from_env()
 IDLE_RECONNECT_SECONDS = 50
 RETRY_DELAY_SECONDS = 5
 STREAM_TIMEOUT_SECONDS = 300.0
-WEBHOOK_TIMEOUT_SECONDS = 300.0
+# Raised so the webhook POST doesn't time out before a large, multi-iteration
+# orchestrator run (LLM calls can now take up to UNIQUE_LLM_TIMEOUT_SECONDS
+# each) finishes and replies.
+WEBHOOK_TIMEOUT_SECONDS = 1900.0
 
 
 def _parse_sse_event(event_data: str) -> dict | None:
@@ -64,7 +67,7 @@ def _process_buffer(buffer: str) -> tuple[list[dict], str]:
 
 def _build_stream_url() -> str:
     """Build the upstream SSE stream URL from settings."""
-    subscriptions = ",".join(settings.sse_subscriptions)
+    subscriptions = ",".join(settings.subscriptions)
     return (
         f"{settings.sse_api_base}/public/event-socket/events/stream"
         f"?subscriptions={subscriptions}"
@@ -156,7 +159,7 @@ async def start_sse_listener(webhook_url: str, max_concurrent_tasks: int = 10) -
     """Listen to SSE events and forward them to the webhook."""
     logger.info(
         "Starting SSE listener for %s -> %s",
-        settings.sse_subscriptions,
+        settings.subscriptions,
         webhook_url,
     )
 

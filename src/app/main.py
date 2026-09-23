@@ -13,6 +13,7 @@ from fastapi.responses import JSONResponse
 
 from app.agents.crm_agent import build_crm_tools
 from app.agents.portfolio_agent import build_portfolio_tools
+from app.agents.portfolio_statement_agent import build_portfolio_statement_tools
 from app.agents.relationship_manager import RelationshipManagerOrchestrator
 from app.api.routes import create_router
 from app.api.portfolio_routes import router as portfolio_router
@@ -59,8 +60,9 @@ else:
 
 portfolio_tools = build_portfolio_tools(unique_toolkit=unique_toolkit)
 crm_tools = build_crm_tools(unique_toolkit=unique_toolkit)
+portfolio_statement_tools = build_portfolio_statement_tools(unique_toolkit=unique_toolkit)
 orchestrator = RelationshipManagerOrchestrator(
-    tools=[*portfolio_tools, *crm_tools],
+    tools=[*portfolio_tools, *crm_tools, *portfolio_statement_tools],
     unique_toolkit=unique_toolkit,
     settings=settings,
     mcp_manager=mcp_manager,  # MCP tools discovered and exposed to LLM on first request

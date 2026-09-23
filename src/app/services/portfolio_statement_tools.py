@@ -1,0 +1,135 @@
+"""Retrieval tools for the OCR-derived single-account portfolio statement.
+
+``portfolio_data.json`` is a single detailed account statement (not a list of
+customer records like ``portfolio.json``), so it is loaded independently here
+rather than through ``BaseDataTools``. Four focused query methods merge the
+fields that naturally belong together, mirroring the granularity of
+``PortfolioTools``.
+
+Methods
+-------
+get_statement_overview        — account metadata + total assets/liabilities/net summary
+get_holdings                  — individual holdings, optionally filtered by asset class
+get_allocation_breakdown       — asset-class totals + country allocation + subtotals
+get_credit_and_fx_info         — off-balance-sheet credit lines + exchange rates used
+"""
+
+from __future__ import annotations
+
+import logging
+from pathlib import Path
+from typing import Any
+
+from app.services.data_loader import JsonDataLoader
+
+logger = logging.getLogger(__name__)
+
+_DATA_DIR = Path(__file__).parent.parent / "data"
+
+
+class PortfolioStatementTools:
+    """Expose retrieval operations over the single-account statement JSON."""
+
+    def __init__(self) -> None:
+        """Initialize with the statement data file."""
+        self._loader = JsonDataLoader(_DATA_DIR)
+        self._filename = "portfolio_data.json"
+
+    def _data(self) -> dict[str, Any]:
+        """Return the parsed statement document."""
+        return self._loader.load(self._filename)
+
+    def _check_portfolio_id(self, portfolio_id: str, doc: dict[str, Any]) -> None:
+        """Log a warning when the requested portfolio_id doesn't match this statement.
+
+        This POC only has one account statement on file, so a mismatch never blocks
+        the read — it's a traceability signal for when multiple statements are added.
+        """
+        actual = doc.get("portfolio", {}).get("portfolio_id", "")
+        if portfolio_id and actual and portfolio_id.strip().upper() != str(actual).upper():
+            logger.warning(
+                "Requested portfolio_id does not match the available statement",
+                extra={"requested_portfolio_id": portfolio_id, "actual_portfolio_id": actual},
+            )
+
+    def get_statement_overview(self, portfolio_id: str = "") -> dict[str, Any]:
+        """Return account metadata and the total assets/liabilities/net-total summary.
+
+        Args:
+            portfolio_id: Account/portfolio identifier (e.g. ``GO00001``); logged and
+                checked against the statement on file.
+
+        Returns:
+            Dict with ``portfolio`` (account metadata, risk profile, valuation
+            date) and ``summary`` (total assets, total liabilities, net total,
+            and currency allocation, each with a per-currency percentage).
+        """
+        doc = self._data()
+        self._check_portfolio_id(portfolio_id, doc)
+        logger.info(
+            "Statement overview fetched",
+            extra={"portfolio_id": portfolio_id or doc.get("portfolio", {}).get("portfolio_id")},
+        )
+        return {
+            "portfolio": doc.get("portfolio", {}),
+            "summary": doc.get("summary", {}),
+        }
+
+    def get_holdings(self, portfolio_id: str = "", asset_class: str | None = None) -> list[dict[str, Any]]:
+        """Return individual holdings, optionally filtered by asset class.
+
+        Args:
+            portfolio_id: Account/portfolio identifier (e.g. ``GO00001``); logged and
+                checked against the statement on file.
+            asset_class: Optional asset class filter (e.g. ``EQUITY``,
+                ``BOND``, ``CASH_AND_CURRENT_ACCOUNTS``). Case-insensitive.
+
+        Returns:
+            List of holding dicts (instrument, quantity, prices, market value,
+            P&L, and any OCR ``unverified_fields`` notes).
+        """
+        doc = self._data()
+        self._check_portfolio_id(portfolio_id, doc)
+        holdings = doc.get("holdings", [])
+        if asset_class:
+            needle = asset_class.strip().upper()
+            holdings = [h for h in holdings if h.get("asset_class", "").upper() == needle]
+        logger.info("Holdings fetched", extra={"asset_class": asset_class, "count": len(holdings)})
+        return holdings
+
+    def get_allocation_breakdown(self, portfolio_id: str = "") -> dict[str, Any]:
+        """Return asset-class totals, geographic allocation, and reported subtotals.
+
+        Args:
+            portfolio_id: Account/portfolio identifier (e.g. ``GO00001``); logged and
+                checked against the statement on file.
+
+        Returns:
+            Dict with ``asset_class_totals``, ``country_allocation``, and
+            ``reported_subtotals``.
+        """
+        doc = self._data()
+        self._check_portfolio_id(portfolio_id, doc)
+        return {
+            "asset_class_totals": doc.get("asset_class_totals", {}),
+            "country_allocation": doc.get("country_allocation", []),
+            "reported_subtotals": doc.get("reported_subtotals", []),
+        }
+
+    def get_credit_and_fx_info(self, portfolio_id: str = "") -> dict[str, Any]:
+        """Return off-balance-sheet credit facilities and the FX rates used.
+
+        Args:
+            portfolio_id: Account/portfolio identifier (e.g. ``GO00001``); logged and
+                checked against the statement on file.
+
+        Returns:
+            Dict with ``off_balance_sheet`` (e.g. credit lines) and
+            ``exchange_rates`` (per-currency rate and rate date).
+        """
+        doc = self._data()
+        self._check_portfolio_id(portfolio_id, doc)
+        return {
+            "off_balance_sheet": doc.get("off_balance_sheet", []),
+            "exchange_rates": doc.get("exchange_rates", []),
+        }

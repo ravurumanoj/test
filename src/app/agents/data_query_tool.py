@@ -16,6 +16,7 @@ Mirrors the Unique Toolkit Tool pattern (docs/unique_toolkit_agentic_framework_c
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 from collections.abc import Callable
@@ -46,6 +47,8 @@ class DataQuerySpec:
     summarize_prompt    — domain prompt used to summarise the fetched data.
     fetch               — the single bound data method this tool calls.
     requires_customer   — whether ``customer_id`` is a required argument.
+    requires_portfolio_id — whether ``portfolio_id`` is forwarded to ``fetch`` (falls
+                          back to ``UNIQUE_DEFAULT_PORTFOLIO_ID`` when not supplied).
     optional_parameters — extra JSON-schema properties the LLM may supply
                           (forwarded as keyword arguments to ``fetch``).
     """
@@ -57,6 +60,7 @@ class DataQuerySpec:
     summarize_prompt: str
     fetch: Callable[..., Any]
     requires_customer: bool = True
+    requires_portfolio_id: bool = False
     optional_parameters: dict[str, dict[str, Any]] = field(default_factory=dict)
 
 
@@ -111,6 +115,16 @@ class DataQueryTool(Tool):
                 ),
             }
             required.append("customer_id")
+        if self._spec.requires_portfolio_id:
+            # Optional (not required): falls back to UNIQUE_DEFAULT_PORTFOLIO_ID via
+            # context when the LLM omits it, so the single-account statement always resolves.
+            properties["portfolio_id"] = {
+                "type": "string",
+                "description": (
+                    "The account/portfolio identifier (e.g. GO00001). "
+                    "Defaults to the configured account statement if omitted."
+                ),
+            }
         properties.update(self._spec.optional_parameters)
         return ToolDescription(
             name=self._spec.name,
@@ -137,12 +151,15 @@ class DataQueryTool(Tool):
     ) -> ToolCallResponse:
         """Fetch data via the bound API, summarise it, and return a ToolCallResponse."""
         customer_id = str(arguments.get("customer_id") or context.get("customer_id", "")).strip()
+        portfolio_id = str(arguments.get("portfolio_id") or context.get("portfolio_id", "")).strip()
         question = context.get("question", "")
         extra_kwargs = {
             key: arguments[key]
             for key in self._spec.optional_parameters
             if key in arguments and arguments[key] not in (None, "")
         }
+        if self._spec.requires_portfolio_id:
+            extra_kwargs["portfolio_id"] = portfolio_id
 
         logger.info(
             "DataQueryTool: TOOL TRIGGERED — %s",
@@ -152,6 +169,7 @@ class DataQueryTool(Tool):
                 "domain": self._spec.domain,
                 "data_method": getattr(self._spec.fetch, "__name__", "unknown"),
                 "customer_id": customer_id,
+                "portfolio_id": portfolio_id,
                 "optional_args": extra_kwargs,
             },
         )
@@ -165,7 +183,7 @@ class DataQueryTool(Tool):
         except Exception as exc:
             logger.exception(
                 "DataQueryTool: data retrieval failed",
-                extra={"tool_name": self._spec.name, "customer_id": customer_id},
+                extra={"tool_name": self._spec.name, "customer_id": customer_id, "portfolio_id": portfolio_id},
             )
             return ToolCallResponse(
                 id=tool_call_id,
@@ -178,15 +196,21 @@ class DataQueryTool(Tool):
             extra={
                 "tool_name": self._spec.name,
                 "customer_id": customer_id,
+                "portfolio_id": portfolio_id,
                 "record_count": len(data) if isinstance(data, list) else 1,
                 "keys": list(data.keys()) if isinstance(data, dict) else "list",
             },
         )
 
         # ── LLM summarisation ─────────────────────────────────────────────────
+        # Run in a worker thread: UniqueToolkit.execute() is a blocking (sync)
+        # HTTP call — calling it inline would freeze the event loop for the
+        # full LLM timeout and serialize tool calls that asyncio.gather()
+        # intends to run concurrently.
         summarize_context: dict[str, Any] = data if isinstance(data, dict) else {"records": data}
         try:
-            summary = self.unique_toolkit.execute(
+            summary = await asyncio.to_thread(
+                self.unique_toolkit.execute,
                 agent_name=self._spec.name,
                 prompt=self._spec.summarize_prompt,
                 context=summarize_context,
@@ -197,7 +221,7 @@ class DataQueryTool(Tool):
         except Exception as exc:
             logger.exception(
                 "DataQueryTool: LLM summarisation failed",
-                extra={"tool_name": self._spec.name, "customer_id": customer_id},
+                extra={"tool_name": self._spec.name, "customer_id": customer_id, "portfolio_id": portfolio_id},
             )
             return ToolCallResponse(
                 id=tool_call_id,
@@ -205,11 +229,12 @@ class DataQueryTool(Tool):
                 error_message=f"{self._spec.name} summarisation failed: {exc}",
             )
 
-        content_chunks = self._build_chunks(data=data, customer_id=customer_id)
+        content_chunks = self._build_chunks(data=data, customer_id=customer_id, portfolio_id=portfolio_id)
         debug_info: dict[str, Any] = {
             "tool_name": self._spec.name,
             "domain": self._spec.domain,
             "customer_id": customer_id,
+            "portfolio_id": portfolio_id,
             "summary_length": len(summary),
             "chunk_count": len(content_chunks),
         }
@@ -228,9 +253,9 @@ class DataQueryTool(Tool):
 
     # ── Private helpers ───────────────────────────────────────────────────────
 
-    def _build_chunks(self, data: Any, customer_id: str) -> list[ContentChunk]:
+    def _build_chunks(self, data: Any, customer_id: str, portfolio_id: str = "") -> list[ContentChunk]:
         """Turn each top-level data section into a referenceable ContentChunk."""
-        scope = customer_id or "book"
+        scope = customer_id or portfolio_id or "book"
         if isinstance(data, list):
             sections: dict[str, Any] = {"records": data}
         elif isinstance(data, dict):
@@ -252,6 +277,7 @@ class DataQueryTool(Tool):
                     text=text[:_CHUNK_MAX_CHARS],
                     metadata={
                         "customer_id": customer_id,
+                        "portfolio_id": portfolio_id,
                         "section": section_name,
                         "source": self._spec.domain,
                         "tool": self._spec.name,
