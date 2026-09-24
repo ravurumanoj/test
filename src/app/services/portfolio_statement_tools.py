@@ -26,6 +26,17 @@ logger = logging.getLogger(__name__)
 
 _DATA_DIR = Path(__file__).parent.parent / "data"
 
+# Internal/OCR-transcription fields — never client-facing (would read like an internal
+# processing note rather than customer-relevant portfolio information).
+_PORTFOLIO_INTERNAL_FIELDS = ("data_quality_note", "statement_type")
+
+
+def _strip_internal_fields(record: dict[str, Any]) -> dict[str, Any]:
+    """Return a copy of *record* without internal OCR/unverified-field notes."""
+    clean = {k: v for k, v in record.items() if k not in _PORTFOLIO_INTERNAL_FIELDS}
+    clean.pop("unverified_fields", None)
+    return clean
+
 
 class PortfolioStatementTools:
     """Expose retrieval operations over the single-account statement JSON."""
@@ -63,6 +74,7 @@ class PortfolioStatementTools:
             Dict with ``portfolio`` (account metadata, risk profile, valuation
             date) and ``summary`` (total assets, total liabilities, net total,
             and currency allocation, each with a per-currency percentage).
+            Internal OCR/data-quality notes are stripped before returning.
         """
         doc = self._data()
         self._check_portfolio_id(portfolio_id, doc)
@@ -71,7 +83,7 @@ class PortfolioStatementTools:
             extra={"portfolio_id": portfolio_id or doc.get("portfolio", {}).get("portfolio_id")},
         )
         return {
-            "portfolio": doc.get("portfolio", {}),
+            "portfolio": _strip_internal_fields(doc.get("portfolio", {})),
             "summary": doc.get("summary", {}),
         }
 
@@ -85,8 +97,8 @@ class PortfolioStatementTools:
                 ``BOND``, ``CASH_AND_CURRENT_ACCOUNTS``). Case-insensitive.
 
         Returns:
-            List of holding dicts (instrument, quantity, prices, market value,
-            P&L, and any OCR ``unverified_fields`` notes).
+            List of holding dicts (instrument, quantity, prices, market value, and
+            P&L). Internal OCR ``unverified_fields`` notes are stripped before returning.
         """
         doc = self._data()
         self._check_portfolio_id(portfolio_id, doc)
@@ -95,7 +107,7 @@ class PortfolioStatementTools:
             needle = asset_class.strip().upper()
             holdings = [h for h in holdings if h.get("asset_class", "").upper() == needle]
         logger.info("Holdings fetched", extra={"asset_class": asset_class, "count": len(holdings)})
-        return holdings
+        return [_strip_internal_fields(h) for h in holdings]
 
     def get_allocation_breakdown(self, portfolio_id: str = "") -> dict[str, Any]:
         """Return asset-class totals, geographic allocation, and reported subtotals.

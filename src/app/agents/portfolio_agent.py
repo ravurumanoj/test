@@ -4,29 +4,45 @@ The LLM chooses which of these to call based on the question; nothing is
 hardcoded. Each wraps a method on ``PortfolioTools`` via the generic
 ``DataQueryTool``.
 
+DISCONNECTED: ``PortfolioTools`` reads the old sample dataset
+(``data/portfolio.json`` — 5 hardcoded customers incl. CUST-1001 "Rajesh
+Kumar"). All tools in this module are now commented out so the LLM can never
+call them and old data can never leak into an answer. Live portfolio queries
+must go through ``portfolio_statement_agent.py`` / ``PortfolioStatementTools``,
+which reads the current ``data/portfolio_data.json`` statement instead.
+
 Tools
 -----
-portfolio_recent_activity — "what's new since your last visit" digest (active)
-
-portfolio_snapshot, portfolio_performance, portfolio_compliance, and
-portfolio_book_summary are temporarily disabled — see the commented block below.
+All tools below (portfolio_recent_activity, portfolio_snapshot,
+portfolio_performance, portfolio_compliance, portfolio_book_summary) are
+disabled — see the commented block below. ``build_portfolio_tools`` returns
+an empty list.
 """
 
 from __future__ import annotations
 
 import logging
 
-from app.agents.data_query_tool import DataQuerySpec, DataQueryTool
-from app.agents.prompts import PORTFOLIO_AGENT_PROMPT, PORTFOLIO_RECENT_ACTIVITY_PROMPT
-from app.services.portfolio_tools import PortfolioTools
+# from app.agents.data_query_tool import DataQuerySpec, DataQueryTool  # noqa: disabled with old tools below
+from app.agents.data_query_tool import DataQueryTool
+
+# from app.agents.prompts import PORTFOLIO_AGENT_PROMPT, PORTFOLIO_RECENT_ACTIVITY_PROMPT  # unused while disabled
+# from app.services.portfolio_tools import PortfolioTools  # OLD data source (portfolio.json) — disconnected
 from app.services.unique_toolkit import UniqueToolkit
 
 logger = logging.getLogger(__name__)
 
 
 def build_portfolio_tools(unique_toolkit: UniqueToolkit) -> list[DataQueryTool]:
-    """Build the four granular portfolio tools bound to a shared PortfolioTools instance."""
-    tools = PortfolioTools()
+    """Return an empty list — old ``portfolio.json``-backed tools are disconnected.
+
+    Kept as a no-op factory (rather than removed) so ``main.py`` wiring doesn't
+    need to change. Use ``build_portfolio_statement_tools`` (portfolio_data.json)
+    for all live portfolio queries instead.
+    """
+    del unique_toolkit  # unused while disabled
+    return []
+    # tools = PortfolioTools()
 
     # NOTE: Tool connectivity temporarily disabled — kept below for later restoration.
     # tools = PortfolioTools()
@@ -98,28 +114,32 @@ def build_portfolio_tools(unique_toolkit: UniqueToolkit) -> list[DataQueryTool]:
     # )
     # return built
 
-    specs = [
-        DataQuerySpec(
-            name="portfolio_recent_activity",
-            domain="portfolio",
-            description=(
-                "Get a 'what's new since your last visit' digest for a customer: portfolio "
-                "value and cash changes, dividends received, top performing and declining "
-                "holdings, and current asset/geographic/sector allocation. Use for questions "
-                "like 'what's changed', 'what's new in my portfolio', 'recent activity', or "
-                "'give me an update since I last checked'."
-            ),
-            prompt_hint=(
-                "Use portfolio_recent_activity for a 'what's new since last visit' recap: "
-                "value/cash changes, dividends, top movers, and current allocation."
-            ),
-            summarize_prompt=PORTFOLIO_RECENT_ACTIVITY_PROMPT,
-            fetch=tools.get_recent_activity_digest,
-        ),
-    ]
-    built = [DataQueryTool(spec=spec, unique_toolkit=unique_toolkit) for spec in specs]
-    logger.info(
-        "Portfolio tools built",
-        extra={"tool_names": [t.name for t in built]},
-    )
-    return built
+    # DISCONNECTED (old data): this was the last remaining tool reading portfolio.json
+    # (via PortfolioTools.get_recent_activity_digest) — it caused CUST-1001/"Rajesh Kumar"
+    # sample data to appear in webhook answers. Commented out; use the statement_* tools
+    # (portfolio_statement_agent.py, portfolio_data.json) for all portfolio queries now.
+    # specs = [
+    #     DataQuerySpec(
+    #         name="portfolio_recent_activity",
+    #         domain="portfolio",
+    #         description=(
+    #             "Get a 'what's new since your last visit' digest for a customer: portfolio "
+    #             "value and cash changes, dividends received, top performing and declining "
+    #             "holdings, and current asset/geographic/sector allocation. Use for questions "
+    #             "like 'what's changed', 'what's new in my portfolio', 'recent activity', or "
+    #             "'give me an update since I last checked'."
+    #         ),
+    #         prompt_hint=(
+    #             "Use portfolio_recent_activity for a 'what's new since last visit' recap: "
+    #             "value/cash changes, dividends, top movers, and current allocation."
+    #         ),
+    #         summarize_prompt=PORTFOLIO_RECENT_ACTIVITY_PROMPT,
+    #         fetch=tools.get_recent_activity_digest,
+    #     ),
+    # ]
+    # built = [DataQueryTool(spec=spec, unique_toolkit=unique_toolkit) for spec in specs]
+    # logger.info(
+    #     "Portfolio tools built",
+    #     extra={"tool_names": [t.name for t in built]},
+    # )
+    # return built

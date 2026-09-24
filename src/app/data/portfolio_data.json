@@ -4,11 +4,9 @@
     "account_reference": "CH800022300001",
     "account_number": "8000223",
     "reference_currency": "USD",
-    "statement_type": "TITLE_PTF_STATEMENT",
     "risk_profile": "Very Dynamic",
     "valuation_date": "22/09/2026",
-    "generated_timestamp": "22/09/2026 09:41:10 GMT",
-    "data_quality_note": "Transcribed from OCR of scanned statement pages. Some character-level values were reconstructed from OCR patterns and are pending manual verification."
+    "generated_timestamp": "22/09/2026 09:41:10 GMT"
   },
   "summary": {
     "total_assets": {
@@ -293,13 +291,7 @@
       "exchange_rate": 8.455301,
       "market_value_local": 4000000.0,
       "market_value_usd": 473076.0,
-      "pct_portfolio": 7.6,
-      "unverified_fields": {
-        "account_number": {
-          "ocr_value": "001-000-762",
-          "reason": "digit 6 vs 5"
-        }
-      }
+      "pct_portfolio": 7.6
     },
     {
       "asset_class": "CASH_AND_CURRENT_ACCOUNTS",
@@ -350,13 +342,7 @@
       "market_value_usd": -130610.25,
       "accrued_interest_usd": 0.0,
       "pct_portfolio": -2.1,
-      "country": "SINGAPORE DOLLAR",
-      "unverified_fields": {
-        "interest_rate_pct": {
-          "ocr_value": "3.100096",
-          "reason": "trailing digits ambiguous"
-        }
-      }
+      "country": "SINGAPORE DOLLAR"
     },
     {
       "asset_class": "BOND",
@@ -380,17 +366,7 @@
       "yield_to_maturity": 0.0,
       "duration": null,
       "pct_portfolio": 2.98,
-      "country": "SINGAPORE DOLLAR",
-      "unverified_fields": {
-        "average_price": {
-          "ocr_value": "100.2500 appeared in last_price column",
-          "reason": "column mapping reconstructed"
-        },
-        "unrealised_pct": {
-          "ocr_value": "-117",
-          "reason": "decimal point inferred"
-        }
-      }
+      "country": "SINGAPORE DOLLAR"
     },
     {
       "asset_class": "BOND_FUND",
@@ -434,17 +410,7 @@
       "accrued_interest_local": 0.0,
       "market_value_usd": 0.0,
       "accrued_interest_usd": 0.0,
-      "pct_portfolio": 0.0,
-      "unverified_fields": {
-        "instrument_name": {
-          "ocr_value": "FCN NOM-PANW/GDX 1200 130121",
-          "reason": "coupon read as 1200"
-        },
-        "isin": {
-          "ocr_value": "X52217623045",
-          "reason": "XS vs X5"
-        }
-      }
+      "pct_portfolio": 0.0
     },
     {
       "asset_class": "EQUITY",
@@ -577,17 +543,7 @@
       "market_value_local": 82000.0,
       "market_value_usd": 10446.14,
       "pct_portfolio": 0.17,
-      "country": "HONG KONG",
-      "unverified_fields": {
-        "instrument_name": {
-          "ocr_value": "INDUSTRIAL COMMERCIAL BK OF CHINA",
-          "reason": "ampersand spacing"
-        },
-        "isin": {
-          "ocr_value": "CNE 100000301",
-          "reason": "ISIN characters reconstructed"
-        }
-      }
+      "country": "HONG KONG"
     },
     {
       "asset_class": "EQUITY",
@@ -682,13 +638,7 @@
       "market_value_local": 32844.0,
       "market_value_usd": 39343.83,
       "pct_portfolio": 0.63,
-      "country": "NETHERLANDS",
-      "unverified_fields": {
-        "ticker": {
-          "ocr_value": "RDS AS",
-          "reason": "ticker separator inferred"
-        }
-      }
+      "country": "NETHERLANDS"
     },
     {
       "asset_class": "EQUITY",
@@ -707,21 +657,7 @@
       "market_value_local": 10644.0,
       "market_value_usd": 12750.45,
       "pct_portfolio": 0.2,
-      "country": "SPAIN",
-      "unverified_fields": {
-        "isin": {
-          "ocr_value": "E50105025003",
-          "reason": "ES vs E5"
-        },
-        "last_price": {
-          "ocr_value": "88700",
-          "reason": "decimal point inferred"
-        },
-        "average_exchange_rate": {
-          "ocr_value": "1.15/900",
-          "reason": "garbled, last_exchange_rate used from FX table"
-        }
-      }
+      "country": "SPAIN"
     },
     {
       "asset_class": "EQUITY",
@@ -740,13 +676,7 @@
       "market_value_local": 10705.54,
       "market_value_usd": 14764.55,
       "pct_portfolio": 0.24,
-      "country": "UNITED KINGDOM",
-      "unverified_fields": {
-        "ticker": {
-          "ocr_value": "A/L",
-          "reason": "ticker reconstructed"
-        }
-      }
+      "country": "UNITED KINGDOM"
     },
     {
       "asset_class": "EQUITY",
@@ -765,17 +695,7 @@
       "market_value_local": 27267.39,
       "market_value_usd": 37605.82,
       "pct_portfolio": 0.6,
-      "country": "UNITED KINGDOM",
-      "unverified_fields": {
-        "isin": {
-          "ocr_value": "GB0007980691",
-          "reason": "digit 6 vs 5"
-        },
-        "ticker": {
-          "ocr_value": "BPL",
-          "reason": "separator inferred"
-        }
-      }
+      "country": "UNITED KINGDOM"
     },
     {
       "asset_class": "EQUITY",
@@ -813,13 +733,7 @@
       "market_value_local": 983620.0,
       "market_value_usd": 9037.5,
       "pct_portfolio": 0.15,
-      "country": "JAPAN",
-      "unverified_fields": {
-        "average_price": {
-          "ocr_value": "666.6637",
-          "reason": "leading digits ambiguous"
-        }
-      }
+      "country": "JAPAN"
     },
     {
       "asset_class": "EQUITY",
@@ -914,13 +828,7 @@
       "market_value_local": 4522.0,
       "market_value_usd": 4522.0,
       "pct_portfolio": 0.07,
-      "country": "UNITED STATES OF AMERICA",
-      "unverified_fields": {
-        "ticker": {
-          "ocr_value": "BILLOO",
-          "reason": "ticker reconstructed"
-        }
-      }
+      "country": "UNITED STATES OF AMERICA"
     },
     {
       "asset_class": "EQUITY",
@@ -958,13 +866,7 @@
       "market_value_local": 293.92,
       "market_value_usd": 230.8,
       "pct_portfolio": 0.0,
-      "country": "AUSTRALIA",
-      "unverified_fields": {
-        "ticker": {
-          "ocr_value": "NABAX",
-          "reason": "separator inferred"
-        }
-      }
+      "country": "AUSTRALIA"
     },
     {
       "asset_class": "EQUITY",
@@ -983,13 +885,7 @@
       "market_value_local": 4775.0,
       "market_value_usd": 3577.18,
       "pct_portfolio": 0.06,
-      "country": "SINGAPORE",
-      "unverified_fields": {
-        "ticker": {
-          "ocr_value": "NETLSI",
-          "reason": "separator inferred"
-        }
-      }
+      "country": "SINGAPORE"
     },
     {
       "asset_class": "EQUITY",
@@ -1008,21 +904,7 @@
       "market_value_local": 11800.0,
       "market_value_usd": 8839.95,
       "pct_portfolio": 0.14,
-      "country": "SINGAPORE",
-      "unverified_fields": {
-        "isin": {
-          "ocr_value": "SG1504926220",
-          "reason": "letter S vs digit 5"
-        },
-        "instrument_name": {
-          "ocr_value": "OVERSEA-CHINESE BANKING CORP ITD",
-          "reason": "LTD vs ITD"
-        },
-        "ticker": {
-          "ocr_value": "OCBC SI",
-          "reason": "separator inferred"
-        }
-      }
+      "country": "SINGAPORE"
     },
     {
       "asset_class": "EQUITY",
@@ -1041,17 +923,7 @@
       "market_value_local": 0.0,
       "market_value_usd": 0.0,
       "pct_portfolio": 0.0,
-      "country": "SINGAPORE",
-      "unverified_fields": {
-        "isin": {
-          "ocr_value": "SGXC28600103",
-          "reason": "digit 6 vs 5"
-        },
-        "ticker": {
-          "ocr_value": "EAGLSI",
-          "reason": "separator inferred"
-        }
-      }
+      "country": "SINGAPORE"
     },
     {
       "asset_class": "FUND_ETF",
@@ -1123,17 +995,7 @@
       "pl_pct": 0.0,
       "market_value_local": 111810.0,
       "market_value_usd": 111810.0,
-      "pct_portfolio": 1.8,
-      "unverified_fields": {
-        "instrument_name": {
-          "ocr_value": "UBS LUX FQ-ALL CHINA-P-ACC-USD",
-          "reason": "EQ vs FQ"
-        },
-        "unrealised_pct": {
-          "ocr_value": "11.09",
-          "reason": "sign inferred from price vs average"
-        }
-      }
+      "pct_portfolio": 1.8
     },
     {
       "asset_class": "FUND_ETF",
@@ -1151,17 +1013,7 @@
       "pl_pct": 5.04,
       "market_value_local": 22316.0,
       "market_value_usd": 16717.99,
-      "pct_portfolio": 0.27,
-      "unverified_fields": {
-        "ticker": {
-          "ocr_value": "STTFSI",
-          "reason": "separator inferred"
-        },
-        "average_exchange_rate": {
-          "ocr_value": "1,402132",
-          "reason": "comma vs decimal"
-        }
-      }
+      "pct_portfolio": 0.27
     },
     {
       "asset_class": "FUND_ETF",
@@ -1197,17 +1049,7 @@
       "pl_pct": 0.0,
       "market_value_local": 65840.0,
       "market_value_usd": 65840.0,
-      "pct_portfolio": 1.06,
-      "unverified_fields": {
-        "instrument_name": {
-          "ocr_value": "NEUBERGER BER &G CONNECT-A-ACC-USD",
-          "reason": "5G vs &G"
-        },
-        "price_date": {
-          "ocr_value": "26/11/2021",
-          "reason": "date digit ambiguous"
-        }
-      }
+      "pct_portfolio": 1.06
     },
     {
       "asset_class": "COMMODITY_ETF",

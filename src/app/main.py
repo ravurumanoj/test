@@ -58,9 +58,9 @@ if settings.mcp_enabled and settings.mcp_server_url:
 else:
     logger.info("MCP Manager disabled (no MCP_SERVER_URL configured)")
 
-portfolio_tools = build_portfolio_tools(unique_toolkit=unique_toolkit)
+portfolio_tools = build_portfolio_tools(unique_toolkit=unique_toolkit)  # DISCONNECTED — always [] (old portfolio.json data source)
 crm_tools = build_crm_tools(unique_toolkit=unique_toolkit)
-portfolio_statement_tools = build_portfolio_statement_tools(unique_toolkit=unique_toolkit)
+portfolio_statement_tools = build_portfolio_statement_tools(unique_toolkit=unique_toolkit)  # ACTIVE — new portfolio_data.json source
 orchestrator = RelationshipManagerOrchestrator(
     tools=[*portfolio_tools, *crm_tools, *portfolio_statement_tools],
     unique_toolkit=unique_toolkit,

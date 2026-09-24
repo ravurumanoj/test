@@ -7,12 +7,16 @@ no per-customer ``customer_id`` since the source data covers one account.
 
 Tools
 -----
-statement_overview   — account/ID metadata, valuation date, risk profile, data-quality note,
+statement_overview   — account/ID metadata, valuation date, risk profile,
                        + total assets/liabilities/net-total with currency allocation
 statement_holdings   — individual holdings (instrument, ISIN/ticker, price, value, P&L),
                        optionally filtered by asset class
 statement_allocation — asset-class totals + geographic (country) allocation + reported subtotals
 statement_credit_fx  — off-balance-sheet credit lines + exchange rates used to value the statement
+
+Internal OCR/data-quality fields (``data_quality_note``, ``statement_type``,
+``unverified_fields``) are stripped in ``PortfolioStatementTools`` before reaching the
+LLM — never surface how this statement was digitised/verified to the client.
 """
 
 from __future__ import annotations
@@ -37,18 +41,15 @@ def build_portfolio_statement_tools(unique_toolkit: UniqueToolkit) -> list[DataQ
             description=(
                 "Get the account statement's identifying details and overall size: account/"
                 "portfolio ID, account number and reference, reference currency, risk profile, "
-                "valuation date, statement type, and a data-quality note (this statement was "
-                "OCR-transcribed from a scanned document, so some values are pending manual "
-                "verification). Also returns total assets, total liabilities, and net total in "
-                "USD, each broken down by per-currency allocation percentage, plus the line-by-"
-                "line asset breakdown. Use for questions about total portfolio value, net worth, "
-                "AUM, currency exposure/allocation, valuation date, risk profile, account/"
-                "reference numbers, or how reliable/verified the statement data is."
+                "and valuation date. Also returns total assets, total liabilities, and net "
+                "total in USD, each broken down by per-currency allocation percentage, plus the "
+                "line-by-line asset breakdown. Use for questions about total portfolio value, "
+                "net worth, AUM, currency exposure/allocation, valuation date, risk profile, or "
+                "account/reference numbers."
             ),
             prompt_hint=(
                 "Use statement_overview for total assets/liabilities/net total, currency "
-                "allocation, account metadata (risk profile, valuation date, account numbers), "
-                "or data-quality/OCR reliability questions."
+                "allocation, or account metadata (risk profile, valuation date, account numbers)."
             ),
             summarize_prompt=PORTFOLIO_STATEMENT_PROMPT,
             fetch=tools.get_statement_overview,
@@ -64,14 +65,13 @@ def build_portfolio_statement_tools(unique_toolkit: UniqueToolkit) -> list[DataQ
                 "market value (local and USD), % of portfolio, unrealised P&L, accrued interest, "
                 "maturity/price dates, and country. Covers cash accounts, fixed term deposits, "
                 "bonds, bond funds, structured products, equities, fund/ETFs, commodity ETFs, and "
-                "private equity funds. Some fields were OCR-reconstructed and flagged as "
-                "unverified in the response. Optionally filter by asset class. Use for questions "
-                "about specific instruments, positions held, quantities, prices, ISIN/ticker "
-                "lookups, or per-holding P&L."
+                "private equity funds. Optionally filter by asset class. Use for questions about "
+                "specific instruments, positions held, quantities, prices, ISIN/ticker lookups, "
+                "or per-holding P&L."
             ),
             prompt_hint=(
                 "Use statement_holdings for specific instruments/positions, quantities, prices, "
-                "ISIN/ticker lookups, per-holding P&L, or which fields are OCR-unverified."
+                "ISIN/ticker lookups, or per-holding P&L."
             ),
             summarize_prompt=PORTFOLIO_STATEMENT_PROMPT,
             fetch=tools.get_holdings,

@@ -776,14 +776,16 @@ class RelationshipManagerOrchestrator:
             "Tool selection:\n"
             "- Choose the tool(s) whose description best matches the question; call several "
             "when a question spans multiple areas.\n"
-            "- portfolio_recent_activity: the current per-customer portfolio view — value/cash "
-            "changes, dividends, top performing/declining holdings, and current asset/geo/sector "
-            "allocation. Use it for recap/update questions and for general holdings/performance "
-            "questions about one named customer (it is currently the only per-customer portfolio "
-            "tool available). CRM detail tools: profile/KYC, interactions/history, advisory/"
-            "suggestions. Statement tools (statement_overview, statement_holdings, "
-            "statement_allocation, statement_credit_fx): the raw single-account statement — "
-            "totals, holdings, asset/geo allocation, credit/FX rates.\n\n"
+            # OLD (disconnected): this used to tell the LLM "portfolio_recent_activity ... is
+            # currently the only per-customer portfolio tool available" — that pointed the LLM
+            # at the old portfolio.json tool, which is why old CUST-1001/Rajesh data sometimes
+            # leaked into answers. Replaced below with statement_* (portfolio_data.json) guidance.
+            "- Statement tools (statement_overview, statement_holdings, statement_allocation, "
+            "statement_credit_fx) are the ONLY portfolio data source — the raw account "
+            "statement: totals, holdings, asset/geo allocation, credit/FX rates. Use these for "
+            "ALL portfolio questions, including recap/update/'what's new' and general holdings/"
+            "performance questions. CRM detail tools: profile/KYC, interactions/history, "
+            "advisory/suggestions.\n\n"
             "CRITICAL — tool call requirement:\n"
             "- You MUST call at least one tool before answering; never answer from memory.\n"
             "- Broad/general questions (e.g. 'what details do you have about me', 'tell me "
@@ -859,27 +861,32 @@ class RelationshipManagerOrchestrator:
 
         # Ordered keyword → granular tool routing. First match per tool wins; a
         # question may select several tools across domains.
+        # NOTE: portfolio_recent_activity/portfolio_performance/portfolio_compliance/
+        # portfolio_snapshot/portfolio_book_summary (old portfolio.json data) are
+        # disconnected in portfolio_agent.py, so those entries are commented out below —
+        # the `tool_name not in self._tools` guard would skip them anyway, but keeping
+        # them commented makes the disconnection explicit here too.
         keyword_routes: list[tuple[str, tuple[str, ...]]] = [
-            ("portfolio_recent_activity", (
-                "recent activity", "what's new", "whats new", "since last visit",
-                "since my last visit", "what changed", "what's changed", "recap", "update me",
-            )),
-            ("portfolio_performance", (
-                "performance", "return", "returns", "alpha", "sharpe", "benchmark",
-                "yield", "sector", "geographic", "exposure", "upcoming event",
-            )),
-            ("portfolio_compliance", (
-                "line of credit", "loc", "tax", "portfolio alert",
-            )),
-            ("portfolio_snapshot", (
-                "portfolio", "holding", "holdings", "allocation", "asset", "position",
-                "p&l", "pnl", "profit", "loss", "invest", "investment", "aum",
-                "equity", "equities", "fund", "funds", "stock", "stocks", "bond", "bonds",
-            )),
-            ("portfolio_book_summary", (
-                "all customers", "book of business", "every customer", "across customers",
-                "book summary", "all portfolios",
-            )),
+            # ("portfolio_recent_activity", (
+            #     "recent activity", "what's new", "whats new", "since last visit",
+            #     "since my last visit", "what changed", "what's changed", "recap", "update me",
+            # )),
+            # ("portfolio_performance", (
+            #     "performance", "return", "returns", "alpha", "sharpe", "benchmark",
+            #     "yield", "sector", "geographic", "exposure", "upcoming event",
+            # )),
+            # ("portfolio_compliance", (
+            #     "line of credit", "loc", "tax", "portfolio alert",
+            # )),
+            # ("portfolio_snapshot", (
+            #     "portfolio", "holding", "holdings", "allocation", "asset", "position",
+            #     "p&l", "pnl", "profit", "loss", "invest", "investment", "aum",
+            #     "equity", "equities", "fund", "funds", "stock", "stocks", "bond", "bonds",
+            # )),
+            # ("portfolio_book_summary", (
+            #     "all customers", "book of business", "every customer", "across customers",
+            #     "book summary", "all portfolios",
+            # )),
             ("statement_holdings", (
                 "holding", "holdings", "instrument", "position", "positions", "stock", "stocks",
                 "equity", "equities", "bond", "bonds", "fund", "funds", "etf", "isin", "ticker",
@@ -895,7 +902,9 @@ class RelationshipManagerOrchestrator:
             ("statement_overview", (
                 "statement", "total assets", "total liabilities", "net total", "net worth",
                 "aum", "valuation", "currency allocation", "account statement", "data quality",
-                "ocr", "unverified", "risk profile",
+                "ocr", "unverified", "risk profile", "portfolio", "holding", "holdings",
+                "allocation", "asset", "position", "p&l", "pnl", "profit", "loss", "invest",
+                "investment", "performance", "return", "returns",
             )),
             ("crm_interactions", (
                 "interaction", "interactions", "conversation", "meeting", "last call",
@@ -923,10 +932,8 @@ class RelationshipManagerOrchestrator:
 
         if not selected:
             # No strong keyword match — fetch the core per-customer/account views so the
-            # final answer is complete across both domains. portfolio_snapshot is kept as a
-            # harmless no-op entry (filtered out by the `in self._tools` check below) so this
-            # list needs no further edits if/when it's re-enabled alongside portfolio_recent_activity.
-            for default_name in ("portfolio_recent_activity", "portfolio_snapshot", "statement_overview", "crm_profile"):
+            # final answer is complete across both domains.
+            for default_name in ("statement_overview", "crm_profile"):
                 if default_name in self._tools and self._tools[default_name].is_enabled():
                     selected.append(default_name)
 

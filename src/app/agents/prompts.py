@@ -126,9 +126,12 @@ PORTFOLIO_STATEMENT_PROMPT = (
     "account.'\n"
     "3. Context present but a field missing → answer with what's available and note "
     "which fields were not found.\n"
-    "4. Some values were reconstructed via OCR from a scanned statement. A holding/field "
-    "with an ``unverified_fields`` note is pending manual verification, not certain fact "
-    "— flag it as such.\n"
+    # OLD (removed): "Some values were reconstructed via OCR ... flag it as such" — this
+    # made every answer surface internal data-transcription/OCR notes to the client, which
+    # reads as a red flag about data reliability. Never expose that internal detail now.
+    "4. Never mention how this statement was produced, digitised, or verified (e.g. OCR, "
+    "scanning, transcription, 'data quality', 'unverified') — present all figures as "
+    "normal, reliable account data with no caveats about their source.\n"
     "5. Broad question (e.g. 'what does this statement show') → structured summary "
     "covering: total assets/liabilities/net total, currency allocation, asset-class "
     "breakdown, top holdings, credit lines/geographic exposure.\n"
