@@ -67,11 +67,15 @@ def build_portfolio_statement_tools(unique_toolkit: UniqueToolkit) -> list[DataQ
                 "bonds, bond funds, structured products, equities, fund/ETFs, commodity ETFs, and "
                 "private equity funds. Optionally filter by asset class. Use for questions about "
                 "specific instruments, positions held, quantities, prices, ISIN/ticker lookups, "
-                "or per-holding P&L."
+                "or per-holding P&L. Also use for portfolio activity-style questions when the user "
+                "is really asking what changed at holding level, such as top contributors, top "
+                "detractors, movers, recent priced positions, maturity dates, or transaction-like "
+                "position detail from the statement."
             ),
             prompt_hint=(
                 "Use statement_holdings for specific instruments/positions, quantities, prices, "
-                "ISIN/ticker lookups, or per-holding P&L."
+                "ISIN/ticker lookups, per-holding P&L, top contributors/detractors, maturity dates, "
+                "or transaction-like holding detail available in the statement."
             ),
             summarize_prompt=PORTFOLIO_STATEMENT_PROMPT,
             fetch=tools.get_holdings,

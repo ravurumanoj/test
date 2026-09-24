@@ -951,6 +951,9 @@ class RelationshipManagerOrchestrator:
             ("statement_holdings", (
                 "holding", "holdings", "instrument", "position", "positions", "stock", "stocks",
                 "equity", "equities", "bond", "bonds", "fund", "funds", "etf", "isin", "ticker",
+                "transaction", "transactions", "activity", "top contributor", "top contributors",
+                "top detractor", "top detractors", "best performer", "best performers",
+                "worst performer", "worst performers", "mover", "movers",
             )),
             ("statement_allocation", (
                 "allocation", "asset class", "asset-class", "geographic", "country", "exposure",
