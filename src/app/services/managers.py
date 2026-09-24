@@ -36,6 +36,7 @@ logger = logging.getLogger(__name__)
 _MERMAID_FENCE_RE = re.compile(r"```mermaid\s*\n(.*?)```", re.DOTALL | re.IGNORECASE)
 _MERMAID_INIT_RE = re.compile(r"^%%\{init:.*?\}%%\s*\n", re.DOTALL)
 _TABLE_ROW_RE = re.compile(r"^\|.*\|\s*$")
+_MARKDOWN_HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)$")
 _NEGATIVE_VALUE_RE = re.compile(r"(?<![\w>])(?:USD|EUR|GBP|AUD|SGD|JPY|HKD|NOK|SEK|INR)?\s*\(?-\d[\d,]*(?:\.\d+)?%?\)?", re.IGNORECASE)
 _POSITIVE_VALUE_RE = re.compile(r"(?<![\w>+])(?:USD|EUR|GBP|AUD|SGD|JPY|HKD|NOK|SEK|INR)?\s*\+\d[\d,]*(?:\.\d+)?%?", re.IGNORECASE)
 _LOSS_WORD_RE = re.compile(r"\b(loss|decline|downside|negative|detractor|underperform(?:er|ing)?)\b", re.IGNORECASE)
@@ -864,7 +865,8 @@ class ResponseFormattingPostprocessor(Postprocessor):
 
     async def run(self, response_text: str) -> str:
         themed = self._inject_mermaid_theme(response_text)
-        return self._style_profit_loss_tables(themed)
+        styled = self._style_profit_loss_tables(themed)
+        return self._normalize_plaintext_fallbacks(styled)
 
     def _inject_mermaid_theme(self, text: str) -> str:
         def _replace(match: re.Match[str]) -> str:
@@ -921,6 +923,45 @@ class ResponseFormattingPostprocessor(Postprocessor):
     @staticmethod
     def _looks_positive_value(value: str) -> bool:
         return bool(_POSITIVE_VALUE_RE.fullmatch(value))
+
+    def _normalize_plaintext_fallbacks(self, text: str) -> str:
+        text = self._convert_markdown_headings(text)
+        text = self._convert_mermaid_to_plaintext_summary(text)
+        return text
+
+    def _convert_markdown_headings(self, text: str) -> str:
+        converted_lines: list[str] = []
+        for line in text.splitlines():
+            match = _MARKDOWN_HEADING_RE.match(line)
+            if not match:
+                converted_lines.append(line)
+                continue
+            heading_text = match.group(2).strip()
+            if not heading_text:
+                continue
+            converted_lines.append(f"{heading_text}:")
+        return "\n".join(converted_lines)
+
+    def _convert_mermaid_to_plaintext_summary(self, text: str) -> str:
+        def _replace(match: re.Match[str]) -> str:
+            body = _MERMAID_INIT_RE.sub("", match.group(1)).strip()
+            lines = [line.strip() for line in body.splitlines() if line.strip()]
+            if not lines:
+                return ""
+            title = "Breakdown"
+            if lines[0].lower().startswith("pie title "):
+                title = lines[0][10:].strip() or title
+                lines = lines[1:]
+            slices: list[str] = []
+            for line in lines:
+                slice_match = re.match(r'^"([^"]+)"\s*:\s*([0-9][0-9.]*)$', line)
+                if slice_match:
+                    slices.append(f"{slice_match.group(1)} {slice_match.group(2)}")
+            if not slices:
+                return title
+            return f"{title}: " + "; ".join(slices)
+
+        return _MERMAID_FENCE_RE.sub(_replace, text)
 
 
 class FinancialDisclaimerPostprocessor(Postprocessor):

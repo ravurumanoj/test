@@ -49,6 +49,11 @@ SHARED_PORTFOLIO_ANALYSIS_RULES = (
     "date, or any other date if that exact field is present for the relevant item. Never infer "
     "one date from another. If the user explicitly asked for a date that is not present, say it "
     "is not available in the retrieved data.\n"
+    "- For a narrow date question about one specific instrument (for example a bond maturity "
+    "date), do not reply with the bare date alone. Give one short explanatory sentence that "
+    "names the instrument and states what the date represents, then add one brief supporting "
+    "detail from the retrieved data when available (for example currency, quantity, coupon, or "
+    "valuation context).\n"
 )
 
 # Shared formatting rules appended to every sub-agent summarisation prompt so each
@@ -64,6 +69,10 @@ OUTPUT_FORMATTING_GUIDELINES = (
     "- Return the answer directly. Never prefix sections or paragraphs with labels like "
     "'Answer:', 'Response:', 'Final Answer:', or repeat the same conclusion twice in "
     "different wording.\n"
+    "- The final answer must read cleanly even in a plain-text renderer. Do not rely on raw "
+    "markdown syntax being rendered beautifully; avoid unnecessary heading markers, fenced code "
+    "blocks, or formatting noise when a simple sentence, list, or table would communicate the "
+    "same point more reliably.\n"
     "- Say each fact once. If a table/chart already shows the numbers, add only brief "
     "interpretation around it instead of restating every row in prose.\n"
     "- Multi-item data (holdings, allocations, interactions, suggestions, metrics) → a "
@@ -75,6 +84,9 @@ OUTPUT_FORMATTING_GUIDELINES = (
     "- A single proportional breakdown with 3+ categories (e.g. asset allocation, sector "
     "exposure, currency allocation) often benefits from a Mermaid PIE chart above the "
     "table — include one when it adds clarity, per the strict rules below.\n"
+    "- Use Mermaid only when it adds clear value and the surrounding answer still makes sense "
+    "without the chart. If a plain-text renderer would show the raw fence awkwardly, prefer a "
+    "table or prose summary instead.\n"
     "- When using a pie chart, make it feel modern through better information design: short "
     "labels, meaningful slice ordering, and a companion takeaway/table. Do not rely on the "
     "chart alone to carry the message.\n"
