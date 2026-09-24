@@ -55,6 +55,7 @@ from app.services.managers import (
     HistoryManager,
     PostprocessorManager,
     ReferenceManager,
+    ResponseFormattingPostprocessor,
 )
 from app.services.unique_toolkit import UniqueToolkit
 from app.settings import Settings
@@ -211,6 +212,7 @@ class RelationshipManagerOrchestrator:
         evaluation_manager.add_evaluation(FinancialSafetyEvaluation())
 
         # Register postprocessors — mirrors PostprocessorManager.add_postprocessor()
+        postprocessor_manager.add_postprocessor(ResponseFormattingPostprocessor())
         postprocessor_manager.add_postprocessor(FinancialDisclaimerPostprocessor())
 
         logger.info("Orchestrator: all managers initialized and configured")
@@ -849,8 +851,13 @@ class RelationshipManagerOrchestrator:
             "(different tools, customers, missing fields) — build structure from what's "
             "actually present, and use a different clear format when it serves the data/"
             "question better.\n"
+            "- Return the answer directly. Never prefix the response with labels like 'Answer:' "
+            "or repeat the same conclusion twice.\n"
             "- Tool summaries are already pre-formatted (tables/Mermaid charts) where relevant "
             "— preserve and reuse them as-is rather than flattening back to prose.\n"
+            "- Do not rely on tables alone for portfolio questions. Add concise commentary that "
+            "interprets the numbers and points out the main driver, concentration, offset, or "
+            "risk visible in the retrieved data.\n"
             "- Comparisons (this vs. that, period-over-period, customer vs. benchmark, several "
             "holdings/metrics side by side) → a markdown table with compared items as columns.\n"
             "- A proportional breakdown spanning multiple tool results, not already charted → a "
@@ -860,6 +867,15 @@ class RelationshipManagerOrchestrator:
             "each followed by its table/chart where applicable.\n"
             "- A single narrow fact (e.g. 'what is the customer's NPS score') → one short "
             "sentence; don't force a table or chart onto trivial data.\n"
+            "- For valuation questions, include related totals that materially complete the "
+            "picture when present (for example assets, liabilities, and net total), rather than "
+            "isolating one number if the retrieved data clearly provides the rest.\n"
+            "- For 'top contributors/detractors' or similar ranking questions, prefer the most "
+            "granular relevant level available for the request. For portfolio holdings questions, "
+            "that means instrument-level holdings, not currency-level or whole-portfolio totals, "
+            "unless the user explicitly asks for those levels.\n"
+            "- Never infer missing dates. If a requested maturity or other date is not explicitly "
+            "present in tool output, say it is not available in the retrieved data.\n"
             "- Never fabricate table rows, chart slices, or values not present in tool "
             "outputs.\n\n"
             f"{MERMAID_PIE_RULES}\n\n"

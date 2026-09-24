@@ -25,12 +25,21 @@ import abc
 import asyncio
 import json
 import logging
+import re
 from typing import Any
 
 from app.logging_config import log_text_preview
 from app.schemas import ContentChunk, EvaluationMetricResult, ToolCallResponse
 
 logger = logging.getLogger(__name__)
+
+_MERMAID_FENCE_RE = re.compile(r"```mermaid\s*\n(.*?)```", re.DOTALL | re.IGNORECASE)
+_MERMAID_INIT_RE = re.compile(r"^%%\{init:.*?\}%%\s*\n", re.DOTALL)
+_TABLE_ROW_RE = re.compile(r"^\|.*\|\s*$")
+_NEGATIVE_VALUE_RE = re.compile(r"(?<![\w>])(?:USD|EUR|GBP|AUD|SGD|JPY|HKD|NOK|SEK|INR)?\s*\(?-\d[\d,]*(?:\.\d+)?%?\)?", re.IGNORECASE)
+_POSITIVE_VALUE_RE = re.compile(r"(?<![\w>+])(?:USD|EUR|GBP|AUD|SGD|JPY|HKD|NOK|SEK|INR)?\s*\+\d[\d,]*(?:\.\d+)?%?", re.IGNORECASE)
+_LOSS_WORD_RE = re.compile(r"\b(loss|decline|downside|negative|detractor|underperform(?:er|ing)?)\b", re.IGNORECASE)
+_GAIN_WORD_RE = re.compile(r"\b(gain|profit|upside|positive|contributor|outperform(?:er|ing)?)\b", re.IGNORECASE)
 
 
 # ─── DebugInfoManager ────────────────────────────────────────────────────────
@@ -837,6 +846,81 @@ class FinancialSafetyEvaluation(Evaluation):
 
 
 # ─── Concrete postprocessors ──────────────────────────────────────────────────
+
+
+class ResponseFormattingPostprocessor(Postprocessor):
+    """Apply lightweight presentation upgrades to markdown answers."""
+
+    _MERMAID_INIT: str = (
+        '%%{init: {"theme": "base", "themeVariables": {'
+        '"pie1": "#0F766E", "pie2": "#14B8A6", "pie3": "#0EA5E9", '
+        '"pie4": "#2563EB", "pie5": "#F59E0B", "pie6": "#EF4444", '
+        '"pie7": "#7C3AED", "pieStrokeColor": "#FFFFFF", '
+        '"pieOuterStrokeWidth": "2px", "fontFamily": "Segoe UI"}}}%%'
+    )
+
+    def __init__(self) -> None:
+        super().__init__(name="response_formatting")
+
+    async def run(self, response_text: str) -> str:
+        themed = self._inject_mermaid_theme(response_text)
+        return self._style_profit_loss_tables(themed)
+
+    def _inject_mermaid_theme(self, text: str) -> str:
+        def _replace(match: re.Match[str]) -> str:
+            body = match.group(1)
+            if _MERMAID_INIT_RE.match(body):
+                return match.group(0)
+            return f"```mermaid\n{self._MERMAID_INIT}\n{body}```"
+
+        return _MERMAID_FENCE_RE.sub(_replace, text)
+
+    def _style_profit_loss_tables(self, text: str) -> str:
+        lines = text.splitlines()
+        styled_lines: list[str] = []
+        for line in lines:
+            if _TABLE_ROW_RE.match(line):
+                styled_lines.append(self._style_table_row(line))
+            else:
+                styled_lines.append(line)
+        return "\n".join(styled_lines)
+
+    def _style_table_row(self, line: str) -> str:
+        if "---" in line:
+            return line
+
+        cells = line.split("|")
+        if len(cells) < 3:
+            return line
+
+        styled_cells = [cells[0]]
+        for cell in cells[1:-1]:
+            styled_cells.append(self._style_table_cell(cell))
+        styled_cells.append(cells[-1])
+        return "|".join(styled_cells)
+
+    def _style_table_cell(self, cell: str) -> str:
+        stripped = cell.strip()
+        if not stripped or stripped.startswith("<span "):
+            return cell
+
+        if _LOSS_WORD_RE.search(stripped) or self._looks_negative_value(stripped):
+            return cell.replace(stripped, self._wrap_span(stripped, "rm-negative"), 1)
+        if _GAIN_WORD_RE.search(stripped) or self._looks_positive_value(stripped):
+            return cell.replace(stripped, self._wrap_span(stripped, "rm-positive"), 1)
+        return cell
+
+    @staticmethod
+    def _wrap_span(value: str, css_class: str) -> str:
+        return f'<span class="{css_class}">{value}</span>'
+
+    @staticmethod
+    def _looks_negative_value(value: str) -> bool:
+        return bool(_NEGATIVE_VALUE_RE.fullmatch(value)) and ("-" in value or "(" in value)
+
+    @staticmethod
+    def _looks_positive_value(value: str) -> bool:
+        return bool(_POSITIVE_VALUE_RE.fullmatch(value))
 
 
 class FinancialDisclaimerPostprocessor(Postprocessor):
