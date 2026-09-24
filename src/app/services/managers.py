@@ -37,6 +37,10 @@ _MERMAID_FENCE_RE = re.compile(r"```mermaid\s*\n(.*?)```", re.DOTALL | re.IGNORE
 _MERMAID_INIT_RE = re.compile(r"^%%\{init:.*?\}%%\s*\n", re.DOTALL)
 _TABLE_ROW_RE = re.compile(r"^\|.*\|\s*$")
 _MARKDOWN_HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)$")
+_MODEL_SOURCES_BLOCK_RE = re.compile(
+    r"(?:\n|\A)(?:\*\*Sources:\*\*|Sources:)\s*(?:\n(?:\[[0-9]+\].*|[-*].*|\d+\..*|.+))*\s*\Z",
+    re.IGNORECASE,
+)
 _NEGATIVE_VALUE_RE = re.compile(r"(?<![\w>])(?:USD|EUR|GBP|AUD|SGD|JPY|HKD|NOK|SEK|INR)?\s*\(?-\d[\d,]*(?:\.\d+)?%?\)?", re.IGNORECASE)
 _POSITIVE_VALUE_RE = re.compile(r"(?<![\w>+])(?:USD|EUR|GBP|AUD|SGD|JPY|HKD|NOK|SEK|INR)?\s*\+\d[\d,]*(?:\.\d+)?%?", re.IGNORECASE)
 _LOSS_WORD_RE = re.compile(r"\b(loss|decline|downside|negative|detractor|underperform(?:er|ing)?)\b", re.IGNORECASE)
@@ -864,9 +868,13 @@ class ResponseFormattingPostprocessor(Postprocessor):
         super().__init__(name="response_formatting")
 
     async def run(self, response_text: str) -> str:
-        themed = self._inject_mermaid_theme(response_text)
+        cleaned = self._strip_model_generated_sources(response_text)
+        themed = self._inject_mermaid_theme(cleaned)
         styled = self._style_profit_loss_tables(themed)
         return self._normalize_plaintext_fallbacks(styled)
+
+    def _strip_model_generated_sources(self, text: str) -> str:
+        return _MODEL_SOURCES_BLOCK_RE.sub("", text).rstrip()
 
     def _inject_mermaid_theme(self, text: str) -> str:
         def _replace(match: re.Match[str]) -> str:
