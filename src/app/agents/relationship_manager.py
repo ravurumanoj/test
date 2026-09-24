@@ -72,7 +72,7 @@ _XYCHART_X_AXIS_RE = re.compile(r'^x-axis\s*\[(.*)\]\s*$', re.IGNORECASE)
 _XYCHART_Y_AXIS_RE = re.compile(r'^y-axis\s+"([^"]{1,40})"\s+([0-9][0-9.,]*)\s+-->\s+([0-9][0-9.,]*)\s*$', re.IGNORECASE)
 _XYCHART_BAR_RE = re.compile(r'^bar\s*\[(.*)\]\s*$', re.IGNORECASE)
 _QUOTED_LIST_ITEM_RE = re.compile(r'"([^"\n]{1,40})"')
-_NUMERIC_LIST_RE = re.compile(r'[0-9][0-9.,]*')
+_NUMERIC_LIST_RE = re.compile(r'[0-9][0-9.,]*(?:e[+-]?[0-9]+)?', re.IGNORECASE)
 # Characters known to break the Mermaid parser inside titles/labels (quotes, arrows, etc.)
 _MERMAID_UNSAFE_CHARS_RE = re.compile(r'["`<>\\|{}]|-+>|<-+')
 # A message that is ONLY a greeting/pleasantry (no actual question) — matched so we
@@ -1075,6 +1075,10 @@ class RelationshipManagerOrchestrator:
         def _clean(fragment: str, max_len: int) -> str:
             return _MERMAID_UNSAFE_CHARS_RE.sub("", fragment).strip()[:max_len]
 
+        def _format_mermaid_number(value: float) -> str:
+            formatted = f"{value:.6f}".rstrip("0").rstrip(".")
+            return formatted or "0"
+
         def _parse_numeric_list(raw: str) -> list[float]:
             values: list[float] = []
             for token in _NUMERIC_LIST_RE.findall(raw):
@@ -1138,13 +1142,13 @@ class RelationshipManagerOrchestrator:
                 y_max = safe_max
 
             labels = ", ".join(f'"{label}"' for label in x_labels)
-            values = ", ".join(f"{value:g}" for value in bar_values)
+            values = ", ".join(_format_mermaid_number(value) for value in bar_values)
             return (
                 "```mermaid\n"
                 "xychart-beta\n"
                 f'    title "{title}"\n'
                 f'    x-axis [{labels}]\n'
-                f'    y-axis "{y_label}" {y_min:g} --> {y_max:g}\n'
+                f'    y-axis "{y_label}" {_format_mermaid_number(y_min)} --> {_format_mermaid_number(y_max)}\n'
                 f'    bar [{values}]\n'
                 "```"
             )
@@ -1205,7 +1209,9 @@ class RelationshipManagerOrchestrator:
                     kept.append(("Other", other_total))
                 slices = kept
 
-            body = "\n".join(f'    "{label}" : {value:g}' for label, value in slices)
+            body = "\n".join(
+                f'    "{label}" : {_format_mermaid_number(value)}' for label, value in slices
+            )
             return f"```mermaid\npie title {title}\n{body}\n```"
 
         return _MERMAID_BLOCK_RE.sub(_repair, text)
