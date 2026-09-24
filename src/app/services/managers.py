@@ -926,7 +926,6 @@ class ResponseFormattingPostprocessor(Postprocessor):
 
     def _normalize_plaintext_fallbacks(self, text: str) -> str:
         text = self._convert_markdown_headings(text)
-        text = self._convert_mermaid_to_plaintext_summary(text)
         return text
 
     def _convert_markdown_headings(self, text: str) -> str:
@@ -941,28 +940,6 @@ class ResponseFormattingPostprocessor(Postprocessor):
                 continue
             converted_lines.append(f"{heading_text}:")
         return "\n".join(converted_lines)
-
-    def _convert_mermaid_to_plaintext_summary(self, text: str) -> str:
-        def _replace(match: re.Match[str]) -> str:
-            body = _MERMAID_INIT_RE.sub("", match.group(1)).strip()
-            lines = [line.strip() for line in body.splitlines() if line.strip()]
-            if not lines:
-                return ""
-            title = "Breakdown"
-            if lines[0].lower().startswith("pie title "):
-                title = lines[0][10:].strip() or title
-                lines = lines[1:]
-            slices: list[str] = []
-            for line in lines:
-                slice_match = re.match(r'^"([^"]+)"\s*:\s*([0-9][0-9.]*)$', line)
-                if slice_match:
-                    slices.append(f"{slice_match.group(1)} {slice_match.group(2)}")
-            if not slices:
-                return title
-            return f"{title}: " + "; ".join(slices)
-
-        return _MERMAID_FENCE_RE.sub(_replace, text)
-
 
 class FinancialDisclaimerPostprocessor(Postprocessor):
     """Appends a standard financial services disclaimer to every response.
