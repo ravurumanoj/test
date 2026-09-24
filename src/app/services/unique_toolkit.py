@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import json
 import logging
+from datetime import datetime
 from typing import Any
 
 from app.errors import UniqueIntegrationError
@@ -258,6 +259,7 @@ class UniqueToolkit:
         docs/unique_sdk_ai_completion_advanced_api.md — Message Format section
         """
         context_json = json.dumps(context, ensure_ascii=True, indent=2, sort_keys=True)
+        current_date = datetime.now().strftime("%Y-%m-%d (%A)")
         return [
             {"role": "system", "content": prompt},
             {
@@ -265,6 +267,7 @@ class UniqueToolkit:
                 "content": (
                     "Use the retrieved relationship-manager context to answer the question. "
                     "Do not invent facts beyond the provided context.\n\n"
+                    f"Current date: {current_date}\n"
                     f"Question: {question}\n\n"
                     f"Retrieved Context:\n{context_json}"
                 ),

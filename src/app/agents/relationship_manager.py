@@ -34,6 +34,7 @@ import logging
 import re
 from collections.abc import Sequence
 from dataclasses import dataclass
+from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 from app.agents.base_tool import Tool
@@ -763,6 +764,7 @@ class RelationshipManagerOrchestrator:
             "You are a relationship manager orchestrator running an iterative tool loop. "
             "Plan which tools are needed, call them, then produce a final concise answer. "
             "Only use facts from tool outputs — never invent data.\n\n"
+            f"Current date: {datetime.now().strftime('%Y-%m-%d (%A)')}\n"
             f"Current customer ID: {customer_id}\n"
             f"Always pass \"customer_id\": \"{customer_id}\" when calling any customer-specific "
             f"tool.\n"
@@ -774,14 +776,14 @@ class RelationshipManagerOrchestrator:
             "Tool selection:\n"
             "- Choose the tool(s) whose description best matches the question; call several "
             "when a question spans multiple areas.\n"
-            "- Portfolio detail tools: position/holdings, performance/returns, compliance "
-            "(credit/tax). portfolio_recent_activity: a 'what's new since your last visit' "
-            "digest (value/cash changes, dividends, top movers, allocation) — prefer it for "
-            "recap/update questions over a raw snapshot. CRM detail tools: profile/KYC, "
-            "interactions/history, advisory/suggestions. Statement tools (statement_overview, "
-            "statement_holdings, statement_allocation, statement_credit_fx): the raw "
-            "single-account statement — totals, holdings, asset/geo allocation, credit/FX "
-            "rates.\n\n"
+            "- portfolio_recent_activity: the current per-customer portfolio view — value/cash "
+            "changes, dividends, top performing/declining holdings, and current asset/geo/sector "
+            "allocation. Use it for recap/update questions and for general holdings/performance "
+            "questions about one named customer (it is currently the only per-customer portfolio "
+            "tool available). CRM detail tools: profile/KYC, interactions/history, advisory/"
+            "suggestions. Statement tools (statement_overview, statement_holdings, "
+            "statement_allocation, statement_credit_fx): the raw single-account statement — "
+            "totals, holdings, asset/geo allocation, credit/FX rates.\n\n"
             "CRITICAL — tool call requirement:\n"
             "- You MUST call at least one tool before answering; never answer from memory.\n"
             "- Broad/general questions (e.g. 'what details do you have about me', 'tell me "
@@ -921,8 +923,10 @@ class RelationshipManagerOrchestrator:
 
         if not selected:
             # No strong keyword match — fetch the core per-customer/account views so the
-            # final answer is complete across both domains.
-            for default_name in ("portfolio_snapshot", "statement_overview", "crm_profile"):
+            # final answer is complete across both domains. portfolio_snapshot is kept as a
+            # harmless no-op entry (filtered out by the `in self._tools` check below) so this
+            # list needs no further edits if/when it's re-enabled alongside portfolio_recent_activity.
+            for default_name in ("portfolio_recent_activity", "portfolio_snapshot", "statement_overview", "crm_profile"):
                 if default_name in self._tools and self._tools[default_name].is_enabled():
                     selected.append(default_name)
 
@@ -1088,7 +1092,7 @@ class RelationshipManagerOrchestrator:
     def _deduplicate_agent_answers(self, agent_answers: list[AgentAnswer]) -> list[AgentAnswer]:
         """Keep the latest answer per (domain, tool) so each granular tool is represented once.
 
-        Multiple tools in the same domain (e.g. portfolio_snapshot + portfolio_performance)
+        Multiple tools in the same domain (e.g. portfolio_recent_activity + statement_overview)
         are all preserved; only exact re-runs of the same tool collapse. Ordered portfolio
         answers first, then crm, preserving tool call order within each domain.
         """
