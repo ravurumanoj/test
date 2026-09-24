@@ -10,6 +10,8 @@ get_all_portfolios_summary  — RM book-of-business overview (all customers)
 get_portfolio_snapshot      — Holdings + asset allocation + P&L for one customer
 get_performance_view        — Returns, risk metrics, sector/geo exposure, events
 get_compliance_view         — LOC, tax summary, and active alerts
+get_recent_activity_digest  — "What's new since your last visit" recap: value/cash
+                               changes, dividends, top movers, and current allocation
 """
 
 from __future__ import annotations
@@ -162,4 +164,78 @@ class PortfolioTools(BaseDataTools):
             "line_of_credit": rec.get("line_of_credit"),
             "tax_summary": rec.get("tax_summary", {}),
             "alerts": rec.get("alerts", []),
+        }
+
+    def get_recent_activity_digest(self, customer_id: str) -> dict[str, Any]:
+        """Return a "what's new since your last visit" digest for one customer.
+
+        Some template concepts are not yet tracked by this data source — a stored
+        last-visit date, a transaction-level buy/sell/income-event log, and
+        currency/FX attribution — and are returned as ``None``. The summarisation
+        prompt is instructed to silently omit any section it cannot back with real
+        data rather than inventing or padding it.
+
+        Top gainers/decliners are ranked here (not by the LLM) from each holding's
+        ``unrealized_pnl_pct`` so the ranking is deterministic and never invented.
+
+        Args:
+            customer_id: Unique customer identifier.
+
+        Returns:
+            Dict with ``portfolio_value_summary``, ``cash_position``,
+            ``dividends_received_ytd``, ``top_movers`` (gainers/decliners),
+            ``asset_allocation``, ``sector_exposure``, ``geographic_exposure``,
+            and the untracked fields set to ``None``.
+        """
+        rec = self._find_customer(customer_id)
+        summary = rec.get("portfolio_summary", {})
+        allocation = rec.get("asset_allocation", {})
+        cash = allocation.get("cash_and_equivalents", {})
+        holdings = [h for h in rec.get("holdings", []) if isinstance(h.get("unrealized_pnl_pct"), (int, float))]
+
+        def _mover(h: dict[str, Any]) -> dict[str, Any]:
+            return {
+                "instrument_name": h.get("instrument_name"),
+                "unrealized_pnl_pct": h.get("unrealized_pnl_pct"),
+                "weight_in_portfolio_pct": h.get("weight_in_portfolio_pct"),
+            }
+
+        top_gainers = sorted((h for h in holdings if h["unrealized_pnl_pct"] > 0), key=lambda h: h["unrealized_pnl_pct"], reverse=True)[:3]
+        top_decliners = sorted((h for h in holdings if h["unrealized_pnl_pct"] < 0), key=lambda h: h["unrealized_pnl_pct"])[:3]
+
+        logger.info(
+            "Recent activity digest fetched",
+            extra={
+                "customer_id": customer_id,
+                "top_gainer_count": len(top_gainers),
+                "top_decliner_count": len(top_decliners),
+            },
+        )
+        return {
+            "customer_id": rec.get("customer_id"),
+            "as_of_date": summary.get("as_of_date"),
+            "last_visit_date": None,  # not tracked yet by this data source
+            "portfolio_value_summary": {
+                "current_value": summary.get("current_value"),
+                "invested_value": summary.get("invested_value"),
+                "unrealized_pnl": summary.get("unrealized_pnl"),
+                "unrealized_pnl_pct": summary.get("unrealized_pnl_pct"),
+                "total_return_ytd_pct": summary.get("total_return_ytd_pct"),
+                "realized_pnl_ytd": summary.get("realized_pnl_ytd"),
+                "currency": summary.get("currency"),
+            },
+            "cash_position": {
+                "value": cash.get("value"),
+                "pct_of_total": cash.get("pct"),
+            },
+            "dividends_received_ytd": summary.get("dividends_received_ytd"),
+            "transaction_history": None,  # buy/sell/income-event log not tracked yet
+            "currency_movement_impact": None,  # FX attribution not tracked yet
+            "top_movers": {
+                "top_gainers": [_mover(h) for h in top_gainers],
+                "top_decliners": [_mover(h) for h in top_decliners],
+            },
+            "asset_allocation": allocation,
+            "sector_exposure": rec.get("sector_exposure", {}),
+            "geographic_exposure": rec.get("geographic_exposure", {}),
         }

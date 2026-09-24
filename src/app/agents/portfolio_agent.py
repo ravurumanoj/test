@@ -1,15 +1,15 @@
 """Portfolio data tools — each portfolio API exposed as an individual LLM tool.
 
 The LLM chooses which of these to call based on the question; nothing is
-hardcoded. All four wrap methods on ``PortfolioTools`` via the generic
+hardcoded. Each wraps a method on ``PortfolioTools`` via the generic
 ``DataQueryTool``.
 
 Tools
 -----
-portfolio_snapshot     — holdings + asset allocation + P&L for one customer
-portfolio_performance  — returns, risk metrics, sector/geo exposure, events
-portfolio_compliance   — line of credit, tax summary, active alerts
-portfolio_book_summary — book-of-business overview across ALL customers
+portfolio_recent_activity — "what's new since your last visit" digest (active)
+
+portfolio_snapshot, portfolio_performance, portfolio_compliance, and
+portfolio_book_summary are temporarily disabled — see the commented block below.
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ from __future__ import annotations
 import logging
 
 from app.agents.data_query_tool import DataQuerySpec, DataQueryTool
-from app.agents.prompts import PORTFOLIO_AGENT_PROMPT
+from app.agents.prompts import PORTFOLIO_AGENT_PROMPT, PORTFOLIO_RECENT_ACTIVITY_PROMPT
 from app.services.portfolio_tools import PortfolioTools
 from app.services.unique_toolkit import UniqueToolkit
 
@@ -26,6 +26,8 @@ logger = logging.getLogger(__name__)
 
 def build_portfolio_tools(unique_toolkit: UniqueToolkit) -> list[DataQueryTool]:
     """Build the four granular portfolio tools bound to a shared PortfolioTools instance."""
+    tools = PortfolioTools()
+
     # NOTE: Tool connectivity temporarily disabled — kept below for later restoration.
     # tools = PortfolioTools()
     # specs = [
@@ -95,4 +97,29 @@ def build_portfolio_tools(unique_toolkit: UniqueToolkit) -> list[DataQueryTool]:
     #     extra={"tool_names": [t.name for t in built]},
     # )
     # return built
-    return []
+
+    specs = [
+        DataQuerySpec(
+            name="portfolio_recent_activity",
+            domain="portfolio",
+            description=(
+                "Get a 'what's new since your last visit' digest for a customer: portfolio "
+                "value and cash changes, dividends received, top performing and declining "
+                "holdings, and current asset/geographic/sector allocation. Use for questions "
+                "like 'what's changed', 'what's new in my portfolio', 'recent activity', or "
+                "'give me an update since I last checked'."
+            ),
+            prompt_hint=(
+                "Use portfolio_recent_activity for a 'what's new since last visit' recap: "
+                "value/cash changes, dividends, top movers, and current allocation."
+            ),
+            summarize_prompt=PORTFOLIO_RECENT_ACTIVITY_PROMPT,
+            fetch=tools.get_recent_activity_digest,
+        ),
+    ]
+    built = [DataQueryTool(spec=spec, unique_toolkit=unique_toolkit) for spec in specs]
+    logger.info(
+        "Portfolio tools built",
+        extra={"tool_names": [t.name for t in built]},
+    )
+    return built

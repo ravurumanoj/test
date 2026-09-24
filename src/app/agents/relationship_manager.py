@@ -31,12 +31,14 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import re
 from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 from app.agents.base_tool import Tool
 from app.agents.mcp_tool_wrapper import MCP_TOOL_PREFIX, McpToolWrapper
+from app.agents.prompts import MERMAID_PIE_RULES
 from app.errors import RoutingError
 from app.schemas import AgentAnswer, ConversationTurn, EvaluationMetricResult, RelationshipManagerRequest, RelationshipManagerResponse, ToolCallResponse
 
@@ -56,6 +58,14 @@ from app.services.unique_toolkit import UniqueToolkit
 from app.settings import Settings
 
 logger = logging.getLogger(__name__)
+
+# Matches fenced ```mermaid ... ``` blocks so they can be validated/repaired regardless
+# of where they originated (orchestrator answer or a sub-agent tool summary copied verbatim).
+_MERMAID_BLOCK_RE = re.compile(r"```mermaid\s*\n(.*?)```", re.DOTALL | re.IGNORECASE)
+# One valid pie slice line: "Label" : 12.34
+_PIE_SLICE_RE = re.compile(r'^\s*"([^"\n]{1,60})"\s*:\s*([0-9][0-9.,]*)\s*$')
+# Characters known to break the Mermaid parser inside titles/labels (quotes, arrows, etc.)
+_MERMAID_UNSAFE_CHARS_RE = re.compile(r'["`<>\\|{}]|-+>|<-+')
 
 
 @dataclass(frozen=True)
@@ -493,6 +503,11 @@ class RelationshipManagerOrchestrator:
         if not final_answer:
             final_answer = self._combine_answers(all_agent_answers)
 
+        # Repair or strip any malformed Mermaid diagrams before anything else sees this
+        # text (evaluation, disclaimers, persistence) — the UI must never receive broken
+        # chart syntax, regardless of what the LLM produced or copied from a tool summary.
+        final_answer = self._sanitize_mermaid_diagrams(final_answer)
+
         # ── Inject reference citations from ReferenceManager ──────────────────
         references_section = self._build_references_section(reference_manager)
         if references_section:
@@ -747,61 +762,63 @@ class RelationshipManagerOrchestrator:
         prompt = (
             "You are a relationship manager orchestrator running an iterative tool loop. "
             "Plan which tools are needed, call them, then produce a final concise answer. "
-            "Only use facts from tool outputs — do not invent data.\n\n"
+            "Only use facts from tool outputs — never invent data.\n\n"
             f"Current customer ID: {customer_id}\n"
-            f"When calling any customer-specific tool, always pass "
-            f"\"customer_id\": \"{customer_id}\" in the arguments.\n"
+            f"Always pass \"customer_id\": \"{customer_id}\" when calling any customer-specific "
+            f"tool.\n"
             f"Current portfolio/account ID (single-account statement tools): {portfolio_id}\n"
-            f"When calling any statement_* tool, pass \"portfolio_id\": \"{portfolio_id}\" "
-            f"in the arguments (it also defaults to this value if omitted).\n"
-            f"When calling MCP tools (names starting with mcp__), use the exact argument "
-            f"names from the tool's own schema.  The customer's ID is {customer_id}.\n\n"
+            f"Pass \"portfolio_id\": \"{portfolio_id}\" when calling any statement_* tool (it "
+            f"also defaults to this value if omitted).\n"
+            f"MCP tools (names starting with mcp__): use the exact argument names from the "
+            f"tool's own schema. The customer's ID is {customer_id}.\n\n"
             "Tool selection:\n"
-            "- Choose the specific tool(s) whose description best matches the question. "
-            "You may call several tools when a question spans multiple areas.\n"
-            "- Portfolio detail tools cover: current position/holdings, performance/returns, "
-            "and compliance (credit/tax). CRM detail tools cover: profile/KYC, interactions/"
-            "history, and advisory/suggestions. Statement tools (statement_overview, "
-            "statement_holdings, statement_allocation, statement_credit_fx) cover the raw "
-            "single-account statement: totals, individual holdings, asset/geo allocation, "
-            "and credit lines/FX rates.\n\n"
+            "- Choose the tool(s) whose description best matches the question; call several "
+            "when a question spans multiple areas.\n"
+            "- Portfolio detail tools: position/holdings, performance/returns, compliance "
+            "(credit/tax). portfolio_recent_activity: a 'what's new since your last visit' "
+            "digest (value/cash changes, dividends, top movers, allocation) — prefer it for "
+            "recap/update questions over a raw snapshot. CRM detail tools: profile/KYC, "
+            "interactions/history, advisory/suggestions. Statement tools (statement_overview, "
+            "statement_holdings, statement_allocation, statement_credit_fx): the raw "
+            "single-account statement — totals, holdings, asset/geo allocation, credit/FX "
+            "rates.\n\n"
             "CRITICAL — tool call requirement:\n"
-            "- You MUST call at least one tool before answering. Never answer directly from memory.\n"
-            "- For broad or general questions (e.g. 'what details do you have about me', "
-            "'tell me about this customer', 'give me a summary', 'what do you know'), call the "
-            "core portfolio AND CRM tools needed to cover the customer's position and profile.\n"
-            "- Only produce a final answer AFTER tool results have been returned.\n\n"
+            "- You MUST call at least one tool before answering; never answer from memory.\n"
+            "- Broad/general questions (e.g. 'what details do you have about me', 'tell me "
+            "about this customer', 'give me a summary') → call the core portfolio AND CRM "
+            "tools.\n"
+            "- Only produce a final answer AFTER tool results have returned.\n\n"
             "Handling missing or unavailable data:\n"
-            "- If a tool returns an error (customer not found, retrieval failed), acknowledge "
-            "that clearly in the final answer — do NOT retry the same failing tool.\n"
-            "- If one source is unavailable but another succeeded, summarise what is available "
-            "and note which source could not be reached.\n"
-            "- If both sources fail, respond with a helpful message explaining that no data could "
-            "be found for the given customer ID and advise verifying it.\n\n"
+            "- Tool error (customer not found, retrieval failed) → acknowledge it clearly; do "
+            "NOT retry the same failing tool.\n"
+            "- One source unavailable, another succeeded → summarise what's available and note "
+            "which source could not be reached.\n"
+            "- Both fail → explain no data could be found for this customer ID and advise "
+            "verifying it.\n\n"
             "Output formatting — adapt to the question and the data (CRITICAL):\n"
-            "- Tool summaries are already pre-formatted (markdown tables / Mermaid charts) where "
-            "relevant. Preserve and reuse them as-is in your final answer instead of flattening "
-            "them back into prose.\n"
-            "- For comparisons (this vs. that, period-over-period, customer vs. benchmark, several "
-            "holdings/metrics side by side), present the comparison as a markdown table with the "
-            "compared items as columns.\n"
-            "- For a proportional breakdown that spans multiple tool results and isn't already "
-            "charted (e.g. a combined portfolio + statement allocation view), render it as a "
-            "Mermaid pie chart in a fenced ```mermaid``` block, capped at 7 slices (group the rest "
-            "into 'Other').\n"
-            "- For broad or 'tell me everything' questions spanning multiple domains, use ### "
-            "section headers per topic (e.g. ### Portfolio Snapshot, ### Client Profile, "
-            "### Recent Interactions) so the answer is scannable, each followed by its table or "
-            "chart where applicable.\n"
-            "- For a single narrow fact (e.g. 'what is the customer's NPS score'), answer in one "
-            "short sentence — do not force a table or chart onto trivial data.\n"
-            "- Never fabricate table rows, chart slices, or values that are not present in tool "
+            "- These are defaults, not a fixed template. Tool result shape varies call to call "
+            "(different tools, customers, missing fields) — build structure from what's "
+            "actually present, and use a different clear format when it serves the data/"
+            "question better.\n"
+            "- Tool summaries are already pre-formatted (tables/Mermaid charts) where relevant "
+            "— preserve and reuse them as-is rather than flattening back to prose.\n"
+            "- Comparisons (this vs. that, period-over-period, customer vs. benchmark, several "
+            "holdings/metrics side by side) → a markdown table with compared items as columns.\n"
+            "- A proportional breakdown spanning multiple tool results, not already charted → a "
+            "Mermaid PIE chart (see strict rules below).\n"
+            "- Broad/'tell me everything' questions spanning domains → ### section headers per "
+            "topic (e.g. ### Portfolio Snapshot, ### Client Profile, ### Recent Interactions), "
+            "each followed by its table/chart where applicable.\n"
+            "- A single narrow fact (e.g. 'what is the customer's NPS score') → one short "
+            "sentence; don't force a table or chart onto trivial data.\n"
+            "- Never fabricate table rows, chart slices, or values not present in tool "
             "outputs.\n\n"
+            f"{MERMAID_PIE_RULES}\n\n"
             "Citations:\n"
-            "- Do NOT add your own citation markers (e.g. '[1]', 'Source:', footnotes) and do NOT "
-            "quote raw JSON tool payloads verbatim. Write a plain, human-readable answer.\n"
-            "- The system automatically appends a verified 'Sources' section after your answer "
-            "based on the tools actually called — you must never generate this section yourself.\n\n"
+            "- Do NOT add your own citation markers (e.g. '[1]', 'Source:') or quote raw JSON "
+            "tool payloads verbatim — write a plain, human-readable answer.\n"
+            "- The system automatically appends a verified 'Sources' section — never generate "
+            "this yourself.\n\n"
         )
         if tool_hints:
             prompt += f"Tool usage guidance:\n{tool_hints}\n"
@@ -841,6 +858,10 @@ class RelationshipManagerOrchestrator:
         # Ordered keyword → granular tool routing. First match per tool wins; a
         # question may select several tools across domains.
         keyword_routes: list[tuple[str, tuple[str, ...]]] = [
+            ("portfolio_recent_activity", (
+                "recent activity", "what's new", "whats new", "since last visit",
+                "since my last visit", "what changed", "what's changed", "recap", "update me",
+            )),
             ("portfolio_performance", (
                 "performance", "return", "returns", "alpha", "sharpe", "benchmark",
                 "yield", "sector", "geographic", "exposure", "upcoming event",
@@ -947,6 +968,74 @@ class RelationshipManagerOrchestrator:
         return tool_calls[:max_calls]
 
     # ── Response assembly helpers ─────────────────────────────────────────────
+
+    def _sanitize_mermaid_diagrams(self, text: str) -> str:
+        """Repair or strip Mermaid diagrams so malformed syntax never reaches the UI.
+
+        Defense-in-depth against LLM output like arrows, unescaped quotes/currency
+        symbols, or unsupported diagram types (the exact cause of the observed
+        "Parsing failed: unexpected character" UI error). Only the `pie` chart type is
+        supported: any other diagram type is dropped, and pie blocks are rebuilt from
+        their valid slices only. A block with fewer than 2 valid slices after cleanup is
+        removed entirely rather than shown broken or empty.
+        """
+
+        def _clean(fragment: str, max_len: int) -> str:
+            return _MERMAID_UNSAFE_CHARS_RE.sub("", fragment).strip()[:max_len]
+
+        def _repair(match: re.Match[str]) -> str:
+            lines = [ln.strip() for ln in match.group(1).splitlines() if ln.strip()]
+            if not lines or not lines[0].lower().startswith("pie"):
+                logger.warning(
+                    "Orchestrator: dropped unsupported/malformed mermaid diagram",
+                    extra={"first_line": lines[0][:50] if lines else ""},
+                )
+                return ""
+
+            first_line = lines[0]
+            remaining = lines[1:]
+            title_match = re.match(r"pie\s+title\s+(.+)", first_line, re.IGNORECASE)
+            if title_match:
+                title = title_match.group(1)
+            elif remaining and remaining[0].lower().startswith("title"):
+                title = re.sub(r"^title\s+", "", remaining[0], flags=re.IGNORECASE)
+                remaining = remaining[1:]
+            else:
+                title = "Breakdown"
+            title = _clean(title, 60) or "Breakdown"
+
+            slices: list[tuple[str, float]] = []
+            for line in remaining:
+                slice_match = _PIE_SLICE_RE.match(line)
+                if not slice_match:
+                    continue
+                label = _clean(slice_match.group(1), 40) or "Other"
+                try:
+                    value = float(slice_match.group(2).replace(",", ""))
+                except ValueError:
+                    continue
+                if value > 0:
+                    slices.append((label, value))
+
+            if len(slices) < 2:
+                logger.warning(
+                    "Orchestrator: dropped malformed mermaid pie chart (too few valid slices)",
+                    extra={"valid_slices": len(slices)},
+                )
+                return ""
+
+            if len(slices) > 7:
+                slices.sort(key=lambda s: s[1], reverse=True)
+                kept, rest = slices[:6], slices[6:]
+                other_total = sum(v for _, v in rest)
+                if other_total > 0:
+                    kept.append(("Other", other_total))
+                slices = kept
+
+            body = "\n".join(f'    "{label}" : {value:g}' for label, value in slices)
+            return f"```mermaid\npie title {title}\n{body}\n```"
+
+        return _MERMAID_BLOCK_RE.sub(_repair, text)
 
     def _combine_answers(self, agent_answers: list[AgentAnswer]) -> str:
         """Compose a fallback final answer from sub-agent outputs."""
