@@ -39,7 +39,7 @@ from typing import TYPE_CHECKING, Any
 
 from app.agents.base_tool import Tool
 from app.agents.mcp_tool_wrapper import MCP_TOOL_PREFIX, McpToolWrapper
-from app.agents.prompts import MERMAID_PIE_RULES
+from app.agents.prompts import MERMAID_CHART_RULES
 from app.logging_config import log_text_preview
 from app.errors import RoutingError
 from app.schemas import AgentAnswer, ConversationTurn, EvaluationMetricResult, RelationshipManagerRequest, RelationshipManagerResponse, ToolCallResponse
@@ -67,6 +67,12 @@ logger = logging.getLogger(__name__)
 _MERMAID_BLOCK_RE = re.compile(r"```mermaid\s*\n(.*?)```", re.DOTALL | re.IGNORECASE)
 # One valid pie slice line: "Label" : 12.34
 _PIE_SLICE_RE = re.compile(r'^\s*"([^"\n]{1,60})"\s*:\s*([0-9][0-9.,]*)\s*$')
+_XYCHART_TITLE_RE = re.compile(r'^title\s+"([^"]{1,80})"\s*$', re.IGNORECASE)
+_XYCHART_X_AXIS_RE = re.compile(r'^x-axis\s*\[(.*)\]\s*$', re.IGNORECASE)
+_XYCHART_Y_AXIS_RE = re.compile(r'^y-axis\s+"([^"]{1,40})"\s+([0-9][0-9.,]*)\s+-->\s+([0-9][0-9.,]*)\s*$', re.IGNORECASE)
+_XYCHART_BAR_RE = re.compile(r'^bar\s*\[(.*)\]\s*$', re.IGNORECASE)
+_QUOTED_LIST_ITEM_RE = re.compile(r'"([^"\n]{1,40})"')
+_NUMERIC_LIST_RE = re.compile(r'[0-9][0-9.,]*')
 # Characters known to break the Mermaid parser inside titles/labels (quotes, arrows, etc.)
 _MERMAID_UNSAFE_CHARS_RE = re.compile(r'["`<>\\|{}]|-+>|<-+')
 # A message that is ONLY a greeting/pleasantry (no actual question) — matched so we
@@ -861,7 +867,8 @@ class RelationshipManagerOrchestrator:
             "- Comparisons (this vs. that, period-over-period, customer vs. benchmark, several "
             "holdings/metrics side by side) → a markdown table with compared items as columns.\n"
             "- A proportional breakdown spanning multiple tool results, not already charted → a "
-            "Mermaid PIE chart (see strict rules below).\n"
+            "Mermaid pie chart; a ranking/comparison across categories → a Mermaid bar chart "
+            "using xychart-beta, if it can be emitted safely (see strict rules below).\n"
             "- Broad/'tell me everything' questions spanning domains → ### section headers per "
             "topic (e.g. ### Portfolio Snapshot, ### Client Profile, ### Recent Interactions), "
             "each followed by its table/chart where applicable.\n"
@@ -878,7 +885,7 @@ class RelationshipManagerOrchestrator:
             "present in tool output, say it is not available in the retrieved data.\n"
             "- Never fabricate table rows, chart slices, or values not present in tool "
             "outputs.\n\n"
-            f"{MERMAID_PIE_RULES}\n\n"
+            f"{MERMAID_CHART_RULES}\n\n"
             "Citations:\n"
             "- Do NOT add your own citation markers (e.g. '[1]', 'Source:') or quote raw JSON "
             "tool payloads verbatim — write a plain, human-readable answer.\n"
@@ -1058,18 +1065,100 @@ class RelationshipManagerOrchestrator:
 
         Defense-in-depth against LLM output like arrows, unescaped quotes/currency
         symbols, or unsupported diagram types (the exact cause of the observed
-        "Parsing failed: unexpected character" UI error). Only the `pie` chart type is
-        supported: any other diagram type is dropped, and pie blocks are rebuilt from
-        their valid slices only. A block with fewer than 2 valid slices after cleanup is
-        removed entirely rather than shown broken or empty.
+        "Parsing failed: unexpected character" UI error). Only `pie` and
+        `xychart-beta` are supported: any other diagram type is dropped. Pie blocks are
+        rebuilt from valid slices only, and xychart blocks are rebuilt from one safe bar
+        series only. A block that cannot be repaired into a valid compact chart is
+        removed entirely rather than shown broken.
         """
 
         def _clean(fragment: str, max_len: int) -> str:
             return _MERMAID_UNSAFE_CHARS_RE.sub("", fragment).strip()[:max_len]
 
+        def _parse_numeric_list(raw: str) -> list[float]:
+            values: list[float] = []
+            for token in _NUMERIC_LIST_RE.findall(raw):
+                try:
+                    value = float(token.replace(",", ""))
+                except ValueError:
+                    continue
+                values.append(value)
+            return values
+
+        def _repair_xychart(lines: list[str]) -> str:
+            title = "Breakdown"
+            x_labels: list[str] = []
+            y_label = "Value"
+            y_min = 0.0
+            y_max = 0.0
+            bar_values: list[float] = []
+
+            for line in lines[1:]:
+                if title_match := _XYCHART_TITLE_RE.match(line):
+                    title = _clean(title_match.group(1), 60) or "Breakdown"
+                    continue
+                if x_axis_match := _XYCHART_X_AXIS_RE.match(line):
+                    x_labels = [
+                        _clean(label, 30) or "Other"
+                        for label in _QUOTED_LIST_ITEM_RE.findall(x_axis_match.group(1))
+                    ]
+                    continue
+                if y_axis_match := _XYCHART_Y_AXIS_RE.match(line):
+                    y_label = _clean(y_axis_match.group(1), 30) or "Value"
+                    try:
+                        y_min = float(y_axis_match.group(2).replace(",", ""))
+                        y_max = float(y_axis_match.group(3).replace(",", ""))
+                    except ValueError:
+                        y_min = 0.0
+                        y_max = 0.0
+                    continue
+                if bar_match := _XYCHART_BAR_RE.match(line):
+                    bar_values = _parse_numeric_list(bar_match.group(1))
+
+            if len(x_labels) < 2 or len(bar_values) < 2:
+                logger.warning(
+                    "Orchestrator: dropped malformed mermaid xychart (too few valid categories)",
+                    extra={"x_labels": len(x_labels), "bar_values": len(bar_values)},
+                )
+                return ""
+
+            count = min(len(x_labels), len(bar_values), 7)
+            x_labels = x_labels[:count]
+            bar_values = bar_values[:count]
+            if count < 2:
+                logger.warning(
+                    "Orchestrator: dropped malformed mermaid xychart after truncation",
+                    extra={"count": count},
+                )
+                return ""
+
+            safe_max = max(bar_values)
+            if y_max <= y_min or y_max < safe_max:
+                y_min = 0.0 if min(bar_values) >= 0 else min(bar_values)
+                y_max = safe_max
+
+            labels = ", ".join(f'"{label}"' for label in x_labels)
+            values = ", ".join(f"{value:g}" for value in bar_values)
+            return (
+                "```mermaid\n"
+                "xychart-beta\n"
+                f'    title "{title}"\n'
+                f'    x-axis [{labels}]\n'
+                f'    y-axis "{y_label}" {y_min:g} --> {y_max:g}\n'
+                f'    bar [{values}]\n'
+                "```"
+            )
+
         def _repair(match: re.Match[str]) -> str:
             lines = [ln.strip() for ln in match.group(1).splitlines() if ln.strip()]
-            if not lines or not lines[0].lower().startswith("pie"):
+            if not lines:
+                return ""
+
+            first = lines[0].lower()
+            if first.startswith("xychart-beta"):
+                return _repair_xychart(lines)
+
+            if not first.startswith("pie"):
                 logger.warning(
                     "Orchestrator: dropped unsupported/malformed mermaid diagram",
                     extra={"first_line": lines[0][:50] if lines else ""},

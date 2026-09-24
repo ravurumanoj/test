@@ -3,33 +3,42 @@
 
 # Mermaid syntax rules — the one part of formatting kept strictly mandatory (not a
 # style default): the rendering surface has shown "Parsing failed" errors when the
-# LLM emits arrows, unquoted symbols/currency, or non-pie diagram types. Shared by
+# LLM emits arrows, unquoted symbols/currency, or malformed Mermaid blocks. Shared by
 # OUTPUT_FORMATTING_GUIDELINES (sub-agent prompts) and the orchestrator's system
 # prompt (relationship_manager.py) so the rule lives in exactly one place. A backend
 # sanitizer (RelationshipManagerOrchestrator._sanitize_mermaid_diagrams) also
 # repairs/strips malformed blocks as a last-resort net, but the model must not rely
 # on that — it must emit valid syntax the first time, whenever it uses a diagram.
-MERMAID_PIE_RULES = (
+MERMAID_CHART_RULES = (
     "Mermaid rules (STRICT whenever you choose to use one — invalid syntax breaks the UI):\n"
-    "- ONLY the `pie` chart type. Never flowchart/graph/sequenceDiagram/gantt/other types, "
+    "- ONLY `pie` or `xychart-beta`. Never flowchart/graph/sequenceDiagram/gantt/other types, "
     "and never arrows (->, <-, -->, <-->) anywhere.\n"
-    "- Exact shape, with a real filled example:\n"
+    "- Choose the chart type that best fits the data instead of forcing one format:\n"
+    "  - `pie` for proportional breakdowns where parts make up a whole (asset allocation, sector mix, currency mix).\n"
+    "  - `xychart-beta` bar chart for comparisons/rankings across categories (top holdings, contributors, detractors, country exposure).\n"
+    "  - If the data is too sparse, labels are too long, or you are not fully certain the chart will be valid, use a table instead.\n"
+    "- Pie exact shape, with a real filled example:\n"
     "  ```mermaid\n"
     "  pie title Asset Allocation\n"
     "      \"Equities\" : 42.5\n"
     "      \"Fixed Income\" : 31.0\n"
     "      \"Cash\" : 26.5\n"
     "  ```\n"
-    "- Title: plain text only — no quotes, colons, arrows, angle brackets, backslashes, "
-    "or backticks.\n"
-    "- Each label must stay wrapped in double quotes. Inside the label use plain text only "
-    "— no quotes, colons, arrows, angle brackets, backslashes, or backticks.\n"
-    "- Values: a bare number (e.g. 42.5) — no currency symbols, '%', commas, or units.\n"
-    "- Max 7 slices — merge the smallest real categories into a single \"Other\" slice when "
-    "needed. Aggregating real values into \"Other\" is allowed; inventing values is not.\n"
-    "- Nothing else inside the fence — no commentary, no blank filler lines.\n"
-    "- Not fully certain it's valid? Skip the chart and use a table instead — a correct "
-    "table beats a broken chart."
+    "- Bar exact shape, with a real filled example:\n"
+    "  ```mermaid\n"
+    "  xychart-beta\n"
+    "      title \"Top Holdings by Market Value\"\n"
+    "      x-axis [\"HDFC Bank\", \"TCS\", \"Infosys\"]\n"
+    "      y-axis \"Value\" 0 --> 42.5\n"
+    "      bar [42.5, 31.0, 26.5]\n"
+    "  ```\n"
+    "- Titles and labels: plain text only — no arrows, angle brackets, backslashes, backticks, or embedded quotes.\n"
+    "- Pie labels must stay wrapped in double quotes.\n"
+    "- Bar x-axis labels must stay wrapped in double quotes inside the bracket list.\n"
+    "- Values: bare numbers only (e.g. 42.5) — no currency symbols, '%', commas, or units inside the chart data. Explain units in surrounding prose/table if needed.\n"
+    "- Keep charts compact: max 7 categories. Merge the smallest real categories into \"Other\" when needed for pie charts; for bar charts, show the most relevant categories only.\n"
+    "- Nothing else inside the fence — no commentary, no blank filler lines, no extra series, no unsupported Mermaid options.\n"
+    "- Not fully certain it's valid? Skip the chart and use a table instead — a correct table beats a broken chart."
 )
 
 SHARED_PORTFOLIO_ANALYSIS_RULES = (
@@ -82,14 +91,15 @@ OUTPUT_FORMATTING_GUIDELINES = (
     "helps, keep numeric precision consistent, and add a short lead-in or takeaway that "
     "explains what matters in the table.\n"
     "- A single proportional breakdown with 3+ categories (e.g. asset allocation, sector "
-    "exposure, currency allocation) often benefits from a Mermaid PIE chart above the "
-    "table — include one when it adds clarity, per the strict rules below.\n"
+    "exposure, currency allocation) often benefits from a Mermaid pie chart above the "
+    "table; category comparisons or rankings often fit a Mermaid bar chart better. Choose the "
+    "chart type that best matches the data, per the strict rules below.\n"
     "- Use Mermaid only when it adds clear value and the surrounding answer still makes sense "
     "without the chart. If a plain-text renderer would show the raw fence awkwardly, prefer a "
     "table or prose summary instead.\n"
-    "- When using a pie chart, make it feel modern through better information design: short "
-    "labels, meaningful slice ordering, and a companion takeaway/table. Do not rely on the "
-    "chart alone to carry the message.\n"
+    "- When using a chart, make it feel modern through better information design: short "
+    "labels, meaningful ordering, and a companion takeaway/table. Do not rely on the chart "
+    "alone to carry the message.\n"
     "- Do not claim or imply that the prompt controls chart colors. The prompt controls only "
     "chart content and structure; visual theming may be applied separately by the renderer.\n"
     "- When values indicate gain/profit/upside vs loss/downside, make that obvious in the "
@@ -102,7 +112,7 @@ OUTPUT_FORMATTING_GUIDELINES = (
     "- Only chart/tabulate values actually present in the retrieved data — never invent "
     "rows or slices, and skip a table/chart entirely when there isn't enough real data "
     "to justify one.\n\n"
-    f"{MERMAID_PIE_RULES}"
+    f"{MERMAID_CHART_RULES}"
 )
 
 PORTFOLIO_AGENT_PROMPT = (

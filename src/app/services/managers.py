@@ -861,7 +861,9 @@ class ResponseFormattingPostprocessor(Postprocessor):
         '"pie1": "#0F766E", "pie2": "#14B8A6", "pie3": "#0EA5E9", '
         '"pie4": "#2563EB", "pie5": "#F59E0B", "pie6": "#EF4444", '
         '"pie7": "#7C3AED", "pieStrokeColor": "#FFFFFF", '
-        '"pieOuterStrokeWidth": "2px", "fontFamily": "Segoe UI"}}}%%'
+        '"pieOuterStrokeWidth": "2px", "xyChart": {"plotColorPalette": '
+        '"#0F766E, #14B8A6, #0EA5E9, #2563EB, #F59E0B, #EF4444, #7C3AED"}, '
+        '"fontFamily": "Segoe UI"}}}%%'
     )
 
     def __init__(self) -> None:
