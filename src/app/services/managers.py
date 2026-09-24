@@ -27,6 +27,7 @@ import json
 import logging
 from typing import Any
 
+from app.logging_config import log_text_preview
 from app.schemas import ContentChunk, EvaluationMetricResult, ToolCallResponse
 
 logger = logging.getLogger(__name__)
@@ -269,7 +270,6 @@ class HistoryManager:
             extra={
                 "source": source,
                 "content_length": len(content),
-                "content_preview": content[:200],
             },
         )
 
@@ -319,7 +319,7 @@ class HistoryManager:
                 )
                 logger.warning(
                     "HistoryManager: tool failure recorded",
-                    extra={"tool_name": resp.name, "error": resp.error_message},
+                    extra={"tool_name": resp.name, "error_preview": log_text_preview(resp.error_message or "")},
                 )
             else:
                 content = resp.content
@@ -418,7 +418,8 @@ class HistoryManager:
                     "HistoryManager: Loop Token Reducer removed user+assistant pair",
                     extra={
                         "user_preview": (u.get("content") or "")[:80],
-                        "assistant_preview": (a.get("content") or "")[:80],
+                        "user_length": len(u.get("content") or ""),
+                        "assistant_preview": log_text_preview(a.get("content") or ""),
                     },
                 )
             else:

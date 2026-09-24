@@ -1,4 +1,3 @@
-
 """API routes for the relationship manager POC."""
 
 from __future__ import annotations
@@ -11,6 +10,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 
 from app.agents.relationship_manager import RelationshipManagerOrchestrator
+from app.logging_config import log_text_preview
 from app.schemas import (
     HealthResponse,
     RelationshipManagerRequest,
@@ -130,7 +130,6 @@ def create_router(
             extra={
                 "customer_id": request.customer_id,
                 "portfolio_id": request.portfolio_id,
-                "question": request.question,
                 "question_length": len(request.question),
             },
         )
@@ -146,7 +145,7 @@ def create_router(
                 "agent_answer_count": len(response.agent_answers),
                 "evaluation_count": len(response.evaluation_results),
                 "final_answer_length": len(response.final_answer),
-                "final_answer_preview": response.final_answer[:300],
+                "final_answer_preview": log_text_preview(response.final_answer),
             },
         )
         return response

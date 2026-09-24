@@ -40,6 +40,7 @@ from typing import TYPE_CHECKING, Any
 from app.agents.base_tool import Tool
 from app.agents.mcp_tool_wrapper import MCP_TOOL_PREFIX, McpToolWrapper
 from app.agents.prompts import MERMAID_PIE_RULES
+from app.logging_config import log_text_preview
 from app.errors import RoutingError
 from app.schemas import AgentAnswer, ConversationTurn, EvaluationMetricResult, RelationshipManagerRequest, RelationshipManagerResponse, ToolCallResponse
 
@@ -67,6 +68,18 @@ _MERMAID_BLOCK_RE = re.compile(r"```mermaid\s*\n(.*?)```", re.DOTALL | re.IGNORE
 _PIE_SLICE_RE = re.compile(r'^\s*"([^"\n]{1,60})"\s*:\s*([0-9][0-9.,]*)\s*$')
 # Characters known to break the Mermaid parser inside titles/labels (quotes, arrows, etc.)
 _MERMAID_UNSAFE_CHARS_RE = re.compile(r'["`<>\\|{}]|-+>|<-+')
+# A message that is ONLY a greeting/pleasantry (no actual question) — matched so we
+# never fetch/name a specific customer's data just to answer "hi" (see _is_pure_greeting).
+_PURE_GREETING_RE = re.compile(
+    r"^\s*(hi+|he+llo+|hey+|yo|greetings?|good\s*(morning|afternoon|evening)|namaste)"
+    r"(\s+(there|team|all))?[\s!.,?]*$",
+    re.IGNORECASE,
+)
+_GREETING_REPLY = (
+    "Hello! I'm your relationship manager assistant. Ask me about your portfolio "
+    "(holdings, allocation, performance) or your CRM profile and I'll pull up the details."
+)
+
 
 
 @dataclass(frozen=True)
@@ -181,7 +194,7 @@ class RelationshipManagerOrchestrator:
         """
         logger.info(
             "Orchestrator: request received",
-            extra={"customer_id": request.customer_id, "question": request.question},
+            extra={"customer_id": request.customer_id, "question_length": len(request.question)},
         )
 
         # Discover MCP tools on first request (idempotent, fails soft).
@@ -272,7 +285,7 @@ class RelationshipManagerOrchestrator:
         history_manager.add_user_message(request.question, source="current")
         logger.debug(
             "Orchestrator: current user question added to history",
-            extra={"question_length": len(request.question), "question_preview": request.question[:120]},
+            extra={"question_length": len(request.question)},
         )
 
         # ── Build tool definitions from registered Tool instances ──────────────
@@ -289,6 +302,7 @@ class RelationshipManagerOrchestrator:
         iteration_index: int = 0  # initialized so post-loop reference is always defined
         total_tool_calls_executed: int = 0  # counts ALL tools (portfolio, crm, mcp__*)
         triggered_tool_names: list[str] = []  # every tool name triggered, in call order
+        successful_tool_call_keys: set[tuple[str, str]] = set()
         context: dict[str, Any] = {
             "customer_id": request.customer_id,
             "portfolio_id": resolved_portfolio_id,
@@ -309,6 +323,17 @@ class RelationshipManagerOrchestrator:
                     "agent_answers_so_far": len(all_agent_answers),
                 },
             )
+
+            # A bare greeting ("hi", "hello", ...) never needs customer data — answer
+            # generically and skip planning/tool calls entirely. Without this, the
+            # "must call at least one tool" rule below would fetch and name whichever
+            # customer_id happens to be in context (e.g. the UNIQUE_DEFAULT_CUSTOMER_ID
+            # sample record) even for a plain "hi".
+            if iteration_index == 0 and _PURE_GREETING_RE.match(request.question):
+                final_answer = _GREETING_REPLY
+                debug_info_manager.add("loop_exit_reason", "pure_greeting_no_tools")
+                logger.info("Orchestrator: pure greeting detected — skipping tool calls")
+                break
 
             is_last_iteration = iteration_index == (max_iterations - 1)
 
@@ -351,6 +376,22 @@ class RelationshipManagerOrchestrator:
             tool_calls = self._parse_tool_calls(raw_tool_calls)
             tool_calls = self._filter_duplicate_tool_calls(tool_calls)
             tool_calls = self._limit_tool_calls(tool_calls)
+
+            repeated_tool_calls = [
+                tc for tc in tool_calls if self._tool_call_key(tc) in successful_tool_call_keys
+            ]
+            if repeated_tool_calls:
+                tool_calls = [
+                    tc for tc in tool_calls if self._tool_call_key(tc) not in successful_tool_call_keys
+                ]
+                logger.warning(
+                    "Orchestrator: planner repeated already successful tool calls — skipping duplicates",
+                    extra={"tool_names": [tc.name for tc in repeated_tool_calls]},
+                )
+            if repeated_tool_calls and not tool_calls:
+                final_answer = self._combine_answers(all_agent_answers)
+                debug_info_manager.add("loop_exit_reason", "repeated_successful_tool_call")
+                break
 
             logger.info(
                 "Orchestrator: planning step completed",
@@ -403,6 +444,11 @@ class RelationshipManagerOrchestrator:
             tool_responses: list[ToolCallResponse] = await self._execute_selected_tools(
                 tool_calls=tool_calls,
                 context=context,
+            )
+            successful_tool_call_keys.update(
+                self._tool_call_key(tool_call)
+                for tool_call, response in zip(tool_calls, tool_responses, strict=True)
+                if response.successful
             )
 
             # ── Update all managers with tool results ──────────────────────────
@@ -482,7 +528,7 @@ class RelationshipManagerOrchestrator:
                 else:
                     logger.warning(
                         "Orchestrator: tool call failed — excluded from agent answers",
-                        extra={"tool_name": resp.name, "error": resp.error_message},
+                        extra={"tool_name": resp.name, "error_preview": log_text_preview(resp.error_message or "")},
                     )
 
             # ── Check if any tool takes control ───────────────────────────────
@@ -630,7 +676,7 @@ class RelationshipManagerOrchestrator:
             extra={
                 "tool_calls_count": len(tool_calls_returned),
                 "tool_calls_names": [tc.get("name") for tc in tool_calls_returned],
-                "content_preview": content_returned[:200] if content_returned else "",
+                "content_preview": log_text_preview(content_returned),
             },
         )
         return result
@@ -683,7 +729,7 @@ class RelationshipManagerOrchestrator:
         except json.JSONDecodeError:
             logger.warning(
                 "Orchestrator: failed to parse tool call arguments as JSON — using empty dict",
-                extra={"tool_name": tool_call.name, "raw_arguments": tool_call.arguments},
+                extra={"tool_name": tool_call.name, "arguments_length": len(tool_call.arguments)},
             )
             arguments = {}
 
@@ -692,9 +738,8 @@ class RelationshipManagerOrchestrator:
             extra={
                 "tool_name": tool_call.name,
                 "tool_call_id": tool_call.id,
-                "arguments": arguments,
+                "argument_keys": sorted(arguments.keys()),
                 "customer_id": context.get("customer_id"),
-                "question": context.get("question"),
             },
         )
 
@@ -711,8 +756,8 @@ class RelationshipManagerOrchestrator:
                 "tool_call_id": tool_call.id,
                 "successful": response.successful,
                 "content_length": len(response.content or ""),
-                "content_preview": (response.content or "")[:500],
-                "error_message": response.error_message or None,
+                "content_preview": log_text_preview(response.content or ""),
+                "error_preview": log_text_preview(response.error_message or ""),
             },
         )
         return response
@@ -956,13 +1001,22 @@ class RelationshipManagerOrchestrator:
         unique: list[ToolCall] = []
         seen: set[tuple[str, str]] = set()
         for tc in tool_calls:
-            key = (tc.name, tc.arguments)
+            key = self._tool_call_key(tc)
             if key in seen:
                 logger.debug("Orchestrator: duplicate tool call filtered", extra={"tool_name": tc.name})
                 continue
             seen.add(key)
             unique.append(tc)
         return unique
+
+    @staticmethod
+    def _tool_call_key(tool_call: ToolCall) -> tuple[str, str]:
+        """Return a stable key for a tool call regardless of JSON formatting."""
+        try:
+            arguments = json.dumps(json.loads(tool_call.arguments or "{}"), sort_keys=True, separators=(",", ":"))
+        except json.JSONDecodeError:
+            arguments = tool_call.arguments.strip()
+        return tool_call.name, arguments
 
     def _limit_tool_calls(self, tool_calls: list[ToolCall]) -> list[ToolCall]:
         """Limit tool calls per iteration to avoid overload.

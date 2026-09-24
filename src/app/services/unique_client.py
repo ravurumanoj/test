@@ -8,6 +8,7 @@ import logging
 from typing import Any
 
 from app.errors import UniqueIntegrationError
+from app.logging_config import log_text_preview
 from app.settings import Settings
 
 logger = logging.getLogger(__name__)
@@ -59,7 +60,7 @@ class UniqueAIClient:
             extra={
                 "agent_name": agent_name,
                 "content_length": len(content),
-                "content_preview": content[:300],
+                "content_preview": log_text_preview(content),
             },
         )
         return content
@@ -170,7 +171,7 @@ class UniqueAIClient:
             extra={
                 "model": self.settings.unique_model_name,
                 "response_has_content": bool(content_peek),
-                "content_preview": content_peek[:200],
+                "content_preview": log_text_preview(content_peek),
                 "tool_call_count": tool_call_count,
             },
         )

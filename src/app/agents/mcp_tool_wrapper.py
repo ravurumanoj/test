@@ -34,6 +34,7 @@ import logging
 from typing import TYPE_CHECKING, Any
 
 from app.agents.base_tool import BaseToolConfig, Tool
+from app.logging_config import log_text_preview
 from app.schemas import ContentChunk, ToolCallResponse, ToolDescription
 
 if TYPE_CHECKING:
@@ -168,9 +169,6 @@ class McpToolWrapper(Tool):
                 "mcp_tool_name": self.mcp_name,
                 "tool_call_id": tool_call_id,
                 "argument_keys": sorted(arguments.keys()),
-                "argument_values_preview": {
-                    k: str(v)[:60] for k, v in arguments.items()
-                },
             },
         )
 
@@ -187,7 +185,7 @@ class McpToolWrapper(Tool):
                 "tool_call_id": tool_call_id,
                 "is_error": result.is_error,
                 "result_length": len(result.text),
-                "result_preview": result.text[:200],
+                "result_preview": log_text_preview(result.text),
             },
         )
 
@@ -196,8 +194,8 @@ class McpToolWrapper(Tool):
                 "McpToolWrapper: MCP tool returned an error",
                 extra={
                     "mcp_tool_name": self.mcp_name,
-                    "error_text": result.text[:300],
-                    "arguments_sent": arguments,
+                    "error_preview": log_text_preview(result.text),
+                    "argument_keys": sorted(arguments.keys()),
                 },
             )
             return ToolCallResponse(

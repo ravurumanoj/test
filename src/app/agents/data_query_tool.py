@@ -170,7 +170,7 @@ class DataQueryTool(Tool):
                 "data_method": getattr(self._spec.fetch, "__name__", "unknown"),
                 "customer_id": customer_id,
                 "portfolio_id": portfolio_id,
-                "optional_args": extra_kwargs,
+                "optional_arg_keys": sorted(extra_kwargs.keys()),
             },
         )
 

@@ -37,6 +37,12 @@ _NOISY_LOGGERS: list[str] = [
     "httpcore",
 ]
 
+def log_text_preview(value: str, edge_length: int = 50) -> str:
+    """Return a bounded preview containing the start and end of text."""
+    if len(value) <= edge_length * 2:
+        return value
+    return f"{value[:edge_length]}...{value[-edge_length:]}"
+
 
 def configure_logging() -> None:
     """Configure application-wide structured logging once at startup.
@@ -90,6 +96,9 @@ def configure_logging() -> None:
             "loggers": {
                 # Application namespace — inherit root level
                 "app": {"level": log_level, "propagate": True},
+                # SDK DEBUG records contain complete prompts, responses, and headers.
+                "unique": {"level": logging.INFO, "propagate": True},
+                "urllib3": {"level": logging.WARNING, "propagate": True},
                 # Silence noisy third-party loggers at WARNING unless DEBUG requested
                 **{
                     name: {

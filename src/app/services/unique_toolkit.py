@@ -22,6 +22,7 @@ from datetime import datetime
 from typing import Any
 
 from app.errors import UniqueIntegrationError
+from app.logging_config import log_text_preview
 from app.settings import Settings
 from app.services.unique_client import UniqueAIClient
 
@@ -78,7 +79,6 @@ class UniqueToolkit:
             extra={
                 "agent_name": agent_name,
                 "question_length": len(question),
-                "question_preview": question[:200],
                 "context_keys": list(context.keys()),
             },
         )
@@ -101,7 +101,7 @@ class UniqueToolkit:
                 extra={
                     "agent_name": agent_name,
                     "response_length": len(toolkit_response),
-                    "response_preview": toolkit_response[:300],
+                    "response_preview": log_text_preview(toolkit_response),
                 },
             )
             return toolkit_response
@@ -122,7 +122,7 @@ class UniqueToolkit:
             extra={
                 "agent_name": agent_name,
                 "response_length": len(result),
-                "response_preview": result[:300],
+                "response_preview": log_text_preview(result),
             },
         )
         return result
@@ -193,10 +193,7 @@ class UniqueToolkit:
                 ">>> LLM planned tool calls",
                 extra={
                     "tool_call_count": len(tool_calls),
-                    "tool_calls": [
-                        {"name": tc.get("name"), "arguments": tc.get("arguments", "{}")}
-                        for tc in tool_calls
-                    ],
+                    "tool_names": [tc.get("name") for tc in tool_calls],
                 },
             )
         else:
@@ -204,7 +201,7 @@ class UniqueToolkit:
                 "UniqueToolkit.plan_with_tools: LLM returned direct answer (no tool calls)",
                 extra={
                     "content_length": len(content or ""),
-                    "content_preview": (content or "")[:300],
+                    "content_preview": log_text_preview(content or ""),
                 },
             )
 

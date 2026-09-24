@@ -58,6 +58,7 @@ import urllib.request
 from dataclasses import dataclass, field
 from typing import Any
 
+from app.logging_config import log_text_preview
 from app.errors import McpIntegrationError
 
 logger = logging.getLogger(__name__)
@@ -218,7 +219,7 @@ class McpManager:
                 "tool_name": name,
                 "is_error": parsed.is_error,
                 "text_length": len(parsed.text),
-                "text_preview": parsed.text[:200],
+                "text_preview": log_text_preview(parsed.text),
             },
         )
         return parsed
@@ -270,14 +271,14 @@ class McpManager:
         if status < 200 or status >= 300:
             raise McpIntegrationError(
                 f"MCP server returned HTTP {status} for method '{method}'.",
-                {"method": method, "status": status, "body_preview": body[:300]},
+                {"method": method, "status": status, "body_preview": log_text_preview(body)},
             )
 
         message = self._parse_body(content_type, body)
         if message is None:
             raise McpIntegrationError(
                 f"MCP server returned an unparseable response for method '{method}'.",
-                {"method": method, "content_type": content_type, "body_preview": body[:300]},
+                {"method": method, "content_type": content_type, "body_preview": log_text_preview(body)},
             )
         error = message.get("error")
         if error:
