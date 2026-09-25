@@ -33,8 +33,6 @@ from app.schemas import ContentChunk, EvaluationMetricResult, ToolCallResponse
 
 logger = logging.getLogger(__name__)
 
-_MERMAID_FENCE_RE = re.compile(r"```mermaid\s*\n(.*?)```", re.DOTALL | re.IGNORECASE)
-_MERMAID_INIT_RE = re.compile(r"^%%\{init:.*?\}%%\s*\n", re.DOTALL)
 _TABLE_ROW_RE = re.compile(r"^\|.*\|\s*$")
 _MARKDOWN_HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)$")
 _MODEL_SOURCES_BLOCK_RE = re.compile(
@@ -856,36 +854,16 @@ class FinancialSafetyEvaluation(Evaluation):
 class ResponseFormattingPostprocessor(Postprocessor):
     """Apply lightweight presentation upgrades to markdown answers."""
 
-    _MERMAID_INIT: str = (
-        '%%{init: {"theme": "base", "themeVariables": {'
-        '"pie1": "#0F766E", "pie2": "#14B8A6", "pie3": "#0EA5E9", '
-        '"pie4": "#2563EB", "pie5": "#F59E0B", "pie6": "#EF4444", '
-        '"pie7": "#7C3AED", "pieStrokeColor": "#FFFFFF", '
-        '"pieOuterStrokeWidth": "2px", "xyChart": {"plotColorPalette": '
-        '"#0F766E, #14B8A6, #0EA5E9, #2563EB, #F59E0B, #EF4444, #7C3AED"}, '
-        '"fontFamily": "Segoe UI"}}}%%'
-    )
-
     def __init__(self) -> None:
         super().__init__(name="response_formatting")
 
     async def run(self, response_text: str) -> str:
         cleaned = self._strip_model_generated_sources(response_text)
-        themed = self._inject_mermaid_theme(cleaned)
-        styled = self._style_profit_loss_tables(themed)
+        styled = self._style_profit_loss_tables(cleaned)
         return self._normalize_plaintext_fallbacks(styled)
 
     def _strip_model_generated_sources(self, text: str) -> str:
         return _MODEL_SOURCES_BLOCK_RE.sub("", text).rstrip()
-
-    def _inject_mermaid_theme(self, text: str) -> str:
-        def _replace(match: re.Match[str]) -> str:
-            body = match.group(1)
-            if _MERMAID_INIT_RE.match(body):
-                return match.group(0)
-            return f"```mermaid\n{self._MERMAID_INIT}\n{body}```"
-
-        return _MERMAID_FENCE_RE.sub(_replace, text)
 
     def _style_profit_loss_tables(self, text: str) -> str:
         lines = text.splitlines()

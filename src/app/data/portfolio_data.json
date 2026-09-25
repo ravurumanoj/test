@@ -10,28 +10,28 @@
   },
   "summary": {
     "total_assets": {
-      "market_value_usd": 6356135.32,
-      "pct_portfolio": 102.1,
+      "market_value_usd": 6419738.47,
+      "pct_portfolio": 102.08,
       "currency_allocation_pct": {
-        "USD": 70.57,
-        "NOK": 7.67,
-        "SEK": 7.6,
-        "SGD": 8.0,
-        "JPY": 3.46,
-        "HKD": 2.53,
-        "EUR": 1.12,
-        "GBP": 0.85,
+        "USD": 69.0,
+        "NOK": 7.59,
+        "SEK": 7.52,
+        "SGD": 7.92,
+        "JPY": 3.43,
+        "HKD": 2.5,
+        "EUR": 2.98,
+        "GBP": 0.84,
         "AUD": 0.3
       }
     },
     "total_liabilities": {
       "market_value_usd": -130610.25,
-      "pct_portfolio": -2.1,
+      "pct_portfolio": -2.08,
       "currency_allocation_pct": {
         "USD": null,
         "NOK": null,
         "SEK": null,
-        "SGD": -2.1,
+        "SGD": -2.08,
         "JPY": null,
         "HKD": null,
         "EUR": null,
@@ -40,30 +40,31 @@
       }
     },
     "net_total": {
-      "market_value_usd": 6225525.07,
+      "market_value_usd": 6289128.22,
       "pct_portfolio": 100.0,
       "currency_allocation_pct": {
-        "USD": 70.57,
-        "NOK": 7.67,
-        "SEK": 7.6,
-        "SGD": 5.9,
-        "JPY": 3.46,
-        "HKD": 2.53,
-        "EUR": 1.12,
-        "GBP": 0.85,
-        "AUD": 0.3
+        "SGD": 5.84,
+        "EUR": 2.98,
+        "GBP": 0.84,
+        "NOK": 7.59,
+        "SEK": 7.52,
+        "USD": 69.0,
+        "AUD": 0.3,
+        "JPY": 3.43,
+        "HKD": 2.5
       }
     },
     "asset_line_breakdown": [
       {
-        "market_value_usd": 5197285.67,
-        "pct_portfolio": 83.48,
+        "asset_class": "CASH_AND_CURRENT_ACCOUNTS",
+        "market_value_usd": 4417495.67,
+        "pct_portfolio": 70.24,
         "currency_allocation_pct": {
-          "USD": 64.34,
-          "NOK": 7.67,
-          "SEK": 7.6,
-          "SGD": 2.87,
-          "JPY": 0.68,
+          "USD": 51.29,
+          "NOK": 7.59,
+          "SEK": 7.52,
+          "SGD": 2.84,
+          "JPY": 0.67,
           "HKD": 0.01,
           "EUR": 0.02,
           "GBP": 0.01,
@@ -71,13 +72,14 @@
         }
       },
       {
+        "asset_class": "BOND",
         "market_value_usd": 185558.34,
-        "pct_portfolio": 2.98,
+        "pct_portfolio": 2.95,
         "currency_allocation_pct": {
           "USD": null,
           "NOK": null,
           "SEK": null,
-          "SGD": 2.98,
+          "SGD": 2.95,
           "JPY": null,
           "HKD": null,
           "EUR": null,
@@ -86,13 +88,14 @@
         }
       },
       {
+        "asset_class": "BOND_FUND",
         "market_value_usd": 104618.52,
-        "pct_portfolio": 1.68,
+        "pct_portfolio": 1.66,
         "currency_allocation_pct": {
           "USD": null,
           "NOK": null,
           "SEK": null,
-          "SGD": 1.68,
+          "SGD": 1.66,
           "JPY": null,
           "HKD": null,
           "EUR": null,
@@ -101,44 +104,47 @@
         }
       },
       {
-        "market_value_usd": 0.0,
-        "pct_portfolio": 0.0,
+        "asset_class": "STRUCTURED_PRODUCT",
+        "market_value_usd": 270393.15,
+        "pct_portfolio": 4.3,
         "currency_allocation_pct": {
-          "USD": 0.0,
+          "USD": 2.42,
           "NOK": null,
           "SEK": null,
           "SGD": null,
           "JPY": null,
           "HKD": null,
-          "EUR": null,
+          "EUR": 1.88,
           "GBP": null,
           "AUD": null
         }
       },
       {
+        "asset_class": "EQUITY",
         "market_value_usd": 438064.08,
-        "pct_portfolio": 7.04,
+        "pct_portfolio": 6.97,
         "currency_allocation_pct": {
-          "USD": 1.28,
+          "USD": 1.26,
           "NOK": null,
           "SEK": null,
           "SGD": 0.2,
-          "JPY": 1.18,
-          "HKD": 2.43,
-          "EUR": 1.1,
-          "GBP": 0.84,
+          "JPY": 1.17,
+          "HKD": 2.41,
+          "EUR": 1.09,
+          "GBP": 0.83,
           "AUD": 0.0
         }
       },
       {
+        "asset_class": "FUND_ETF",
         "market_value_usd": 396269.51,
-        "pct_portfolio": 6.37,
+        "pct_portfolio": 6.3,
         "currency_allocation_pct": {
-          "USD": 4.41,
+          "USD": 4.36,
           "NOK": null,
           "SEK": null,
           "SGD": 0.27,
-          "JPY": 1.6,
+          "JPY": 1.59,
           "HKD": 0.09,
           "EUR": null,
           "GBP": null,
@@ -146,6 +152,7 @@
         }
       },
       {
+        "asset_class": "COMMODITY_ETF",
         "market_value_usd": 34339.2,
         "pct_portfolio": 0.55,
         "currency_allocation_pct": {
@@ -161,16 +168,17 @@
         }
       },
       {
-        "market_value_usd": 0.0,
-        "pct_portfolio": 0.0,
+        "asset_class": "PRIVATE_EQUITY_FUND",
+        "market_value_usd": 573000.0,
+        "pct_portfolio": 9.11,
         "currency_allocation_pct": {
-          "USD": null,
+          "USD": 9.11,
           "NOK": null,
           "SEK": null,
           "SGD": null,
           "JPY": null,
           "HKD": null,
-          "EUR": 0.0,
+          "EUR": null,
           "GBP": null,
           "AUD": null
         }
@@ -179,40 +187,40 @@
   },
   "asset_class_totals": {
     "CASH_AND_CURRENT_ACCOUNTS": {
-      "market_value_usd": 5197285.67,
-      "pct_portfolio": 83.48
+      "market_value_usd": 4417495.67,
+      "pct_portfolio": 70.24
     },
     "BOND": {
       "market_value_usd": 185558.34,
-      "pct_portfolio": 2.98
+      "pct_portfolio": 2.95
     },
     "BOND_FUND": {
       "market_value_usd": 104618.52,
-      "pct_portfolio": 1.68
+      "pct_portfolio": 1.66
     },
     "STRUCTURED_PRODUCT": {
-      "market_value_usd": 0.0,
-      "pct_portfolio": 0.0
+      "market_value_usd": 270393.15,
+      "pct_portfolio": 4.3
     },
     "EQUITY": {
       "market_value_usd": 438064.08,
-      "pct_portfolio": 7.04
+      "pct_portfolio": 6.97
     },
     "FUND_ETF": {
       "market_value_usd": 396269.51,
-      "pct_portfolio": 6.37
+      "pct_portfolio": 6.3
     },
     "COMMODITY_ETF": {
       "market_value_usd": 34339.2,
       "pct_portfolio": 0.55
     },
     "PRIVATE_EQUITY_FUND": {
-      "market_value_usd": 0.0,
-      "pct_portfolio": 0.0
+      "market_value_usd": 573000.0,
+      "pct_portfolio": 9.11
     },
     "FIXED_TERM_DEPOSIT": {
       "market_value_usd": -130610.25,
-      "pct_portfolio": -2.1
+      "pct_portfolio": -2.08
     }
   },
   "holdings": [
@@ -269,7 +277,7 @@
       "exchange_rate": 108.837614,
       "market_value_local": 4599857.0,
       "market_value_usd": 42263.49,
-      "pct_portfolio": 0.68
+      "pct_portfolio": 0.67
     },
     {
       "asset_class": "CASH_AND_CURRENT_ACCOUNTS",
@@ -280,7 +288,7 @@
       "exchange_rate": 8.377525,
       "market_value_local": 4000000.0,
       "market_value_usd": 477468.0,
-      "pct_portfolio": 7.67
+      "pct_portfolio": 7.59
     },
     {
       "asset_class": "CASH_AND_CURRENT_ACCOUNTS",
@@ -291,7 +299,7 @@
       "exchange_rate": 8.455301,
       "market_value_local": 4000000.0,
       "market_value_usd": 473076.0,
-      "pct_portfolio": 7.6
+      "pct_portfolio": 7.52
     },
     {
       "asset_class": "CASH_AND_CURRENT_ACCOUNTS",
@@ -302,7 +310,7 @@
       "exchange_rate": 1.33485,
       "market_value_local": 238242.52,
       "market_value_usd": 178478.91,
-      "pct_portfolio": 2.87
+      "pct_portfolio": 2.84
     },
     {
       "asset_class": "CASH_AND_CURRENT_ACCOUNTS",
@@ -322,9 +330,10 @@
       "currency": "USD",
       "amount": 4000000.0,
       "exchange_rate": 1.0,
-      "market_value_local": 4000000.0,
-      "market_value_usd": 4000000.0,
-      "pct_portfolio": 64.25
+      "market_value_local": 3220210.0,
+      "market_value_usd": 3220210.0,
+      "pct_portfolio": 51.2,
+      "deployment_note": "USD 779,790.00 deployed from this account into structured products and private equity commitments during September 2026. Residual balance USD 3,220,210.00 remains uninvested."
     },
     {
       "asset_class": "FIXED_TERM_DEPOSIT",
@@ -341,7 +350,7 @@
       "exchange_rate": 1.33485,
       "market_value_usd": -130610.25,
       "accrued_interest_usd": 0.0,
-      "pct_portfolio": -2.1,
+      "pct_portfolio": -2.08,
       "country": "SINGAPORE DOLLAR"
     },
     {
@@ -365,7 +374,7 @@
       "accrued_interest_usd": 0.0,
       "yield_to_maturity": 0.0,
       "duration": null,
-      "pct_portfolio": 2.98,
+      "pct_portfolio": 2.95,
       "country": "SINGAPORE DOLLAR"
     },
     {
@@ -384,7 +393,7 @@
       "market_value_local": 139650.0,
       "market_value_usd": 104618.52,
       "accrued_interest_usd": 0.0,
-      "pct_portfolio": 1.68,
+      "pct_portfolio": 1.66,
       "country": "SINGAPORE DOLLAR"
     },
     {
@@ -410,7 +419,11 @@
       "accrued_interest_local": 0.0,
       "market_value_usd": 0.0,
       "accrued_interest_usd": 0.0,
-      "pct_portfolio": 0.0
+      "pct_portfolio": 0.0,
+      "position_status": "CLOSED_NIL_VALUE",
+      "attribution_available": false,
+      "exclude_from_twr": true,
+      "nil_value_note": "Legacy position carried at nil value. Retained in the holdings array for audit continuity. Contributes zero to valuation, allocation and performance. Pre-dates the September 2026 SP/PE additions."
     },
     {
       "asset_class": "EQUITY",
@@ -447,7 +460,7 @@
       "pl_pct": -1.08,
       "market_value_local": 110880.0,
       "market_value_usd": 14125.22,
-      "pct_portfolio": 0.23,
+      "pct_portfolio": 0.22,
       "country": "HONG KONG"
     },
     {
@@ -466,7 +479,7 @@
       "pl_pct": -1.02,
       "market_value_local": 164500.0,
       "market_value_usd": 20955.98,
-      "pct_portfolio": 0.34,
+      "pct_portfolio": 0.33,
       "country": "HONG KONG"
     },
     {
@@ -523,7 +536,7 @@
       "pl_pct": -0.8,
       "market_value_local": 412023.3,
       "market_value_usd": 52488.47,
-      "pct_portfolio": 0.84,
+      "pct_portfolio": 0.83,
       "country": "HONG KONG"
     },
     {
@@ -599,7 +612,7 @@
       "pl_pct": -1.27,
       "market_value_local": 130500.0,
       "market_value_usd": 16624.66,
-      "pct_portfolio": 0.27,
+      "pct_portfolio": 0.26,
       "country": "HONG KONG"
     },
     {
@@ -618,7 +631,7 @@
       "pl_pct": 5.56,
       "market_value_local": 13830.36,
       "market_value_usd": 16567.39,
-      "pct_portfolio": 0.27,
+      "pct_portfolio": 0.26,
       "country": "FRANCE"
     },
     {
@@ -675,7 +688,7 @@
       "pl_pct": 10.72,
       "market_value_local": 10705.54,
       "market_value_usd": 14764.55,
-      "pct_portfolio": 0.24,
+      "pct_portfolio": 0.23,
       "country": "UNITED KINGDOM"
     },
     {
@@ -732,7 +745,7 @@
       "pl_pct": -2.53,
       "market_value_local": 983620.0,
       "market_value_usd": 9037.5,
-      "pct_portfolio": 0.15,
+      "pct_portfolio": 0.14,
       "country": "JAPAN"
     },
     {
@@ -846,7 +859,7 @@
       "pl_pct": 0.0,
       "market_value_local": 74984.0,
       "market_value_usd": 74984.0,
-      "pct_portfolio": 1.2,
+      "pct_portfolio": 1.19,
       "country": "UNITED STATES OF AMERICA"
     },
     {
@@ -977,7 +990,7 @@
       "pl_pct": 0.0,
       "market_value_local": 96643.2,
       "market_value_usd": 96643.2,
-      "pct_portfolio": 1.55
+      "pct_portfolio": 1.54
     },
     {
       "asset_class": "FUND_ETF",
@@ -995,7 +1008,7 @@
       "pl_pct": 0.0,
       "market_value_local": 111810.0,
       "market_value_usd": 111810.0,
-      "pct_portfolio": 1.8
+      "pct_portfolio": 1.78
     },
     {
       "asset_class": "FUND_ETF",
@@ -1031,7 +1044,7 @@
       "pl_pct": -0.71,
       "market_value_local": 10871238.0,
       "market_value_usd": 99884.93,
-      "pct_portfolio": 1.6
+      "pct_portfolio": 1.59
     },
     {
       "asset_class": "FUND_ETF",
@@ -1049,7 +1062,7 @@
       "pl_pct": 0.0,
       "market_value_local": 65840.0,
       "market_value_usd": 65840.0,
-      "pct_portfolio": 1.06
+      "pct_portfolio": 1.05
     },
     {
       "asset_class": "COMMODITY_ETF",
@@ -1085,7 +1098,277 @@
       "pl_pct": -2.77,
       "market_value_local": 0.0,
       "market_value_usd": 0.0,
-      "pct_portfolio": 0.0
+      "pct_portfolio": 0.0,
+      "position_status": "CLOSED_NIL_VALUE",
+      "attribution_available": false,
+      "exclude_from_twr": true,
+      "nil_value_note": "Legacy position carried at nil value. Retained in the holdings array for audit continuity. Contributes zero to valuation, allocation and performance. Pre-dates the September 2026 SP/PE additions."
+    },
+    {
+      "asset_class": "STRUCTURED_PRODUCT",
+      "product_subtype": "AUTOCALLABLE_NOTE",
+      "instrument_name": "AUTOCALL NOTE 3Y USD BASKET 08/2029 - ISSUER A",
+      "ticker": null,
+      "isin": "XS2915004471",
+      "currency": "USD",
+      "quantity": 150000.0,
+      "quantity_basis": "NOTIONAL_AMOUNT",
+      "average_price": 100.0,
+      "price_basis": "PERCENT_OF_NOTIONAL",
+      "average_exchange_rate": 1.0,
+      "last_price": 101.6,
+      "last_exchange_rate": 1.0,
+      "price_date": "19/09/2026",
+      "issuer_name": "ISSUER A INTERNATIONAL BANK",
+      "issuer_lei": "5493001KJTIIGC8Y1R12",
+      "issuer_credit_rating": "A+",
+      "issue_date": "02/09/2026",
+      "maturity_date": "02/09/2029",
+      "capital_protection_pct": 0.0,
+      "barrier_type": "EUROPEAN_KNOCK_IN",
+      "barrier_level_pct": 60.0,
+      "barrier_breached": false,
+      "autocall_trigger_pct": 100.0,
+      "next_observation_date": "02/12/2026",
+      "observation_frequency": "QUARTERLY",
+      "coupon_rate_pct_pa": 8.0,
+      "coupon_frequency": "QUARTERLY",
+      "coupon_condition": "MEMORY_COUPON_ABOVE_70PCT_OF_INITIAL",
+      "next_coupon_date": "02/12/2026",
+      "coupons_received_to_date_usd": 0.0,
+      "reference_asset_type": "EQUITY_BASKET",
+      "reference_assets": [
+        {
+          "name": "APPLE INC",
+          "isin": "US0378331005",
+          "weight_pct": 33.34
+        },
+        {
+          "name": "MICROSOFT CORP",
+          "isin": "US5949181045",
+          "weight_pct": 33.33
+        },
+        {
+          "name": "NVIDIA CORP",
+          "isin": "US67066G1040",
+          "weight_pct": 33.33
+        }
+      ],
+      "worst_of_structure": true,
+      "underlying_currency": "USD",
+      "product_currency": "USD",
+      "valuation_basis": "ISSUER_MARK",
+      "valuation_source": "ISSUER_A_PRICING_DESK",
+      "valuation_frequency": "WEEKLY",
+      "is_exchange_traded": false,
+      "market_value_local": 152400.0,
+      "market_value_usd": 152400.0,
+      "cost_basis_usd": 150000.0,
+      "unrealised_pl_usd": 2400.0,
+      "unrealised_pct": 1.6,
+      "accrued_coupon_usd": 0.0,
+      "attribution_available": false,
+      "exclude_from_twr": false,
+      "is_illiquid": true,
+      "liquidity_note": "Secondary market provided by issuer only; bid/offer spread applies. Not exchange traded.",
+      "pct_portfolio": 2.42,
+      "country": "UNITED KINGDOM",
+      "geo_attribution_basis": "ISSUER_DOMICILE"
+    },
+    {
+      "asset_class": "STRUCTURED_PRODUCT",
+      "product_subtype": "CAPITAL_PROTECTED_NOTE",
+      "instrument_name": "CAP PROT NOTE 5Y EUR EUROSTOXX50 09/2031 - ISSUER B",
+      "ticker": null,
+      "isin": "CH1298447206",
+      "currency": "EUR",
+      "quantity": 100000.0,
+      "quantity_basis": "NOTIONAL_AMOUNT",
+      "average_price": 100.0,
+      "price_basis": "PERCENT_OF_NOTIONAL",
+      "average_exchange_rate": 1.1979,
+      "last_price": 98.5,
+      "last_exchange_rate": 1.1979,
+      "price_date": "19/09/2026",
+      "issuer_name": "ISSUER B PRIVATE BANK AG",
+      "issuer_lei": "549300Q2RQOAM9OWQ440",
+      "issuer_credit_rating": "AA-",
+      "issue_date": "04/09/2026",
+      "maturity_date": "04/09/2031",
+      "capital_protection_pct": 100.0,
+      "capital_protection_basis": "AT_MATURITY_ONLY",
+      "barrier_type": null,
+      "barrier_level_pct": null,
+      "barrier_breached": null,
+      "autocall_trigger_pct": null,
+      "next_observation_date": null,
+      "observation_frequency": "AT_MATURITY",
+      "coupon_rate_pct_pa": 0.0,
+      "coupon_frequency": "ZERO_COUPON",
+      "coupon_condition": null,
+      "next_coupon_date": null,
+      "coupons_received_to_date_usd": 0.0,
+      "participation_rate_pct": 70.0,
+      "cap_level_pct": 140.0,
+      "reference_asset_type": "EQUITY_INDEX",
+      "reference_assets": [
+        {
+          "name": "EURO STOXX 50 INDEX",
+          "isin": "EU0009658145",
+          "weight_pct": 100.0
+        }
+      ],
+      "worst_of_structure": false,
+      "underlying_currency": "EUR",
+      "product_currency": "EUR",
+      "valuation_basis": "ISSUER_MARK",
+      "valuation_source": "ISSUER_B_PRICING_DESK",
+      "valuation_frequency": "WEEKLY",
+      "is_exchange_traded": false,
+      "market_value_local": 98500.0,
+      "market_value_usd": 117993.15,
+      "cost_basis_usd": 119790.0,
+      "unrealised_pl_usd": -1796.85,
+      "unrealised_pct": -1.5,
+      "accrued_coupon_usd": 0.0,
+      "attribution_available": false,
+      "exclude_from_twr": false,
+      "is_illiquid": true,
+      "liquidity_note": "Capital protection applies at maturity only. Mid-life mark may be below par. Early exit at issuer bid.",
+      "pct_portfolio": 1.88,
+      "country": "SWITZERLAND",
+      "geo_attribution_basis": "ISSUER_DOMICILE"
+    },
+    {
+      "asset_class": "PRIVATE_EQUITY_FUND",
+      "product_subtype": "SECONDARY_LP_INTEREST",
+      "instrument_name": "MERIDIAN CAPITAL PARTNERS IV LP",
+      "ticker": null,
+      "isin": "LU2489117735",
+      "currency": "USD",
+      "quantity": 1.0,
+      "quantity_basis": "LP_INTEREST_UNIT",
+      "average_price": 350000.0,
+      "price_basis": "TOTAL_COST_OF_INTEREST",
+      "average_exchange_rate": 1.0,
+      "last_price": 425000.0,
+      "last_exchange_rate": 1.0,
+      "price_date": "30/06/2026",
+      "fund_manager": "MERIDIAN CAPITAL PARTNERS",
+      "fund_strategy": "BUYOUT",
+      "fund_sub_strategy": "MID_MARKET_BUYOUT",
+      "vintage_year": 2021,
+      "fund_domicile": "LUXEMBOURG",
+      "fund_term_years": 10,
+      "expected_wind_down_year": 2031,
+      "acquisition_route": "SECONDARY_MARKET",
+      "acquisition_date": "08/09/2026",
+      "acquisition_discount_to_nav_pct": -17.65,
+      "committed_capital_usd": 500000.0,
+      "called_capital_usd": 350000.0,
+      "unfunded_commitment_usd": 150000.0,
+      "called_pct_of_commitment": 70.0,
+      "distributions_to_date_usd": 0.0,
+      "current_nav_usd": 425000.0,
+      "performance_multiples": {
+        "tvpi": 1.214,
+        "dpi": 0.0,
+        "rvpi": 1.214,
+        "net_irr_pct": null,
+        "irr_note": "Net IRR not computable: full LP cash flow history from fund inception is not held in this system. Manager-reported IRR should be sourced from the quarterly capital account statement."
+      },
+      "valuation_basis": "MANAGER_REPORTED_NAV",
+      "valuation_source": "GP_QUARTERLY_CAPITAL_ACCOUNT_STATEMENT",
+      "valuation_frequency": "QUARTERLY",
+      "nav_date": "30/06/2026",
+      "nav_lag_days": 84,
+      "data_freshness_warning": "NAV is as at 30/06/2026 against a portfolio valuation date of 22/09/2026 (84-day lag). This is standard for private market assets. The NAV does not reflect Q3 2026 developments and must be presented to the client as at its own reporting date, not as a current value.",
+      "is_exchange_traded": false,
+      "market_value_local": 425000.0,
+      "market_value_usd": 425000.0,
+      "cost_basis_usd": 350000.0,
+      "unrealised_pl_usd": 75000.0,
+      "unrealised_pct": 21.43,
+      "attribution_available": false,
+      "exclude_from_twr": true,
+      "twr_exclusion_reason": "Stale quarterly NAV and lumpy cash flows would distort a time-weighted return. PE performance is reported on a TVPI/DPI/IRR basis in `performance_multiples`.",
+      "is_illiquid": true,
+      "lock_up_end_date": "30/09/2031",
+      "liquidity_note": "No redemption rights. Exit via GP distributions or secondary market sale, typically at a discount. Must not be treated as a source of liquidity.",
+      "pct_portfolio": 6.76,
+      "country": "LUXEMBOURG",
+      "geo_attribution_basis": "FUND_DOMICILE",
+      "look_through_geography": {
+        "note": "Underlying portfolio company exposure differs materially from fund domicile.",
+        "NORTH_AMERICA": 55.0,
+        "WESTERN_EUROPE": 35.0,
+        "ASIA_PACIFIC": 10.0
+      }
+    },
+    {
+      "asset_class": "PRIVATE_EQUITY_FUND",
+      "product_subtype": "PRIMARY_FUND_COMMITMENT",
+      "instrument_name": "ASIA GROWTH VENTURES III LP",
+      "ticker": null,
+      "isin": "KYG0445T1085",
+      "currency": "USD",
+      "quantity": 1.0,
+      "quantity_basis": "LP_INTEREST_UNIT",
+      "average_price": 160000.0,
+      "price_basis": "TOTAL_COST_OF_INTEREST",
+      "average_exchange_rate": 1.0,
+      "last_price": 148000.0,
+      "last_exchange_rate": 1.0,
+      "price_date": "30/06/2026",
+      "fund_manager": "ASIA GROWTH VENTURES",
+      "fund_strategy": "GROWTH_EQUITY",
+      "fund_sub_strategy": "LATE_STAGE_VENTURE",
+      "vintage_year": 2023,
+      "fund_domicile": "CAYMAN ISLANDS",
+      "fund_term_years": 10,
+      "expected_wind_down_year": 2033,
+      "acquisition_route": "PRIMARY_COMMITMENT",
+      "acquisition_date": "15/09/2026",
+      "acquisition_discount_to_nav_pct": null,
+      "committed_capital_usd": 400000.0,
+      "called_capital_usd": 160000.0,
+      "unfunded_commitment_usd": 240000.0,
+      "called_pct_of_commitment": 40.0,
+      "distributions_to_date_usd": 0.0,
+      "current_nav_usd": 148000.0,
+      "performance_multiples": {
+        "tvpi": 0.925,
+        "dpi": 0.0,
+        "rvpi": 0.925,
+        "net_irr_pct": null,
+        "irr_note": "Net IRR not computable from data held. TVPI below 1.0x reflects the standard J-curve: management fees and early-stage write-downs depress NAV before value creation is realised."
+      },
+      "valuation_basis": "MANAGER_REPORTED_NAV",
+      "valuation_source": "GP_QUARTERLY_CAPITAL_ACCOUNT_STATEMENT",
+      "valuation_frequency": "QUARTERLY",
+      "nav_date": "30/06/2026",
+      "nav_lag_days": 84,
+      "data_freshness_warning": "NAV is as at 30/06/2026 against a portfolio valuation date of 22/09/2026 (84-day lag). Fund is in the J-curve phase; NAV below called capital is expected at this stage of the fund life and is not itself an indicator of impairment.",
+      "is_exchange_traded": false,
+      "market_value_local": 148000.0,
+      "market_value_usd": 148000.0,
+      "cost_basis_usd": 160000.0,
+      "unrealised_pl_usd": -12000.0,
+      "unrealised_pct": -7.5,
+      "attribution_available": false,
+      "exclude_from_twr": true,
+      "twr_exclusion_reason": "Stale quarterly NAV and lumpy cash flows would distort a time-weighted return. PE performance is reported on a TVPI/DPI/IRR basis in `performance_multiples`.",
+      "is_illiquid": true,
+      "lock_up_end_date": "30/09/2033",
+      "liquidity_note": "No redemption rights. Unfunded commitment of USD 240,000 remains callable at the GP's discretion, typically on 10 business days' notice.",
+      "pct_portfolio": 2.35,
+      "country": "CAYMAN ISLANDS",
+      "geo_attribution_basis": "FUND_DOMICILE",
+      "look_through_geography": {
+        "note": "Underlying portfolio company exposure differs materially from fund domicile.",
+        "ASIA_PACIFIC": 80.0,
+        "NORTH_AMERICA": 20.0
+      }
     }
   ],
   "country_allocation": [
@@ -1093,85 +1376,127 @@
       "country": "HONG KONG",
       "asset_class": "EQUITY",
       "market_value_usd": 151567.34,
-      "pct_portfolio": 2.43
+      "pct_portfolio": 2.41,
+      "attribution_basis": "ISSUER_OR_LISTING_COUNTRY"
     },
     {
       "country": "FRANCE",
       "asset_class": "EQUITY",
       "market_value_usd": 16567.39,
-      "pct_portfolio": 0.27
+      "pct_portfolio": 0.26,
+      "attribution_basis": "ISSUER_OR_LISTING_COUNTRY"
     },
     {
       "country": "NETHERLANDS",
       "asset_class": "EQUITY",
       "market_value_usd": 39343.83,
-      "pct_portfolio": 0.63
+      "pct_portfolio": 0.63,
+      "attribution_basis": "ISSUER_OR_LISTING_COUNTRY"
     },
     {
       "country": "SPAIN",
       "asset_class": "EQUITY",
       "market_value_usd": 12750.45,
-      "pct_portfolio": 0.2
+      "pct_portfolio": 0.2,
+      "attribution_basis": "ISSUER_OR_LISTING_COUNTRY"
     },
     {
       "country": "UNITED KINGDOM",
       "asset_class": "EQUITY",
       "market_value_usd": 52370.37,
-      "pct_portfolio": 0.84
+      "pct_portfolio": 0.83,
+      "attribution_basis": "ISSUER_OR_LISTING_COUNTRY"
     },
     {
       "country": "JAPAN",
       "asset_class": "EQUITY",
       "market_value_usd": 73310.77,
-      "pct_portfolio": 1.18
+      "pct_portfolio": 1.17,
+      "attribution_basis": "ISSUER_OR_LISTING_COUNTRY"
     },
     {
       "country": "UNITED STATES OF AMERICA",
       "asset_class": "EQUITY",
       "market_value_usd": 79506.0,
-      "pct_portfolio": 1.28
+      "pct_portfolio": 1.26,
+      "attribution_basis": "ISSUER_OR_LISTING_COUNTRY"
     },
     {
       "country": "AUSTRALIA",
       "asset_class": "EQUITY",
       "market_value_usd": 230.8,
-      "pct_portfolio": 0.0
+      "pct_portfolio": 0.0,
+      "attribution_basis": "ISSUER_OR_LISTING_COUNTRY"
     },
     {
       "country": "SINGAPORE",
       "asset_class": "EQUITY",
       "market_value_usd": 12417.13,
-      "pct_portfolio": 0.2
+      "pct_portfolio": 0.2,
+      "attribution_basis": "ISSUER_OR_LISTING_COUNTRY"
     },
     {
       "country": "SINGAPORE DOLLAR",
       "asset_class": "BOND",
       "market_value_usd": 185558.34,
-      "pct_portfolio": 2.98
+      "pct_portfolio": 2.95,
+      "attribution_basis": "ISSUER_OR_LISTING_COUNTRY"
     },
     {
       "country": "SINGAPORE DOLLAR",
       "asset_class": "BOND_FUND",
       "market_value_usd": 104618.52,
-      "pct_portfolio": 1.68
+      "pct_portfolio": 1.66,
+      "attribution_basis": "ISSUER_OR_LISTING_COUNTRY"
     },
     {
       "country": "SINGAPORE DOLLAR",
       "asset_class": "FIXED_TERM_DEPOSIT",
       "market_value_usd": -130610.25,
-      "pct_portfolio": -2.1
+      "pct_portfolio": -2.08,
+      "attribution_basis": "ISSUER_OR_LISTING_COUNTRY"
+    },
+    {
+      "country": "UNITED KINGDOM",
+      "asset_class": "STRUCTURED_PRODUCT",
+      "market_value_usd": 152400.0,
+      "pct_portfolio": 2.42,
+      "attribution_basis": "ISSUER_DOMICILE"
+    },
+    {
+      "country": "SWITZERLAND",
+      "asset_class": "STRUCTURED_PRODUCT",
+      "market_value_usd": 117993.15,
+      "pct_portfolio": 1.88,
+      "attribution_basis": "ISSUER_DOMICILE"
+    },
+    {
+      "country": "LUXEMBOURG",
+      "asset_class": "PRIVATE_EQUITY_FUND",
+      "market_value_usd": 425000.0,
+      "pct_portfolio": 6.76,
+      "attribution_basis": "FUND_DOMICILE",
+      "look_through_available": true
+    },
+    {
+      "country": "CAYMAN ISLANDS",
+      "asset_class": "PRIVATE_EQUITY_FUND",
+      "market_value_usd": 148000.0,
+      "pct_portfolio": 2.35,
+      "attribution_basis": "FUND_DOMICILE",
+      "look_through_available": true
     }
   ],
   "reported_subtotals": [
     {
       "scope": "EUR and GBP equities (FRANCE, NETHERLANDS, SPAIN, UNITED KINGDOM)",
       "market_value_usd": 121032.04,
-      "pct_portfolio": 1.94
+      "pct_portfolio": 1.92
     },
     {
       "scope": "FUND_ETF priced in USD and HKD",
       "market_value_usd": 213826.59,
-      "pct_portfolio": 3.43
+      "pct_portfolio": 3.4
     },
     {
       "scope": "FUND_ETF priced in SGD",
@@ -1181,12 +1506,28 @@
     {
       "scope": "FUND_ETF priced in JPY",
       "market_value_usd": 99884.93,
-      "pct_portfolio": 1.6
+      "pct_portfolio": 1.59
     },
     {
       "scope": "NEUBERGER BER 5G CONNECT-A-ACC-USD",
       "market_value_usd": 65840.0,
-      "pct_portfolio": 1.06
+      "pct_portfolio": 1.05
+    },
+    {
+      "scope": "STRUCTURED_PRODUCT - all issuers",
+      "market_value_usd": 270393.15,
+      "pct_portfolio": 4.3
+    },
+    {
+      "scope": "PRIVATE_EQUITY_FUND - all vintages (NAV basis)",
+      "market_value_usd": 573000.0,
+      "pct_portfolio": 9.11
+    },
+    {
+      "scope": "ILLIQUID ASSETS (SP + PE combined)",
+      "market_value_usd": 843393.15,
+      "pct_portfolio": 13.41,
+      "note": "No daily liquidity. Exit subject to issuer bid (SP) or GP distribution / secondary sale (PE)."
     }
   ],
   "off_balance_sheet": [
@@ -1197,6 +1538,40 @@
       "currency": "USD",
       "amount": -1500000.0,
       "start_date": "14/02/2017"
+    },
+    {
+      "type": "UNFUNDED_PE_COMMITMENT",
+      "instrument_name": "MERIDIAN CAPITAL PARTNERS IV LP",
+      "isin": "LU2489117735",
+      "reference": "LP-MCP-IV-0442",
+      "currency": "USD",
+      "total_commitment_usd": 500000.0,
+      "called_to_date_usd": 350000.0,
+      "amount": -150000.0,
+      "unfunded_usd": 150000.0,
+      "start_date": "08/09/2026",
+      "expected_call_window": "2026-2028",
+      "call_notice_period_days": 10,
+      "reconciles_to_holding_isin": "LU2489117735",
+      "included_in_net_total": false,
+      "notes": "Contingent obligation. Deliberately excluded from `summary.net_total` and from `asset_class_totals`. Callable at the GP's discretion. `called_to_date_usd` reconciles to `cost_basis_usd` on the corresponding holding."
+    },
+    {
+      "type": "UNFUNDED_PE_COMMITMENT",
+      "instrument_name": "ASIA GROWTH VENTURES III LP",
+      "isin": "KYG0445T1085",
+      "reference": "LP-AGV-III-0117",
+      "currency": "USD",
+      "total_commitment_usd": 400000.0,
+      "called_to_date_usd": 160000.0,
+      "amount": -240000.0,
+      "unfunded_usd": 240000.0,
+      "start_date": "15/09/2026",
+      "expected_call_window": "2026-2029",
+      "call_notice_period_days": 10,
+      "reconciles_to_holding_isin": "KYG0445T1085",
+      "included_in_net_total": false,
+      "notes": "Contingent obligation. Deliberately excluded from `summary.net_total` and from `asset_class_totals`. Callable at the GP's discretion. `called_to_date_usd` reconciles to `cost_basis_usd` on the corresponding holding."
     }
   ],
   "exchange_rates": [
@@ -1254,5 +1629,2285 @@
       "rate_date": "22/09/2026",
       "estimated_rate": 1.0
     }
-  ]
+  ],
+  "transactions": {
+    "period": {
+      "from_date": "23/08/2026",
+      "to_date": "22/09/2026",
+      "period_description": "Last 30 days",
+      "last_client_visit_date": "23/08/2026",
+      "reference_currency": "USD",
+      "portfolio_id": "GO00001",
+      "account_reference": "CH800022300001",
+      "account_number": "8000223",
+      "valuation_date": "22/09/2026",
+      "generated_timestamp": "22/09/2026 09:41:10 GMT",
+      "date_format": "DD/MM/YYYY",
+      "data_source": "PMS_TRANSACTION_LEDGER",
+      "reconciliation_basis": "All traded instruments exist in `holdings`. For SELL records `quantity_after` equals the holdings quantity and average cost is unchanged. For BUY records `average_cost_before` is derived so the blended cost equals the `average_price` recorded in holdings. All option positions are flat at the valuation date.",
+      "fx_convention": "AUD, EUR and GBP rates are multiplied to convert to USD. HKD, JPY, NOK, SEK and SGD rates are divided. This mirrors the existing `exchange_rates` and `holdings` convention."
+    },
+    "summary": {
+      "total_transactions": 42,
+      "counts_by_category": {
+        "securities_trades": 12,
+        "buys": 7,
+        "sells": 5,
+        "option_transactions": 7,
+        "income_events": 11,
+        "corporate_actions": 4,
+        "cash_movements": 8,
+        "pe_capital_calls": 2,
+        "structured_product_subscriptions": 2
+      },
+      "gross_purchases_usd": 322802.43,
+      "gross_sales_usd": 71827.42,
+      "net_investment_activity_usd": -250975.01,
+      "realised_pl_securities_usd": 264.61,
+      "realised_pl_options_usd": 754.25,
+      "realised_pl_total_usd": 1018.86,
+      "income_gross_usd": 7030.83,
+      "withholding_tax_usd": 54.6,
+      "income_net_usd": 6976.24,
+      "total_transaction_charges_usd": 603.8,
+      "net_cash_impact_usd": 3150579.75,
+      "net_cash_impact_by_currency_usd": {
+        "EUR": 232.76,
+        "GBP": 1210.93,
+        "HKD": 23683.48,
+        "JPY": 10603.4,
+        "SGD": -89542.29,
+        "USD": 3204391.47
+      },
+      "activity_by_asset_class": {
+        "BOND": {
+          "buy_count": 1,
+          "sell_count": 0,
+          "net_usd": -37206.24
+        },
+        "BOND_FUND": {
+          "buy_count": 0,
+          "sell_count": 1,
+          "net_usd": 34979.63
+        },
+        "COMMODITY_ETF": {
+          "buy_count": 1,
+          "sell_count": 0,
+          "net_usd": -9743.98
+        },
+        "EQUITY": {
+          "buy_count": 3,
+          "sell_count": 3,
+          "net_usd": 27193.28
+        },
+        "FUND_ETF": {
+          "buy_count": 0,
+          "sell_count": 1,
+          "net_usd": 3592.3
+        },
+        "OPTION": {
+          "buy_count": 3,
+          "sell_count": 3,
+          "net_usd": 682.41
+        },
+        "STRUCTURED_PRODUCT": {
+          "buy_count": 2,
+          "sell_count": 0,
+          "net_usd": -269790.0
+        },
+        "PRIVATE_EQUITY_FUND": {
+          "buy_count": 0,
+          "sell_count": 0,
+          "capital_call_count": 2,
+          "net_usd": -510000.0,
+          "note": "Funded via capital calls in cash_movements, not via trades."
+        }
+      },
+      "instruments_traded": [
+        "ALIBABA GROUP HOLDING LIMITED",
+        "AUTOCALL NOTE 3Y USD BASKET 08/2029 - ISSUER A",
+        "BLACKROCK GF-CHINA BD-A6-H-DIS-SGD",
+        "CAP PROT NOTE 5Y EUR EUROSTOXX50 09/2031 - ISSUER B",
+        "HSBC HOLDINGS PLC (HK REG)",
+        "MITSUBISHI UFJ FINANCIAL GROUP INC",
+        "NETLINK NBN TRUST",
+        "OLAM INTL LTD 4% 240226-MTN",
+        "OVERSEA-CHINESE BANKING CORP LTD",
+        "SEMICONDUCTOR MANUFACTURING INTL",
+        "SPDR GOLD TRUST-ETF (GLD SP)",
+        "SPDR STRAITS TIMES INDEX ETF"
+      ],
+      "exchanges_used": [
+        "HKEX",
+        "OTC-FUND",
+        "OTC-PRIMARY",
+        "SGX-DT",
+        "SGX-ST",
+        "TSE"
+      ],
+      "pe_capital_calls_usd": 510000.0,
+      "pe_calls_excluded_from_purchases_note": "PE capital calls of USD 510,000.00 are recorded in `cash_movements` and are deliberately NOT included in gross_purchases_usd. They are funding events against standing commitments, not market purchases.",
+      "income_events_note": "No SP coupon or PE distribution was received in this period. The first autocallable coupon observation falls on 02/12/2026; both PE funds have a DPI of 0.000x. Income totals are therefore unchanged by the SP/PE additions."
+    },
+    "trades": [
+      {
+        "trade_date": "28/08/2026",
+        "settlement_date": "01/09/2026",
+        "transaction_type": "BUY",
+        "asset_class": "EQUITY",
+        "instrument_name": "OVERSEA-CHINESE BANKING CORP LTD",
+        "ticker": "OCBC.SI",
+        "isin": "SG1S04926220",
+        "exchange": "SGX-ST",
+        "country": "SINGAPORE",
+        "currency": "SGD",
+        "quantity": 400,
+        "price": 11.65,
+        "price_basis": "PER_UNIT",
+        "gross_amount_local": 4660.0,
+        "brokerage_local": 13.98,
+        "clearing_fee_local": 1.51,
+        "exchange_trading_fee_local": 0.35,
+        "stamp_duty_local": 0.0,
+        "gst_local": 1.43,
+        "total_charges_local": 17.27,
+        "net_amount_local": -4677.27,
+        "exchange_rate": 1.3372,
+        "net_amount_usd": -3497.81,
+        "realised_pl_local": null,
+        "realised_pl_usd": null,
+        "quantity_before": 600.0,
+        "quantity_after": 1000.0,
+        "average_cost_before": 7.118,
+        "average_cost_after": 8.9308,
+        "reconciles_to_holding_isin": "SG1S04926220",
+        "order_channel": "RM_ADVISED",
+        "advice_basis": "ADVISORY",
+        "execution_venue": "SGX-ST",
+        "settlement_status": "SETTLED",
+        "booking_status": "BOOKED",
+        "rm_rationale": "Added to core SG banking exposure ahead of interim dividend.",
+        "transaction_id": "TRD-2026-0001"
+      },
+      {
+        "trade_date": "04/09/2026",
+        "settlement_date": "08/09/2026",
+        "transaction_type": "BUY",
+        "asset_class": "EQUITY",
+        "instrument_name": "NETLINK NBN TRUST",
+        "ticker": "NETL.SI",
+        "isin": "SG1DH9000006",
+        "exchange": "SGX-ST",
+        "country": "SINGAPORE",
+        "currency": "SGD",
+        "quantity": 2000,
+        "price": 0.945,
+        "price_basis": "PER_UNIT",
+        "gross_amount_local": 1890.0,
+        "brokerage_local": 5.67,
+        "clearing_fee_local": 0.61,
+        "exchange_trading_fee_local": 0.14,
+        "stamp_duty_local": 0.0,
+        "gst_local": 0.58,
+        "total_charges_local": 7.0,
+        "net_amount_local": -1897.0,
+        "exchange_rate": 1.3361,
+        "net_amount_usd": -1419.8,
+        "realised_pl_local": null,
+        "realised_pl_usd": null,
+        "quantity_before": 3000.0,
+        "quantity_after": 5000.0,
+        "average_cost_before": 1.0063,
+        "average_cost_after": 0.9818,
+        "reconciles_to_holding_isin": "SG1DH9000006",
+        "order_channel": "RM_ADVISED",
+        "advice_basis": "ADVISORY",
+        "execution_venue": "SGX-ST",
+        "settlement_status": "SETTLED",
+        "booking_status": "BOOKED",
+        "rm_rationale": "Topped up defensive SGD yield holding on price weakness.",
+        "transaction_id": "TRD-2026-0002"
+      },
+      {
+        "trade_date": "10/09/2026",
+        "settlement_date": "14/09/2026",
+        "transaction_type": "SELL",
+        "asset_class": "FUND_ETF",
+        "instrument_name": "SPDR STRAITS TIMES INDEX ETF",
+        "ticker": "STTF.SI",
+        "isin": "SG1W45939194",
+        "exchange": "SGX-ST",
+        "country": null,
+        "currency": "SGD",
+        "quantity": 1500,
+        "price": 3.21,
+        "price_basis": "PER_UNIT",
+        "gross_amount_local": 4815.0,
+        "brokerage_local": 14.45,
+        "clearing_fee_local": 1.56,
+        "exchange_trading_fee_local": 0.36,
+        "stamp_duty_local": 0.0,
+        "gst_local": 1.47,
+        "total_charges_local": 17.84,
+        "net_amount_local": 4797.16,
+        "exchange_rate": 1.3354,
+        "net_amount_usd": 3592.3,
+        "realised_pl_local": 605.41,
+        "realised_pl_usd": 602.75,
+        "quantity_before": 8500.0,
+        "quantity_after": 7000.0,
+        "average_cost_before": 2.7945,
+        "average_cost_after": 2.7945,
+        "reconciles_to_holding_isin": "SG1W45939194",
+        "order_channel": "CLIENT_DIRECTED",
+        "advice_basis": "EXECUTION_ONLY",
+        "execution_venue": "SGX-ST",
+        "settlement_status": "SETTLED",
+        "booking_status": "BOOKED",
+        "rm_rationale": "Partial profit-taking on SG index ETF; proceeds retained in SGD cash.",
+        "transaction_id": "TRD-2026-0003"
+      },
+      {
+        "trade_date": "16/09/2026",
+        "settlement_date": "18/09/2026",
+        "transaction_type": "BUY",
+        "asset_class": "COMMODITY_ETF",
+        "instrument_name": "SPDR GOLD TRUST-ETF (GLD SP)",
+        "ticker": "SGLD.SI",
+        "isin": "US78463V1070",
+        "exchange": "SGX-ST",
+        "country": null,
+        "currency": "USD",
+        "quantity": 60,
+        "price": 161.8,
+        "price_basis": "PER_UNIT",
+        "gross_amount_local": 9708.0,
+        "brokerage_local": 29.12,
+        "clearing_fee_local": 3.16,
+        "exchange_trading_fee_local": 0.73,
+        "stamp_duty_local": 0.0,
+        "gst_local": 2.97,
+        "total_charges_local": 35.98,
+        "net_amount_local": -9743.98,
+        "exchange_rate": 1.0,
+        "net_amount_usd": -9743.98,
+        "realised_pl_local": null,
+        "realised_pl_usd": null,
+        "quantity_before": 150.0,
+        "quantity_after": 210.0,
+        "average_cost_before": 180.5482,
+        "average_cost_after": 175.1916,
+        "reconciles_to_holding_isin": "US78463V1070",
+        "order_channel": "RM_ADVISED",
+        "advice_basis": "ADVISORY",
+        "execution_venue": "SGX-ST",
+        "settlement_status": "SETTLED",
+        "booking_status": "BOOKED",
+        "rm_rationale": "Increased gold allocation as portfolio hedge.",
+        "transaction_id": "TRD-2026-0004"
+      },
+      {
+        "trade_date": "02/09/2026",
+        "settlement_date": "04/09/2026",
+        "transaction_type": "SELL",
+        "asset_class": "EQUITY",
+        "instrument_name": "HSBC HOLDINGS PLC (HK REG)",
+        "ticker": "0005.HK",
+        "isin": "GB0005405286",
+        "exchange": "HKEX",
+        "country": "HONG KONG",
+        "currency": "HKD",
+        "quantity": 1714,
+        "price": 57.1,
+        "price_basis": "PER_UNIT",
+        "gross_amount_local": 97869.4,
+        "brokerage_local": 244.67,
+        "stamp_duty_local": 97.87,
+        "sfc_transaction_levy_local": 2.64,
+        "afrc_transaction_levy_local": 0.15,
+        "exchange_trading_fee_local": 5.53,
+        "ccass_settlement_fee_local": 2.0,
+        "total_charges_local": 352.86,
+        "net_amount_local": 97516.54,
+        "exchange_rate": 7.8462,
+        "net_amount_usd": 12428.51,
+        "realised_pl_local": 4757.6,
+        "realised_pl_usd": 516.03,
+        "quantity_before": 9000.0,
+        "quantity_after": 7286.0,
+        "average_cost_before": 54.1184,
+        "average_cost_after": 54.1184,
+        "reconciles_to_holding_isin": "GB0005405286",
+        "order_channel": "RM_ADVISED",
+        "advice_basis": "ADVISORY",
+        "execution_venue": "HKEX",
+        "settlement_status": "SETTLED",
+        "booking_status": "BOOKED",
+        "rm_rationale": "Trimmed HSBC into strength; position remains largest HK equity line.",
+        "transaction_id": "TRD-2026-0005"
+      },
+      {
+        "trade_date": "09/09/2026",
+        "settlement_date": "11/09/2026",
+        "transaction_type": "BUY",
+        "asset_class": "EQUITY",
+        "instrument_name": "ALIBABA GROUP HOLDING LIMITED",
+        "ticker": "9988.HK",
+        "isin": "KYG017191142",
+        "exchange": "HKEX",
+        "country": "HONG KONG",
+        "currency": "HKD",
+        "quantity": 100,
+        "price": 89.5,
+        "price_basis": "PER_UNIT",
+        "gross_amount_local": 8950.0,
+        "brokerage_local": 22.38,
+        "stamp_duty_local": 8.95,
+        "sfc_transaction_levy_local": 0.24,
+        "afrc_transaction_levy_local": 0.01,
+        "exchange_trading_fee_local": 0.51,
+        "ccass_settlement_fee_local": 2.0,
+        "total_charges_local": 34.09,
+        "net_amount_local": -8984.09,
+        "exchange_rate": 7.8491,
+        "net_amount_usd": -1144.6,
+        "realised_pl_local": null,
+        "realised_pl_usd": null,
+        "quantity_before": 200.0,
+        "quantity_after": 300.0,
+        "average_cost_before": 254.3079,
+        "average_cost_after": 199.3719,
+        "reconciles_to_holding_isin": "KYG017191142",
+        "order_channel": "CLIENT_DIRECTED",
+        "advice_basis": "EXECUTION_ONLY",
+        "execution_venue": "HKEX",
+        "settlement_status": "SETTLED",
+        "booking_status": "BOOKED",
+        "rm_rationale": "Client-directed averaging down on existing loss-making position.",
+        "transaction_id": "TRD-2026-0006"
+      },
+      {
+        "trade_date": "18/09/2026",
+        "settlement_date": "22/09/2026",
+        "transaction_type": "SELL",
+        "asset_class": "EQUITY",
+        "instrument_name": "SEMICONDUCTOR MANUFACTURING INTL",
+        "ticker": "0981.HK",
+        "isin": "KYG8020E1199",
+        "exchange": "HKEX",
+        "country": "HONG KONG",
+        "currency": "HKD",
+        "quantity": 3000,
+        "price": 26.85,
+        "price_basis": "PER_UNIT",
+        "gross_amount_local": 80550.0,
+        "brokerage_local": 201.38,
+        "stamp_duty_local": 80.55,
+        "sfc_transaction_levy_local": 2.17,
+        "afrc_transaction_levy_local": 0.12,
+        "exchange_trading_fee_local": 4.55,
+        "ccass_settlement_fee_local": 2.0,
+        "total_charges_local": 290.77,
+        "net_amount_local": 80259.23,
+        "exchange_rate": 7.8504,
+        "net_amount_usd": 10223.58,
+        "realised_pl_local": -4235.47,
+        "realised_pl_usd": -678.59,
+        "quantity_before": 8000.0,
+        "quantity_after": 5000.0,
+        "average_cost_before": 28.1649,
+        "average_cost_after": 28.1649,
+        "reconciles_to_holding_isin": "KYG8020E1199",
+        "order_channel": "RM_ADVISED",
+        "advice_basis": "ADVISORY",
+        "execution_venue": "HKEX",
+        "settlement_status": "SETTLED",
+        "booking_status": "BOOKED",
+        "rm_rationale": "Reduced semiconductor concentration following sector volatility.",
+        "transaction_id": "TRD-2026-0007"
+      },
+      {
+        "trade_date": "08/09/2026",
+        "settlement_date": "10/09/2026",
+        "transaction_type": "SELL",
+        "asset_class": "EQUITY",
+        "instrument_name": "MITSUBISHI UFJ FINANCIAL GROUP INC",
+        "ticker": "8306.T",
+        "isin": "JP3902900004",
+        "exchange": "TSE",
+        "country": "JAPAN",
+        "currency": "JPY",
+        "quantity": 2000,
+        "price": 579.0,
+        "price_basis": "PER_UNIT",
+        "gross_amount_local": 1158000.0,
+        "brokerage_local": 2895.0,
+        "stamp_duty_local": 0.0,
+        "consumption_tax_local": 290.0,
+        "total_charges_local": 3184.0,
+        "net_amount_local": 1154816.0,
+        "exchange_rate": 108.91,
+        "net_amount_usd": 10603.4,
+        "realised_pl_local": 165332.4,
+        "realised_pl_usd": 1591.48,
+        "quantity_before": 7000.0,
+        "quantity_after": 5000.0,
+        "average_cost_before": 494.7418,
+        "average_cost_after": 494.7418,
+        "reconciles_to_holding_isin": "JP3902900004",
+        "order_channel": "RM_ADVISED",
+        "advice_basis": "ADVISORY",
+        "execution_venue": "TSE",
+        "settlement_status": "SETTLED",
+        "booking_status": "BOOKED",
+        "rm_rationale": "Locked in gains on Japanese financials after strong run.",
+        "transaction_id": "TRD-2026-0008"
+      },
+      {
+        "trade_date": "27/08/2026",
+        "settlement_date": "31/08/2026",
+        "transaction_type": "BUY",
+        "asset_class": "BOND",
+        "instrument_name": "OLAM INTL LTD 4% 240226-MTN",
+        "ticker": null,
+        "isin": "SGXF63577419",
+        "exchange": "SGX-ST",
+        "country": "SINGAPORE DOLLAR",
+        "currency": "SGD",
+        "quantity": 50000,
+        "price": 99.35,
+        "price_basis": "PERCENT_OF_NOMINAL",
+        "gross_amount_local": 49675.0,
+        "brokerage_local": 74.51,
+        "stamp_duty_local": 0.0,
+        "custody_transaction_fee_local": 25.0,
+        "total_charges_local": 99.51,
+        "net_amount_local": -49774.51,
+        "exchange_rate": 1.3378,
+        "net_amount_usd": -37206.24,
+        "realised_pl_local": null,
+        "realised_pl_usd": null,
+        "quantity_before": 200000.0,
+        "quantity_after": 250000.0,
+        "average_cost_before": 100.475,
+        "average_cost_after": 100.25,
+        "reconciles_to_holding_isin": "SGXF63577419",
+        "order_channel": "RM_ADVISED",
+        "advice_basis": "ADVISORY",
+        "execution_venue": "SGX-ST",
+        "settlement_status": "SETTLED",
+        "booking_status": "BOOKED",
+        "rm_rationale": "Added SGD 50k nominal below par to lift portfolio running yield.",
+        "transaction_id": "TRD-2026-0009"
+      },
+      {
+        "trade_date": "12/09/2026",
+        "settlement_date": "16/09/2026",
+        "transaction_type": "SELL",
+        "asset_class": "BOND_FUND",
+        "instrument_name": "BLACKROCK GF-CHINA BD-A6-H-DIS-SGD",
+        "ticker": null,
+        "isin": "LU1847653497",
+        "exchange": "OTC-FUND",
+        "country": "SINGAPORE DOLLAR",
+        "currency": "SGD",
+        "quantity": 5000,
+        "price": 9.36,
+        "price_basis": "PER_UNIT",
+        "gross_amount_local": 46800.0,
+        "brokerage_local": 70.2,
+        "stamp_duty_local": 0.0,
+        "custody_transaction_fee_local": 25.0,
+        "total_charges_local": 95.2,
+        "net_amount_local": 46704.8,
+        "exchange_rate": 1.3352,
+        "net_amount_usd": 34979.63,
+        "realised_pl_local": -4417.2,
+        "realised_pl_usd": -1767.06,
+        "quantity_before": 20000.0,
+        "quantity_after": 15000.0,
+        "average_cost_before": 10.2244,
+        "average_cost_after": 10.2244,
+        "reconciles_to_holding_isin": "LU1847653497",
+        "order_channel": "RM_ADVISED",
+        "advice_basis": "ADVISORY",
+        "execution_venue": "OTC-FUND",
+        "settlement_status": "SETTLED",
+        "booking_status": "BOOKED",
+        "rm_rationale": "Reduced China credit fund exposure; switch proceeds held in SGD cash.",
+        "transaction_id": "TRD-2026-0010"
+      },
+      {
+        "trade_date": "02/09/2026",
+        "settlement_date": "04/09/2026",
+        "transaction_type": "BUY",
+        "asset_class": "STRUCTURED_PRODUCT",
+        "product_subtype": "AUTOCALLABLE_NOTE",
+        "instrument_name": "AUTOCALL NOTE 3Y USD BASKET 08/2029 - ISSUER A",
+        "ticker": null,
+        "isin": "XS2915004471",
+        "exchange": "OTC-PRIMARY",
+        "country": "UNITED KINGDOM",
+        "currency": "USD",
+        "quantity": 150000.0,
+        "quantity_basis": "NOTIONAL_AMOUNT",
+        "price": 100.0,
+        "price_basis": "PERCENT_OF_NOTIONAL",
+        "gross_amount_local": 150000.0,
+        "brokerage_local": 0.0,
+        "structuring_fee_local": 0.0,
+        "structuring_fee_note": "Distribution margin of approximately 1.20% is embedded in the issue price and is not separately charged. Disclosed in the term sheet.",
+        "custody_transaction_fee_local": 0.0,
+        "total_charges_local": 0.0,
+        "net_amount_local": -150000.0,
+        "exchange_rate": 1.0,
+        "net_amount_usd": -150000.0,
+        "realised_pl_local": null,
+        "realised_pl_usd": null,
+        "quantity_before": 0.0,
+        "quantity_after": 150000.0,
+        "average_cost_before": null,
+        "average_cost_after": 100.0,
+        "reconciles_to_holding_isin": "XS2915004471",
+        "order_channel": "RM_ADVISED",
+        "advice_basis": "ADVISORY",
+        "execution_venue": "OTC-PRIMARY",
+        "settlement_status": "SETTLED",
+        "booking_status": "BOOKED",
+        "funding_source": "USD current account - August 2026 inflow",
+        "suitability_check_status": "COMPLETED",
+        "product_risk_rating": "5_HIGH",
+        "client_risk_profile_at_trade": "Very Dynamic",
+        "appropriateness_note": "Complex product. Client classified as able to bear full loss of capital below the 60% barrier. Term sheet and KID acknowledged prior to execution.",
+        "rm_rationale": "Deployed part of the August inflow into a quarterly-coupon autocallable to generate contingent income on large-cap US technology exposure.",
+        "transaction_id": "TRD-2026-0011"
+      },
+      {
+        "trade_date": "04/09/2026",
+        "settlement_date": "08/09/2026",
+        "transaction_type": "BUY",
+        "asset_class": "STRUCTURED_PRODUCT",
+        "product_subtype": "CAPITAL_PROTECTED_NOTE",
+        "instrument_name": "CAP PROT NOTE 5Y EUR EUROSTOXX50 09/2031 - ISSUER B",
+        "ticker": null,
+        "isin": "CH1298447206",
+        "exchange": "OTC-PRIMARY",
+        "country": "SWITZERLAND",
+        "currency": "EUR",
+        "quantity": 100000.0,
+        "quantity_basis": "NOTIONAL_AMOUNT",
+        "price": 100.0,
+        "price_basis": "PERCENT_OF_NOTIONAL",
+        "gross_amount_local": 100000.0,
+        "brokerage_local": 0.0,
+        "structuring_fee_local": 0.0,
+        "structuring_fee_note": "Distribution margin of approximately 0.90% is embedded in the issue price and is not separately charged. Disclosed in the term sheet.",
+        "custody_transaction_fee_local": 0.0,
+        "total_charges_local": 0.0,
+        "net_amount_local": -100000.0,
+        "exchange_rate": 1.1979,
+        "net_amount_usd": -119790.0,
+        "fx_conversion_note": "Funded from the USD current account; EUR purchased at the prevailing rate on trade date. EUR rates are MULTIPLIED to convert to USD, per the file-wide convention.",
+        "realised_pl_local": null,
+        "realised_pl_usd": null,
+        "quantity_before": 0.0,
+        "quantity_after": 100000.0,
+        "average_cost_before": null,
+        "average_cost_after": 100.0,
+        "reconciles_to_holding_isin": "CH1298447206",
+        "order_channel": "RM_ADVISED",
+        "advice_basis": "ADVISORY",
+        "execution_venue": "OTC-PRIMARY",
+        "settlement_status": "SETTLED",
+        "booking_status": "BOOKED",
+        "funding_source": "USD current account - August 2026 inflow",
+        "suitability_check_status": "COMPLETED",
+        "product_risk_rating": "3_MEDIUM",
+        "client_risk_profile_at_trade": "Very Dynamic",
+        "appropriateness_note": "100% capital protection applies at maturity only and is subject to issuer credit risk. Client acknowledged that mid-life marks may fall below par.",
+        "rm_rationale": "Added capital-protected European equity participation to balance the higher-risk autocallable and diversify issuer credit exposure.",
+        "transaction_id": "TRD-2026-0012"
+      }
+    ],
+    "option_transactions": [
+      {
+        "transaction_id": "OPT-2026-0001",
+        "trade_date": "28/08/2026",
+        "settlement_date": "31/08/2026",
+        "transaction_type": "EXPIRED_WORTHLESS",
+        "asset_class": "OPTION",
+        "instrument_name": "ALIBABA GROUP AUG-2026 HKD 95.00 CALL",
+        "option_type": "CALL",
+        "underlying_instrument_name": "ALIBABA GROUP HOLDING LIMITED",
+        "underlying_isin": "KYG017191142",
+        "strike_price": 95.0,
+        "expiry_date": "28/08/2026",
+        "exercise_style": "AMERICAN",
+        "settlement_method": "PHYSICAL",
+        "contracts": 2,
+        "contract_multiplier": 100,
+        "notional_shares_or_units": 200,
+        "premium_per_unit": 0.0,
+        "currency": "HKD",
+        "gross_premium_local": 0.0,
+        "total_charges_local": 0.0,
+        "net_amount_local": 0.0,
+        "exchange_rate": 7.8488,
+        "net_amount_usd": 0.0,
+        "realised_pl_local": 420.0,
+        "realised_pl_usd": 53.51,
+        "strategy": "COVERED_CALL",
+        "coverage_status": "COVERED_BY_UNDERLYING",
+        "collateral_local": 0.0,
+        "position_after_trade": "FLAT",
+        "exchange": "HKEX",
+        "order_channel": "RM_ADVISED",
+        "advice_basis": "ADVISORY",
+        "settlement_status": "SETTLED",
+        "booking_status": "BOOKED",
+        "rm_rationale": "Short call opened 31/07/2026 at HKD 2.10 expired out-of-the-money; full premium of HKD 420.00 retained. 200 shares held as cover."
+      },
+      {
+        "transaction_id": "OPT-2026-0002",
+        "trade_date": "26/08/2026",
+        "settlement_date": "27/08/2026",
+        "transaction_type": "SELL_TO_OPEN",
+        "asset_class": "OPTION",
+        "instrument_name": "HSBC HOLDINGS OCT-2026 HKD 60.00 CALL",
+        "option_type": "CALL",
+        "underlying_instrument_name": "HSBC HOLDINGS PLC (HK REG)",
+        "underlying_isin": "GB0005405286",
+        "strike_price": 60.0,
+        "expiry_date": "29/10/2026",
+        "exercise_style": "AMERICAN",
+        "settlement_method": "PHYSICAL",
+        "contracts": 18,
+        "contract_multiplier": 400,
+        "notional_shares_or_units": 7200,
+        "premium_per_unit": 1.42,
+        "currency": "HKD",
+        "gross_premium_local": 10224.0,
+        "brokerage_local": 720.0,
+        "sfc_transaction_levy_local": 9.72,
+        "exchange_trading_fee_local": 54.0,
+        "clearing_fee_local": 54.0,
+        "total_charges_local": 837.72,
+        "net_amount_local": 9386.28,
+        "exchange_rate": 7.8468,
+        "net_amount_usd": 1196.19,
+        "realised_pl_local": null,
+        "realised_pl_usd": null,
+        "strategy": "COVERED_CALL",
+        "coverage_status": "COVERED_BY_UNDERLYING",
+        "collateral_local": 0.0,
+        "position_after_trade": "FLAT",
+        "exchange": "HKEX",
+        "order_channel": "RM_ADVISED",
+        "advice_basis": "ADVISORY",
+        "settlement_status": "SETTLED",
+        "booking_status": "BOOKED",
+        "rm_rationale": "Yield enhancement on HSBC core holding; 7,200 of 9,000 shares covered."
+      },
+      {
+        "transaction_id": "OPT-2026-0003",
+        "trade_date": "15/09/2026",
+        "settlement_date": "16/09/2026",
+        "transaction_type": "BUY_TO_CLOSE",
+        "asset_class": "OPTION",
+        "instrument_name": "HSBC HOLDINGS OCT-2026 HKD 60.00 CALL",
+        "option_type": "CALL",
+        "underlying_instrument_name": "HSBC HOLDINGS PLC (HK REG)",
+        "underlying_isin": "GB0005405286",
+        "strike_price": 60.0,
+        "expiry_date": "29/10/2026",
+        "exercise_style": "AMERICAN",
+        "settlement_method": "PHYSICAL",
+        "contracts": 18,
+        "contract_multiplier": 400,
+        "notional_shares_or_units": 7200,
+        "premium_per_unit": 0.58,
+        "currency": "HKD",
+        "gross_premium_local": 4176.0,
+        "brokerage_local": 720.0,
+        "sfc_transaction_levy_local": 9.72,
+        "exchange_trading_fee_local": 54.0,
+        "clearing_fee_local": 54.0,
+        "total_charges_local": 837.72,
+        "net_amount_local": -5013.72,
+        "exchange_rate": 7.8495,
+        "net_amount_usd": -638.73,
+        "realised_pl_local": 4516.56,
+        "realised_pl_usd": 575.81,
+        "strategy": "COVERED_CALL",
+        "coverage_status": "CLOSED",
+        "collateral_local": 0.0,
+        "position_after_trade": "FLAT",
+        "exchange": "HKEX",
+        "order_channel": "RM_ADVISED",
+        "advice_basis": "ADVISORY",
+        "settlement_status": "SETTLED",
+        "booking_status": "BOOKED",
+        "rm_rationale": "Closed short call early at 59% premium decay to release the cover."
+      },
+      {
+        "transaction_id": "OPT-2026-0004",
+        "trade_date": "02/09/2026",
+        "settlement_date": "03/09/2026",
+        "transaction_type": "SELL_TO_OPEN",
+        "asset_class": "OPTION",
+        "instrument_name": "PING AN INSURANCE OCT-2026 HKD 85.00 PUT",
+        "option_type": "PUT",
+        "underlying_instrument_name": "PING AN INSURANCE (GP) CO OF CHINA",
+        "underlying_isin": "CNE1000003X6",
+        "strike_price": 85.0,
+        "expiry_date": "29/10/2026",
+        "exercise_style": "AMERICAN",
+        "settlement_method": "PHYSICAL",
+        "contracts": 4,
+        "contract_multiplier": 500,
+        "notional_shares_or_units": 2000,
+        "premium_per_unit": 2.65,
+        "currency": "HKD",
+        "gross_premium_local": 5300.0,
+        "brokerage_local": 160.0,
+        "sfc_transaction_levy_local": 2.16,
+        "exchange_trading_fee_local": 12.0,
+        "clearing_fee_local": 12.0,
+        "total_charges_local": 186.16,
+        "net_amount_local": 5113.84,
+        "exchange_rate": 7.8472,
+        "net_amount_usd": 651.68,
+        "realised_pl_local": null,
+        "realised_pl_usd": null,
+        "strategy": "CASH_SECURED_PUT",
+        "coverage_status": "CASH_SECURED",
+        "collateral_local": 170000.0,
+        "position_after_trade": "FLAT",
+        "exchange": "HKEX",
+        "order_channel": "RM_ADVISED",
+        "advice_basis": "ADVISORY",
+        "settlement_status": "SETTLED",
+        "booking_status": "BOOKED",
+        "rm_rationale": "Premium income with willingness to add Ping An at HKD 85.00. HKD 170,000 cash collateral blocked."
+      },
+      {
+        "transaction_id": "OPT-2026-0005",
+        "trade_date": "19/09/2026",
+        "settlement_date": "22/09/2026",
+        "transaction_type": "BUY_TO_CLOSE",
+        "asset_class": "OPTION",
+        "instrument_name": "PING AN INSURANCE OCT-2026 HKD 85.00 PUT",
+        "option_type": "PUT",
+        "underlying_instrument_name": "PING AN INSURANCE (GP) CO OF CHINA",
+        "underlying_isin": "CNE1000003X6",
+        "strike_price": 85.0,
+        "expiry_date": "29/10/2026",
+        "exercise_style": "AMERICAN",
+        "settlement_method": "PHYSICAL",
+        "contracts": 4,
+        "contract_multiplier": 500,
+        "notional_shares_or_units": 2000,
+        "premium_per_unit": 0.95,
+        "currency": "HKD",
+        "gross_premium_local": 1900.0,
+        "brokerage_local": 160.0,
+        "sfc_transaction_levy_local": 2.16,
+        "exchange_trading_fee_local": 12.0,
+        "clearing_fee_local": 12.0,
+        "total_charges_local": 186.16,
+        "net_amount_local": -2086.16,
+        "exchange_rate": 7.8501,
+        "net_amount_usd": -265.75,
+        "realised_pl_local": 3027.68,
+        "realised_pl_usd": 385.93,
+        "strategy": "CASH_SECURED_PUT",
+        "coverage_status": "CLOSED",
+        "collateral_local": 0.0,
+        "position_after_trade": "FLAT",
+        "exchange": "HKEX",
+        "order_channel": "RM_ADVISED",
+        "advice_basis": "ADVISORY",
+        "settlement_status": "SETTLED",
+        "booking_status": "BOOKED",
+        "rm_rationale": "Closed short put after underlying rallied; collateral released."
+      },
+      {
+        "transaction_id": "OPT-2026-0006",
+        "trade_date": "04/09/2026",
+        "settlement_date": "07/09/2026",
+        "transaction_type": "BUY_TO_OPEN",
+        "asset_class": "OPTION",
+        "instrument_name": "SGX SiMSCI SEP-2026 420 PUT",
+        "option_type": "PUT",
+        "underlying_instrument_name": "SGX MSCI SINGAPORE FREE INDEX",
+        "underlying_isin": null,
+        "strike_price": 420.0,
+        "expiry_date": "30/09/2026",
+        "exercise_style": "EUROPEAN",
+        "settlement_method": "CASH",
+        "contracts": 1,
+        "contract_multiplier": 100,
+        "notional_shares_or_units": 100,
+        "premium_per_unit": 6.5,
+        "currency": "SGD",
+        "gross_premium_local": 650.0,
+        "brokerage_local": 8.0,
+        "clearing_fee_local": 0.65,
+        "gst_local": 0.78,
+        "total_charges_local": 9.43,
+        "net_amount_local": -659.43,
+        "exchange_rate": 1.3359,
+        "net_amount_usd": -493.62,
+        "realised_pl_local": null,
+        "realised_pl_usd": null,
+        "strategy": "PROTECTIVE_INDEX_PUT",
+        "coverage_status": "NOT_APPLICABLE",
+        "collateral_local": 0.0,
+        "position_after_trade": "FLAT",
+        "exchange": "SGX-DT",
+        "order_channel": "RM_ADVISED",
+        "advice_basis": "ADVISORY",
+        "settlement_status": "SETTLED",
+        "booking_status": "BOOKED",
+        "rm_rationale": "Downside hedge over SGD 42,900 notional against SG equity and ETF exposure. European style, cash settled."
+      },
+      {
+        "transaction_id": "OPT-2026-0007",
+        "trade_date": "17/09/2026",
+        "settlement_date": "18/09/2026",
+        "transaction_type": "SELL_TO_CLOSE",
+        "asset_class": "OPTION",
+        "instrument_name": "SGX SiMSCI SEP-2026 420 PUT",
+        "option_type": "PUT",
+        "underlying_instrument_name": "SGX MSCI SINGAPORE FREE INDEX",
+        "underlying_isin": null,
+        "strike_price": 420.0,
+        "expiry_date": "30/09/2026",
+        "exercise_style": "EUROPEAN",
+        "settlement_method": "CASH",
+        "contracts": 1,
+        "contract_multiplier": 100,
+        "notional_shares_or_units": 100,
+        "premium_per_unit": 3.2,
+        "currency": "SGD",
+        "gross_premium_local": 320.0,
+        "brokerage_local": 8.0,
+        "clearing_fee_local": 0.65,
+        "gst_local": 0.78,
+        "total_charges_local": 9.43,
+        "net_amount_local": 310.57,
+        "exchange_rate": 1.335,
+        "net_amount_usd": 232.64,
+        "realised_pl_local": -348.88,
+        "realised_pl_usd": -261.0,
+        "strategy": "PROTECTIVE_INDEX_PUT",
+        "coverage_status": "CLOSED",
+        "collateral_local": 0.0,
+        "position_after_trade": "FLAT",
+        "exchange": "SGX-DT",
+        "order_channel": "RM_ADVISED",
+        "advice_basis": "ADVISORY",
+        "settlement_status": "SETTLED",
+        "booking_status": "BOOKED",
+        "rm_rationale": "Unwound hedge as index stabilised; net cost of protection SGD 348.88."
+      }
+    ],
+    "income_events": [
+      {
+        "transaction_id": "INC-2026-0001",
+        "payment_date": "24/08/2026",
+        "ex_date": "10/08/2026",
+        "record_date": "11/08/2026",
+        "transaction_type": "BOND_COUPON",
+        "instrument_name": "OLAM INTL LTD 4% 240226-MTN",
+        "isin": "SGXF63577419",
+        "currency": "SGD",
+        "quantity_at_record_date": 200000.0,
+        "rate_per_unit": 2.0,
+        "frequency": "SEMI_ANNUAL",
+        "gross_amount_local": 4000.0,
+        "withholding_tax_local": 0.0,
+        "withholding_tax_rate_pct": 0.0,
+        "net_amount_local": 4000.0,
+        "exchange_rate": 1.338,
+        "net_amount_usd": 2989.54,
+        "reconciles_to_holding_isin": "SGXF63577419",
+        "tax_treatment": "SG_QUALIFYING_DEBT_SECURITY_EXEMPT",
+        "booking_status": "BOOKED",
+        "notes": "Semi-annual 4.00% coupon on SGD 200,000 nominal held at record date. Additional SGD 50,000 purchased 27/08/2026 settles after record date.",
+        "gross_amount_usd": 2989.54,
+        "withholding_tax_usd": 0.0
+      },
+      {
+        "transaction_id": "INC-2026-0002",
+        "payment_date": "28/08/2026",
+        "ex_date": "13/08/2026",
+        "record_date": "14/08/2026",
+        "transaction_type": "CASH_DIVIDEND",
+        "instrument_name": "OVERSEA-CHINESE BANKING CORP LTD",
+        "isin": "SG1S04926220",
+        "currency": "SGD",
+        "quantity_at_record_date": 600.0,
+        "rate_per_unit": 0.44,
+        "frequency": "SEMI_ANNUAL",
+        "gross_amount_local": 264.0,
+        "withholding_tax_local": 0.0,
+        "withholding_tax_rate_pct": 0.0,
+        "net_amount_local": 264.0,
+        "exchange_rate": 1.3372,
+        "net_amount_usd": 197.43,
+        "reconciles_to_holding_isin": "SG1S04926220",
+        "tax_treatment": "SG_ONE_TIER_EXEMPT",
+        "booking_status": "BOOKED",
+        "notes": "Interim dividend. 400 shares purchased 28/08/2026 settle after record date.",
+        "gross_amount_usd": 197.43,
+        "withholding_tax_usd": 0.0
+      },
+      {
+        "transaction_id": "INC-2026-0003",
+        "payment_date": "05/09/2026",
+        "ex_date": "01/09/2026",
+        "record_date": "02/09/2026",
+        "transaction_type": "FUND_DISTRIBUTION",
+        "instrument_name": "BLACKROCK GF-CHINA BD-A6-H-DIS-SGD",
+        "isin": "LU1847653497",
+        "currency": "SGD",
+        "quantity_at_record_date": 20000.0,
+        "rate_per_unit": 0.0385,
+        "frequency": "MONTHLY",
+        "gross_amount_local": 770.0,
+        "withholding_tax_local": 0.0,
+        "withholding_tax_rate_pct": 0.0,
+        "net_amount_local": 770.0,
+        "exchange_rate": 1.3364,
+        "net_amount_usd": 576.17,
+        "reconciles_to_holding_isin": "LU1847653497",
+        "tax_treatment": "LUX_SICAV_NO_WHT",
+        "booking_status": "BOOKED",
+        "notes": "Monthly distribution on A6 hedged distributing share class.",
+        "gross_amount_usd": 576.17,
+        "withholding_tax_usd": 0.0
+      },
+      {
+        "transaction_id": "INC-2026-0004",
+        "payment_date": "09/09/2026",
+        "ex_date": "27/08/2026",
+        "record_date": "28/08/2026",
+        "transaction_type": "ETF_DISTRIBUTION",
+        "instrument_name": "SPDR STRAITS TIMES INDEX ETF",
+        "isin": "SG1W45939194",
+        "currency": "SGD",
+        "quantity_at_record_date": 8500.0,
+        "rate_per_unit": 0.075,
+        "frequency": "SEMI_ANNUAL",
+        "gross_amount_local": 637.5,
+        "withholding_tax_local": 0.0,
+        "withholding_tax_rate_pct": 0.0,
+        "net_amount_local": 637.5,
+        "exchange_rate": 1.3357,
+        "net_amount_usd": 477.28,
+        "reconciles_to_holding_isin": "SG1W45939194",
+        "tax_treatment": "SG_ONE_TIER_EXEMPT",
+        "booking_status": "BOOKED",
+        "notes": "Semi-annual distribution. 1,500 units sold 10/09/2026, after record date.",
+        "gross_amount_usd": 477.28,
+        "withholding_tax_usd": 0.0
+      },
+      {
+        "transaction_id": "INC-2026-0005",
+        "payment_date": "10/09/2026",
+        "ex_date": "27/08/2026",
+        "record_date": "28/08/2026",
+        "transaction_type": "CASH_DIVIDEND",
+        "instrument_name": "MERLIN PROPERTIES SOCIMI SA",
+        "isin": "ES0105025003",
+        "currency": "EUR",
+        "quantity_at_record_date": 1200.0,
+        "rate_per_unit": 0.2,
+        "frequency": "SEMI_ANNUAL",
+        "gross_amount_local": 240.0,
+        "withholding_tax_local": 45.6,
+        "withholding_tax_rate_pct": 19.0,
+        "net_amount_local": 194.4,
+        "exchange_rate": 1.1973,
+        "net_amount_usd": 232.76,
+        "reconciles_to_holding_isin": "ES0105025003",
+        "tax_treatment": "ES_WHT_19PCT_TREATY_RECLAIM_AVAILABLE",
+        "booking_status": "BOOKED",
+        "notes": "Interim dividend. Spanish withholding tax applied at 19%; treaty reclaim to 15% may be available.",
+        "gross_amount_usd": 287.35,
+        "withholding_tax_usd": 54.6
+      },
+      {
+        "transaction_id": "INC-2026-0006",
+        "payment_date": "11/09/2026",
+        "ex_date": "20/08/2026",
+        "record_date": "21/08/2026",
+        "transaction_type": "CASH_DIVIDEND",
+        "instrument_name": "HSBC HOLDINGS PLC (HK REG)",
+        "isin": "GB0005405286",
+        "currency": "HKD",
+        "quantity_at_record_date": 9000.0,
+        "rate_per_unit": 0.785,
+        "frequency": "QUARTERLY",
+        "gross_amount_local": 7065.0,
+        "withholding_tax_local": 0.0,
+        "withholding_tax_rate_pct": 0.0,
+        "net_amount_local": 7065.0,
+        "exchange_rate": 7.849,
+        "net_amount_usd": 900.11,
+        "reconciles_to_holding_isin": "GB0005405286",
+        "tax_treatment": "UK_NO_WHT_ON_DIVIDENDS",
+        "booking_status": "BOOKED",
+        "notes": "Second interim dividend USD 0.10 per share, elected in HKD. 1,714 shares sold 02/09/2026, after record date.",
+        "gross_amount_usd": 900.11,
+        "withholding_tax_usd": 0.0
+      },
+      {
+        "transaction_id": "INC-2026-0007",
+        "payment_date": "15/09/2026",
+        "ex_date": "01/09/2026",
+        "record_date": "02/09/2026",
+        "transaction_type": "TRUST_DISTRIBUTION",
+        "instrument_name": "NETLINK NBN TRUST",
+        "isin": "SG1DH9000006",
+        "currency": "SGD",
+        "quantity_at_record_date": 3000.0,
+        "rate_per_unit": 0.0265,
+        "frequency": "SEMI_ANNUAL",
+        "gross_amount_local": 79.5,
+        "withholding_tax_local": 0.0,
+        "withholding_tax_rate_pct": 0.0,
+        "net_amount_local": 79.5,
+        "exchange_rate": 1.3355,
+        "net_amount_usd": 59.53,
+        "reconciles_to_holding_isin": "SG1DH9000006",
+        "tax_treatment": "SG_ONE_TIER_EXEMPT",
+        "booking_status": "BOOKED",
+        "notes": "Semi-annual distribution. 2,000 units purchased 04/09/2026 settle after record date.",
+        "gross_amount_usd": 59.53,
+        "withholding_tax_usd": 0.0
+      },
+      {
+        "transaction_id": "INC-2026-0008",
+        "payment_date": "16/09/2026",
+        "ex_date": "02/09/2026",
+        "record_date": "03/09/2026",
+        "transaction_type": "CASH_DIVIDEND",
+        "instrument_name": "CK INFRASTRUCTURE HOLDINGS LTD",
+        "isin": "BMG2178K1009",
+        "currency": "HKD",
+        "quantity_at_record_date": 1000.0,
+        "rate_per_unit": 0.71,
+        "frequency": "SEMI_ANNUAL",
+        "gross_amount_local": 710.0,
+        "withholding_tax_local": 0.0,
+        "withholding_tax_rate_pct": 0.0,
+        "net_amount_local": 710.0,
+        "exchange_rate": 7.8493,
+        "net_amount_usd": 90.45,
+        "reconciles_to_holding_isin": "BMG2178K1009",
+        "tax_treatment": "HK_NO_WHT_ON_DIVIDENDS",
+        "booking_status": "BOOKED",
+        "notes": "Interim dividend.",
+        "gross_amount_usd": 90.45,
+        "withholding_tax_usd": 0.0
+      },
+      {
+        "transaction_id": "INC-2026-0009",
+        "payment_date": "17/09/2026",
+        "ex_date": "03/09/2026",
+        "record_date": "04/09/2026",
+        "transaction_type": "CASH_DIVIDEND",
+        "instrument_name": "AVIVA PLC",
+        "isin": "GB0002162385",
+        "currency": "GBP",
+        "quantity_at_record_date": 2631.0,
+        "rate_per_unit": 0.117,
+        "frequency": "SEMI_ANNUAL",
+        "gross_amount_local": 307.83,
+        "withholding_tax_local": 0.0,
+        "withholding_tax_rate_pct": 0.0,
+        "net_amount_local": 307.83,
+        "exchange_rate": 1.3794,
+        "net_amount_usd": 424.62,
+        "reconciles_to_holding_isin": "GB0002162385",
+        "tax_treatment": "UK_NO_WHT_ON_DIVIDENDS",
+        "booking_status": "BOOKED",
+        "notes": "Interim dividend.",
+        "gross_amount_usd": 424.62,
+        "withholding_tax_usd": 0.0
+      },
+      {
+        "transaction_id": "INC-2026-0010",
+        "payment_date": "18/09/2026",
+        "ex_date": "04/09/2026",
+        "record_date": "07/09/2026",
+        "transaction_type": "CASH_DIVIDEND",
+        "instrument_name": "PING AN INSURANCE (GP) CO OF CHINA",
+        "isin": "CNE1000003X6",
+        "currency": "HKD",
+        "quantity_at_record_date": 2000.0,
+        "rate_per_unit": 0.95,
+        "frequency": "SEMI_ANNUAL",
+        "gross_amount_local": 1900.0,
+        "withholding_tax_local": 0.0,
+        "withholding_tax_rate_pct": 0.0,
+        "net_amount_local": 1900.0,
+        "exchange_rate": 7.8498,
+        "net_amount_usd": 242.04,
+        "reconciles_to_holding_isin": "CNE1000003X6",
+        "tax_treatment": "HK_NO_WHT_ON_DIVIDENDS",
+        "booking_status": "BOOKED",
+        "notes": "Interim dividend.",
+        "gross_amount_usd": 242.04,
+        "withholding_tax_usd": 0.0
+      },
+      {
+        "transaction_id": "INC-2026-0011",
+        "payment_date": "19/09/2026",
+        "ex_date": "05/09/2026",
+        "record_date": "08/09/2026",
+        "transaction_type": "CASH_DIVIDEND",
+        "instrument_name": "BP PLC",
+        "isin": "GB0007980591",
+        "currency": "GBP",
+        "quantity_at_record_date": 8843.0,
+        "rate_per_unit": 0.0645,
+        "frequency": "QUARTERLY",
+        "gross_amount_local": 570.37,
+        "withholding_tax_local": 0.0,
+        "withholding_tax_rate_pct": 0.0,
+        "net_amount_local": 570.37,
+        "exchange_rate": 1.3786,
+        "net_amount_usd": 786.31,
+        "reconciles_to_holding_isin": "GB0007980591",
+        "tax_treatment": "UK_NO_WHT_ON_DIVIDENDS",
+        "booking_status": "BOOKED",
+        "notes": "Quarterly dividend.",
+        "gross_amount_usd": 786.31,
+        "withholding_tax_usd": 0.0
+      }
+    ],
+    "corporate_actions": [
+      {
+        "transaction_id": "CAE-2026-0001",
+        "announcement_date": "26/08/2026",
+        "effective_date": "03/09/2026",
+        "event_type": "DELISTING_AND_LIQUIDATION_UPDATE",
+        "instrument_name": "EAGLE HOSPITALITY TRUST",
+        "isin": "SGXC28500103",
+        "exchange": "SGX-ST",
+        "currency": "USD",
+        "quantity_before": 30000.0,
+        "quantity_after": 30000.0,
+        "ratio": null,
+        "cash_proceeds_local": 0.0,
+        "cash_proceeds_usd": 0.0,
+        "client_election": "NOT_APPLICABLE",
+        "election_deadline": null,
+        "status": "EFFECTED",
+        "valuation_impact": "NIL_VALUE_RETAINED",
+        "reconciles_to_holding_isin": "SGXC28500103",
+        "notes": "Trust remains suspended from trading on SGX-ST and in liquidation. No distribution declared in the period. Units continue to be carried at nil value pending final liquidator distribution."
+      },
+      {
+        "transaction_id": "CAE-2026-0002",
+        "announcement_date": "14/08/2026",
+        "effective_date": "11/09/2026",
+        "event_type": "SCRIP_DIVIDEND_ELECTION",
+        "instrument_name": "HSBC HOLDINGS PLC (HK REG)",
+        "isin": "GB0005405286",
+        "exchange": "HKEX",
+        "currency": "HKD",
+        "quantity_before": 9000.0,
+        "quantity_after": 9000.0,
+        "ratio": null,
+        "cash_proceeds_local": 7065.0,
+        "cash_proceeds_usd": 900.11,
+        "client_election": "CASH",
+        "election_deadline": "28/08/2026",
+        "status": "EFFECTED",
+        "valuation_impact": "NO_SHARE_QUANTITY_CHANGE",
+        "reconciles_to_holding_isin": "GB0005405286",
+        "notes": "Client elected cash in lieu of scrip for the second interim dividend. Linked to income event INC-2026-0006. Share count unchanged."
+      },
+      {
+        "transaction_id": "CAE-2026-0003",
+        "announcement_date": "08/09/2026",
+        "effective_date": "15/09/2026",
+        "event_type": "DISTRIBUTION_REINVESTMENT_PLAN_ELECTION",
+        "instrument_name": "NETLINK NBN TRUST",
+        "isin": "SG1DH9000006",
+        "exchange": "SGX-ST",
+        "currency": "SGD",
+        "quantity_before": 3000.0,
+        "quantity_after": 3000.0,
+        "ratio": null,
+        "cash_proceeds_local": 79.5,
+        "cash_proceeds_usd": 59.53,
+        "client_election": "CASH",
+        "election_deadline": "05/09/2026",
+        "status": "EFFECTED",
+        "valuation_impact": "NO_UNIT_QUANTITY_CHANGE",
+        "reconciles_to_holding_isin": "SG1DH9000006",
+        "notes": "Distribution Reinvestment Plan offered. Client elected cash. Linked to income event INC-2026-0007."
+      },
+      {
+        "transaction_id": "CAE-2026-0004",
+        "announcement_date": "18/09/2026",
+        "effective_date": "12/10/2026",
+        "event_type": "SHARE_LINE_RECLASSIFICATION",
+        "instrument_name": "ROYAL DUTCH SHELL PLC-B SHS (EUR)",
+        "isin": "GB00B03MM408",
+        "exchange": "EURONEXT-AMS",
+        "currency": "EUR",
+        "quantity_before": 2100.0,
+        "quantity_after": 2100.0,
+        "ratio": "1:1",
+        "cash_proceeds_local": 0.0,
+        "cash_proceeds_usd": 0.0,
+        "client_election": "NO_ACTION_REQUIRED",
+        "election_deadline": null,
+        "status": "PENDING",
+        "valuation_impact": "NO_IMPACT_IN_CURRENT_PERIOD",
+        "reconciles_to_holding_isin": "GB00B03MM408",
+        "notes": "Announced reclassification of the B share line into a single ordinary share line on a 1:1 basis. Effective date falls after the 22/09/2026 valuation date, therefore holdings are unchanged in this period. No client action required."
+      }
+    ],
+    "cash_movements": [
+      {
+        "transaction_id": "CSH-2026-0001",
+        "value_date": "26/08/2026",
+        "transaction_type": "INCOMING_FUND_TRANSFER",
+        "description": "Inbound client wire transfer for investment",
+        "currency": "USD",
+        "amount_local": 4000000.0,
+        "exchange_rate": 1.0,
+        "amount_usd": 4000000.0,
+        "cash_account": "001-000-USD-02",
+        "counterparty_reference": "TT/INB/26082026/4412",
+        "source_of_funds_check": "COMPLETED",
+        "aml_screening_status": "CLEARED",
+        "booking_status": "BOOKED",
+        "notes": "Large inbound transfer received 26/08/2026 and held in USD current account pending investment. This is the principal driver of the elevated cash weighting at the valuation date.",
+        "is_external_flow": true
+      },
+      {
+        "transaction_id": "CSH-2026-0002",
+        "value_date": "01/09/2026",
+        "transaction_type": "ADVISORY_FEE_DEBIT",
+        "description": "Quarterly advisory fee",
+        "currency": "USD",
+        "amount_local": -3890.95,
+        "exchange_rate": 1.0,
+        "amount_usd": -3890.95,
+        "cash_account": "001-000-USD-01",
+        "counterparty_reference": "FEE/ADV/Q3-2026",
+        "fee_basis": "0.25% p.a. on average invested assets, charged quarterly",
+        "booking_status": "BOOKED",
+        "notes": "Advisory fee for the quarter, excludes cash pending investment.",
+        "is_external_flow": false
+      },
+      {
+        "transaction_id": "CSH-2026-0003",
+        "value_date": "01/09/2026",
+        "transaction_type": "CUSTODY_FEE_DEBIT",
+        "description": "Quarterly custody and safekeeping fee",
+        "currency": "USD",
+        "amount_local": -1246.1,
+        "exchange_rate": 1.0,
+        "amount_usd": -1246.1,
+        "cash_account": "001-000-USD-01",
+        "counterparty_reference": "FEE/CUS/Q3-2026",
+        "fee_basis": "0.08% p.a. on custodied market value, charged quarterly",
+        "booking_status": "BOOKED",
+        "notes": null,
+        "is_external_flow": false
+      },
+      {
+        "transaction_id": "CSH-2026-0004",
+        "value_date": "08/09/2026",
+        "transaction_type": "FIXED_TERM_DEPOSIT_ROLLOVER",
+        "description": "Rollover of 3.1000% fixed term deposit facility -A",
+        "currency": "SGD",
+        "amount_local": -207.3,
+        "exchange_rate": 1.336,
+        "amount_usd": -155.16,
+        "cash_account": "001-000-SGD-01",
+        "counterparty_reference": "C2422153",
+        "interest_rate_pct": 3.1,
+        "new_maturity_date": "08/12/2026",
+        "booking_status": "BOOKED",
+        "notes": "Interest settled on rollover of facility reference C2422153. Facility carried as a negative balance in holdings.",
+        "is_external_flow": false
+      },
+      {
+        "transaction_id": "CSH-2026-0005",
+        "value_date": "15/09/2026",
+        "transaction_type": "FX_CONVERSION",
+        "description": "Sale of SGD against USD",
+        "currency": "SGD",
+        "amount_local": -120000.0,
+        "exchange_rate": 1.3352,
+        "amount_usd": -89874.18,
+        "cash_account": "001-000-SGD-01",
+        "counterparty_reference": "FX/SPOT/15092026/0881",
+        "fx_pair": "USDSGD",
+        "contra_currency": "USD",
+        "contra_amount_local": 89874.18,
+        "fx_spread_bps": 12,
+        "booking_status": "BOOKED",
+        "notes": "Spot conversion of surplus SGD sale proceeds into the portfolio reference currency.",
+        "is_external_flow": false
+      },
+      {
+        "transaction_id": "CSH-2026-0006",
+        "value_date": "21/09/2026",
+        "transaction_type": "CREDIT_LINE_COMMITMENT_FEE",
+        "description": "Commitment fee on undrawn global credit line",
+        "currency": "USD",
+        "amount_local": -937.5,
+        "exchange_rate": 1.0,
+        "amount_usd": -937.5,
+        "cash_account": "001-000-USD-01",
+        "counterparty_reference": "540-111-840",
+        "facility_limit_usd": -1500000.0,
+        "drawn_amount_usd": 0.0,
+        "fee_basis": "0.25% p.a. on undrawn commitment, charged quarterly",
+        "booking_status": "BOOKED",
+        "notes": "Facility remains undrawn and is carried off balance sheet as a pro memoria item.",
+        "is_external_flow": false
+      },
+      {
+        "transaction_id": "CSH-2026-0007",
+        "value_date": "08/09/2026",
+        "transaction_type": "PE_CAPITAL_CALL",
+        "description": "Secondary purchase consideration - Meridian Capital Partners IV LP",
+        "currency": "USD",
+        "amount_local": -350000.0,
+        "exchange_rate": 1.0,
+        "amount_usd": -350000.0,
+        "cash_account": "001-000-USD-02",
+        "counterparty_reference": "LP-MCP-IV-0442/SEC-TRF",
+        "related_isin": "LU2489117735",
+        "reconciles_to_holding_isin": "LU2489117735",
+        "call_number": 1,
+        "cumulative_called_usd": 350000.0,
+        "remaining_unfunded_usd": 150000.0,
+        "booking_status": "BOOKED",
+        "is_external_flow": false,
+        "external_flow_note": "Internal redeployment of existing portfolio cash. NOT an external client flow. Must not enter the `external_flows` line of any performance bridge.",
+        "classification_note": "Recorded as a cash movement rather than a securities trade. A capital call is a funding event against a standing commitment, not a market purchase, and is deliberately excluded from gross_purchases_usd and the buy count.",
+        "notes": "Secondary market acquisition of a 2021-vintage LP interest at a 17.65% discount to the 30/06/2026 reported NAV."
+      },
+      {
+        "transaction_id": "CSH-2026-0008",
+        "value_date": "15/09/2026",
+        "transaction_type": "PE_CAPITAL_CALL",
+        "description": "First drawdown - Asia Growth Ventures III LP",
+        "currency": "USD",
+        "amount_local": -160000.0,
+        "exchange_rate": 1.0,
+        "amount_usd": -160000.0,
+        "cash_account": "001-000-USD-02",
+        "counterparty_reference": "LP-AGV-III-0117/CALL-01",
+        "related_isin": "KYG0445T1085",
+        "reconciles_to_holding_isin": "KYG0445T1085",
+        "call_number": 1,
+        "cumulative_called_usd": 160000.0,
+        "remaining_unfunded_usd": 240000.0,
+        "booking_status": "BOOKED",
+        "is_external_flow": false,
+        "external_flow_note": "Internal redeployment of existing portfolio cash. NOT an external client flow. Must not enter the `external_flows` line of any performance bridge.",
+        "classification_note": "Recorded as a cash movement rather than a securities trade. A capital call is a funding event against a standing commitment, not a market purchase, and is deliberately excluded from gross_purchases_usd and the buy count.",
+        "notes": "First capital call representing 40% of the USD 400,000 commitment. Remaining USD 240,000 callable through 2029."
+      }
+    ]
+  },
+  "performance": {
+    "calculation_basis": "TIME_WEIGHTED_RETURN_MONTHLY_CHAIN_LINKED",
+    "calculation_engine": "PMS_PERFORMANCE_MODULE",
+    "computed_by": "SOURCE_SYSTEM_NOT_AGENT",
+    "return_basis": "NET_OF_FEES",
+    "gross_returns_available": false,
+    "annualisation_policy": "PERIODS_UNDER_12_MONTHS_NOT_ANNUALISED",
+    "flow_treatment": "EXTERNAL_FLOWS_NEUTRALISED_MID_PERIOD_WEIGHTING",
+    "reference_currency": "USD",
+    "valuation_date": "22/09/2026",
+    "portfolio_id": "GO00001",
+    "earliest_valuation_date": "31/12/2025",
+    "presentation_restriction": "RM_INTERNAL_ONLY",
+    "presentation_restriction_note": "Returns are net of fees and computed on a chain-linked TWR basis. Not formatted for client-facing use. Any external presentation must satisfy SEC Marketing Rule requirements (US) or MiFID II past-performance disclosure requirements (UK/EU) before release.",
+    "methodology_note": "TWR neutralises external client cash flows and measures portfolio management outcome. MWR (IRR) reflects the client's actual money-weighted experience including flow timing. Where the two diverge materially, flow timing is the cause, not security selection.",
+    "external_flows": [
+      {
+        "flow_date": "12/03/2026",
+        "amount_usd": 250000.0,
+        "flow_type": "INCOMING_FUND_TRANSFER",
+        "description": "Client top-up transfer",
+        "linked_transaction_id": null
+      },
+      {
+        "flow_date": "18/05/2026",
+        "amount_usd": -180000.0,
+        "flow_type": "OUTGOING_FUND_TRANSFER",
+        "description": "Client withdrawal for external commitment",
+        "linked_transaction_id": null
+      },
+      {
+        "flow_date": "26/08/2026",
+        "amount_usd": 4000000.0,
+        "flow_type": "INCOMING_FUND_TRANSFER",
+        "description": "Inbound client wire, ref TT/INB/26082026/4412 (CSH-2026-0001)",
+        "linked_transaction_id": "CSH-2026-0001"
+      }
+    ],
+    "periods": {
+      "MTD": {
+        "period_label": "Month to date",
+        "from_date": "31/08/2026",
+        "to_date": "22/09/2026",
+        "calendar_days": 22,
+        "beginning_market_value_usd": 6206904.36,
+        "ending_market_value_usd": 6289128.22,
+        "net_external_flows_usd": 0.0,
+        "net_gain_loss_usd": 82223.86,
+        "twr_pct": 0.31,
+        "mwr_irr_pct": 1.32,
+        "mwr_irr_annualised_pct": 5.1,
+        "simple_value_change_pct_unadjusted": 1.32,
+        "flow_distortion_warning": null,
+        "attribution_bridge_usd": {
+          "beginning_market_value": 6206904.36,
+          "external_flows": 0.0,
+          "income": 6810.9,
+          "realised_pl": 1018.86,
+          "unrealised_pl": 14742.48,
+          "fx_translation_effect": -2410.88,
+          "fees_and_charges": -937.5,
+          "ending_market_value": 6289128.22,
+          "pe_nav_movement": 63000.0
+        },
+        "bridge_foots": true,
+        "transaction_charges_memo_usd": -603.8,
+        "transaction_charges_note": "Already embedded within realised_pl for disposals and capitalised into cost basis for purchases. Shown as a memo item only and deliberately excluded from the bridge to avoid double counting.",
+        "data_completeness": "COMPLETE",
+        "contribution_by_asset_class_pct": {
+          "EQUITY": 0.18,
+          "FUND_ETF": 0.09,
+          "BOND": 0.03,
+          "BOND_FUND": -0.01,
+          "COMMODITY_ETF": 0.01,
+          "CASH_AND_CURRENT_ACCOUNTS": 0.04,
+          "FIXED_TERM_DEPOSIT": -0.01,
+          "FX_TRANSLATION": -0.02,
+          "FEES_AND_CHARGES": -0.01,
+          "TOTAL": 0.31,
+          "STRUCTURED_PRODUCT": 0.01,
+          "PRIVATE_EQUITY_FUND": 0.0
+        },
+        "benchmark": {
+          "definition": {
+            "name": "Client Composite - Very Dynamic (USD)",
+            "components": [
+              "60% MSCI AC World Net Total Return USD",
+              "25% MSCI AC Asia ex-Japan Net Total Return USD",
+              "15% Bloomberg Global Aggregate USD Hedged"
+            ],
+            "rebalancing_frequency": "QUARTERLY",
+            "source": "BENCHMARK_DATA_VENDOR"
+          },
+          "benchmark_return_pct": 0.41,
+          "relative_return_pct": -0.1,
+          "comparison_basis": "TWR net of fees (excluding private equity) versus benchmark total return. The benchmark contains no private-market component, so excluding PE from the portfolio side keeps the comparison like-for-like."
+        },
+        "twr_pct_excluding_pe": 0.31,
+        "twr_basis_note": "TWR excludes private equity NAV movement. PE is reported separately on a TVPI / DPI / IRR basis in `private_equity_performance`. Structured products ARE included in TWR: they are marked weekly by the issuer and carry no material valuation lag.",
+        "contribution_notes": {
+          "STRUCTURED_PRODUCT": "Included in TWR at issuer mark.",
+          "PRIVATE_EQUITY_FUND": "Contribution shown as 0.00 by design. PE is excluded from TWR; see `private_equity_performance` for TVPI / DPI / RVPI."
+        }
+      },
+      "SINCE_LAST_VISIT": {
+        "period_label": "Since last client visit",
+        "from_date": "23/08/2026",
+        "to_date": "22/09/2026",
+        "calendar_days": 30,
+        "beginning_market_value_usd": 2216192.95,
+        "ending_market_value_usd": 6289128.22,
+        "net_external_flows_usd": 4000000.0,
+        "net_gain_loss_usd": 72935.27,
+        "twr_pct": 0.15,
+        "mwr_irr_pct": 1.73,
+        "mwr_irr_annualised_pct": 2.02,
+        "simple_value_change_pct_unadjusted": 183.78,
+        "flow_distortion_warning": "Simple value change is NOT a return. It is shown only to make the effect of external flows explicit and must never be presented to a client as performance.",
+        "attribution_bridge_usd": {
+          "beginning_market_value": 2216192.95,
+          "external_flows": 4000000.0,
+          "income": 6976.24,
+          "realised_pl": 1018.86,
+          "unrealised_pl": 11015.48,
+          "fx_translation_effect": -2845.6,
+          "fees_and_charges": -6229.71,
+          "ending_market_value": 6289128.22,
+          "pe_nav_movement": 63000.0
+        },
+        "bridge_foots": true,
+        "transaction_charges_memo_usd": -603.8,
+        "transaction_charges_note": "Already embedded within realised_pl for disposals and capitalised into cost basis for purchases. Shown as a memo item only and deliberately excluded from the bridge to avoid double counting.",
+        "data_completeness": "COMPLETE",
+        "contribution_by_asset_class_pct": {
+          "EQUITY": 0.09,
+          "FUND_ETF": 0.04,
+          "BOND": 0.02,
+          "BOND_FUND": -0.01,
+          "COMMODITY_ETF": 0.01,
+          "CASH_AND_CURRENT_ACCOUNTS": 0.03,
+          "FIXED_TERM_DEPOSIT": -0.01,
+          "FX_TRANSLATION": -0.02,
+          "FEES_AND_CHARGES": -0.01,
+          "TOTAL": 0.15,
+          "STRUCTURED_PRODUCT": 0.01,
+          "PRIVATE_EQUITY_FUND": 0.0
+        },
+        "benchmark": {
+          "definition": {
+            "name": "Client Composite - Very Dynamic (USD)",
+            "components": [
+              "60% MSCI AC World Net Total Return USD",
+              "25% MSCI AC Asia ex-Japan Net Total Return USD",
+              "15% Bloomberg Global Aggregate USD Hedged"
+            ],
+            "rebalancing_frequency": "QUARTERLY",
+            "source": "BENCHMARK_DATA_VENDOR"
+          },
+          "benchmark_return_pct": 0.22,
+          "relative_return_pct": -0.07,
+          "comparison_basis": "TWR net of fees (excluding private equity) versus benchmark total return. The benchmark contains no private-market component, so excluding PE from the portfolio side keeps the comparison like-for-like."
+        },
+        "twr_pct_excluding_pe": 0.15,
+        "twr_basis_note": "TWR excludes private equity NAV movement. PE is reported separately on a TVPI / DPI / IRR basis in `private_equity_performance`. Structured products ARE included in TWR: they are marked weekly by the issuer and carry no material valuation lag.",
+        "contribution_notes": {
+          "STRUCTURED_PRODUCT": "Included in TWR at issuer mark.",
+          "PRIVATE_EQUITY_FUND": "Contribution shown as 0.00 by design. PE is excluded from TWR; see `private_equity_performance` for TVPI / DPI / RVPI."
+        }
+      },
+      "QTD": {
+        "period_label": "Quarter to date (Q3 2026)",
+        "from_date": "30/06/2026",
+        "to_date": "22/09/2026",
+        "calendar_days": 84,
+        "beginning_market_value_usd": 2199326.41,
+        "ending_market_value_usd": 6289128.22,
+        "net_external_flows_usd": 4000000.0,
+        "net_gain_loss_usd": 89801.81,
+        "twr_pct": 1.22,
+        "mwr_irr_pct": 2.14,
+        "mwr_irr_annualised_pct": 3.31,
+        "simple_value_change_pct_unadjusted": 185.96,
+        "flow_distortion_warning": "Simple value change is NOT a return. It is shown only to make the effect of external flows explicit and must never be presented to a client as performance.",
+        "attribution_bridge_usd": {
+          "beginning_market_value": 2199326.41,
+          "external_flows": 4000000.0,
+          "income": 11902.36,
+          "realised_pl": 3842.1,
+          "unrealised_pl": 21201.28,
+          "fx_translation_effect": -3914.22,
+          "fees_and_charges": -6229.71,
+          "ending_market_value": 6289128.22,
+          "pe_nav_movement": 63000.0
+        },
+        "bridge_foots": true,
+        "transaction_charges_memo_usd": -1487.55,
+        "transaction_charges_note": "Already embedded within realised_pl for disposals and capitalised into cost basis for purchases. Shown as a memo item only and deliberately excluded from the bridge to avoid double counting.",
+        "data_completeness": "COMPLETE",
+        "contribution_by_asset_class_pct": {
+          "EQUITY": 0.92,
+          "FUND_ETF": 0.48,
+          "BOND": 0.11,
+          "BOND_FUND": -0.07,
+          "COMMODITY_ETF": 0.05,
+          "CASH_AND_CURRENT_ACCOUNTS": 0.11,
+          "FIXED_TERM_DEPOSIT": -0.03,
+          "FX_TRANSLATION": -0.18,
+          "FEES_AND_CHARGES": -0.2,
+          "TOTAL": 1.22,
+          "STRUCTURED_PRODUCT": 0.01,
+          "PRIVATE_EQUITY_FUND": 0.0
+        },
+        "contribution_by_position_pct": {
+          "top_contributors": [
+            {
+              "instrument_name": "WALT DISNEY COMPANY",
+              "isin": "US2546871060",
+              "contribution_pct": 0.52
+            },
+            {
+              "instrument_name": "MITSUBISHI UFJ FINANCIAL GROUP INC",
+              "isin": "JP3902900004",
+              "contribution_pct": 0.31
+            },
+            {
+              "instrument_name": "NEUBERGER BER 5G CONNECT-A-ACC-USD",
+              "isin": "IE00BMPRXN33",
+              "contribution_pct": 0.28
+            },
+            {
+              "instrument_name": "SUMITOMO CORPORATION",
+              "isin": "JP3404600003",
+              "contribution_pct": 0.19
+            },
+            {
+              "instrument_name": "OVERSEA-CHINESE BANKING CORP LTD",
+              "isin": "SG1S04926220",
+              "contribution_pct": 0.11
+            }
+          ],
+          "top_detractors": [
+            {
+              "instrument_name": "UBS LUX EQ-ALL CHINA-P-ACC-USD",
+              "isin": "LU1807302812",
+              "contribution_pct": -0.34
+            },
+            {
+              "instrument_name": "SEMICONDUCTOR MANUFACTURING INTL",
+              "isin": "KYG8020E1199",
+              "contribution_pct": -0.21
+            },
+            {
+              "instrument_name": "BP PLC",
+              "isin": "GB0007980591",
+              "contribution_pct": -0.15
+            },
+            {
+              "instrument_name": "BANK OF CHINA LIMITED",
+              "isin": "CNE1000001Z5",
+              "contribution_pct": -0.09
+            },
+            {
+              "instrument_name": "HANG SENG CHINA ENTERPRISE IDX ETF",
+              "isin": "HK2828013055",
+              "contribution_pct": -0.06
+            }
+          ],
+          "all_other_positions": {
+            "position_count": 39,
+            "contribution_pct": 0.94
+          },
+          "total_security_contribution_pct": 1.5,
+          "note": "Security-level contributions sum to the securities component of TWR. Cash, FX translation and fees are reported separately in contribution_by_asset_class_pct.",
+          "excluded_positions": {
+            "position_count": 2,
+            "reason": "PRIVATE_EQUITY_EXCLUDED_FROM_TWR",
+            "instruments": [
+              "MERIDIAN CAPITAL PARTNERS IV LP",
+              "ASIA GROWTH VENTURES III LP"
+            ],
+            "combined_nav_movement_usd": 63000.0
+          }
+        },
+        "benchmark": {
+          "definition": {
+            "name": "Client Composite - Very Dynamic (USD)",
+            "components": [
+              "60% MSCI AC World Net Total Return USD",
+              "25% MSCI AC Asia ex-Japan Net Total Return USD",
+              "15% Bloomberg Global Aggregate USD Hedged"
+            ],
+            "rebalancing_frequency": "QUARTERLY",
+            "source": "BENCHMARK_DATA_VENDOR"
+          },
+          "benchmark_return_pct": 1.44,
+          "relative_return_pct": -0.22,
+          "comparison_basis": "TWR net of fees (excluding private equity) versus benchmark total return. The benchmark contains no private-market component, so excluding PE from the portfolio side keeps the comparison like-for-like."
+        },
+        "twr_pct_excluding_pe": 1.22,
+        "twr_basis_note": "TWR excludes private equity NAV movement. PE is reported separately on a TVPI / DPI / IRR basis in `private_equity_performance`. Structured products ARE included in TWR: they are marked weekly by the issuer and carry no material valuation lag.",
+        "contribution_notes": {
+          "STRUCTURED_PRODUCT": "Included in TWR at issuer mark.",
+          "PRIVATE_EQUITY_FUND": "Contribution shown as 0.00 by design. PE is excluded from TWR; see `private_equity_performance` for TVPI / DPI / RVPI."
+        }
+      },
+      "YTD": {
+        "period_label": "Year to date 2026",
+        "from_date": "31/12/2025",
+        "to_date": "22/09/2026",
+        "calendar_days": 265,
+        "beginning_market_value_usd": 2025714.25,
+        "ending_market_value_usd": 6289128.22,
+        "net_external_flows_usd": 4070000.0,
+        "net_gain_loss_usd": 193413.97,
+        "twr_pct": 6.21,
+        "mwr_irr_pct": 4.76,
+        "mwr_irr_annualised_pct": 7.16,
+        "simple_value_change_pct_unadjusted": 210.46,
+        "flow_distortion_warning": "Simple value change is NOT a return. It is shown only to make the effect of external flows explicit and must never be presented to a client as performance.",
+        "attribution_bridge_usd": {
+          "beginning_market_value": 2025714.25,
+          "external_flows": 4070000.0,
+          "income": 28450.18,
+          "realised_pl": 14228.55,
+          "unrealised_pl": 114844.92,
+          "fx_translation_effect": -8420.55,
+          "fees_and_charges": -18689.13,
+          "ending_market_value": 6289128.22,
+          "pe_nav_movement": 63000.0
+        },
+        "bridge_foots": true,
+        "transaction_charges_memo_usd": -4106.92,
+        "transaction_charges_note": "Already embedded within realised_pl for disposals and capitalised into cost basis for purchases. Shown as a memo item only and deliberately excluded from the bridge to avoid double counting.",
+        "data_completeness": "COMPLETE",
+        "contribution_by_asset_class_pct": {
+          "EQUITY": 4.85,
+          "FUND_ETF": 1.62,
+          "BOND": 0.41,
+          "BOND_FUND": -0.22,
+          "COMMODITY_ETF": 0.18,
+          "CASH_AND_CURRENT_ACCOUNTS": 0.34,
+          "FIXED_TERM_DEPOSIT": -0.09,
+          "FX_TRANSLATION": -0.35,
+          "FEES_AND_CHARGES": -0.56,
+          "TOTAL": 6.21,
+          "STRUCTURED_PRODUCT": 0.01,
+          "PRIVATE_EQUITY_FUND": 0.0
+        },
+        "contribution_by_position_pct": {
+          "top_contributors": [
+            {
+              "instrument_name": "WALT DISNEY COMPANY",
+              "isin": "US2546871060",
+              "contribution_pct": 2.15
+            },
+            {
+              "instrument_name": "NEUBERGER BER 5G CONNECT-A-ACC-USD",
+              "isin": "IE00BMPRXN33",
+              "contribution_pct": 1.48
+            },
+            {
+              "instrument_name": "MITSUBISHI UFJ FINANCIAL GROUP INC",
+              "isin": "JP3902900004",
+              "contribution_pct": 0.96
+            },
+            {
+              "instrument_name": "BNPP FD JP SMALL CAP-CLS-ACC-JPY",
+              "isin": "LU0069970746",
+              "contribution_pct": 0.74
+            },
+            {
+              "instrument_name": "SUMITOMO CORPORATION",
+              "isin": "JP3404600003",
+              "contribution_pct": 0.58
+            }
+          ],
+          "top_detractors": [
+            {
+              "instrument_name": "UBS LUX EQ-ALL CHINA-P-ACC-USD",
+              "isin": "LU1807302812",
+              "contribution_pct": -0.74
+            },
+            {
+              "instrument_name": "BP PLC",
+              "isin": "GB0007980591",
+              "contribution_pct": -0.52
+            },
+            {
+              "instrument_name": "UBS LUX EQ FD-CHINA OPP-P-ACC-USD",
+              "isin": "LU0067412154",
+              "contribution_pct": -0.41
+            },
+            {
+              "instrument_name": "BILIBILI INC-SPONSORED ADR",
+              "isin": "US0900401060",
+              "contribution_pct": -0.29
+            },
+            {
+              "instrument_name": "BANK OF CHINA LIMITED",
+              "isin": "CNE1000001Z5",
+              "contribution_pct": -0.18
+            }
+          ],
+          "all_other_positions": {
+            "position_count": 39,
+            "contribution_pct": 3.08
+          },
+          "total_security_contribution_pct": 6.85,
+          "note": "Security-level contributions sum to the securities component of TWR. Cash, FX translation and fees are reported separately in contribution_by_asset_class_pct.",
+          "excluded_positions": {
+            "position_count": 2,
+            "reason": "PRIVATE_EQUITY_EXCLUDED_FROM_TWR",
+            "instruments": [
+              "MERIDIAN CAPITAL PARTNERS IV LP",
+              "ASIA GROWTH VENTURES III LP"
+            ],
+            "combined_nav_movement_usd": 63000.0
+          }
+        },
+        "benchmark": {
+          "definition": {
+            "name": "Client Composite - Very Dynamic (USD)",
+            "components": [
+              "60% MSCI AC World Net Total Return USD",
+              "25% MSCI AC Asia ex-Japan Net Total Return USD",
+              "15% Bloomberg Global Aggregate USD Hedged"
+            ],
+            "rebalancing_frequency": "QUARTERLY",
+            "source": "BENCHMARK_DATA_VENDOR"
+          },
+          "benchmark_return_pct": 6.82,
+          "relative_return_pct": -0.61,
+          "comparison_basis": "TWR net of fees (excluding private equity) versus benchmark total return. The benchmark contains no private-market component, so excluding PE from the portfolio side keeps the comparison like-for-like."
+        },
+        "twr_pct_excluding_pe": 6.21,
+        "twr_basis_note": "TWR excludes private equity NAV movement. PE is reported separately on a TVPI / DPI / IRR basis in `private_equity_performance`. Structured products ARE included in TWR: they are marked weekly by the issuer and carry no material valuation lag.",
+        "contribution_notes": {
+          "STRUCTURED_PRODUCT": "Included in TWR at issuer mark.",
+          "PRIVATE_EQUITY_FUND": "Contribution shown as 0.00 by design. PE is excluded from TWR; see `private_equity_performance` for TVPI / DPI / RVPI."
+        }
+      },
+      "ROLLING_1Y": {
+        "period_label": "Rolling 1 year",
+        "from_date": "22/09/2025",
+        "to_date": "22/09/2026",
+        "data_completeness": "PARTIAL",
+        "earliest_available_valuation_date": "31/12/2025",
+        "coverage_days_available": 265,
+        "coverage_days_required": 365,
+        "twr_pct": null,
+        "mwr_irr_pct": null,
+        "unavailable_reason": "Valuation history begins 31/12/2025. A full rolling 12-month return cannot be calculated and has not been estimated."
+      },
+      "SINCE_INCEPTION": {
+        "period_label": "Since inception",
+        "from_date": null,
+        "to_date": "22/09/2026",
+        "data_completeness": "UNAVAILABLE",
+        "twr_pct": null,
+        "mwr_irr_pct": null,
+        "unavailable_reason": "Account inception date and opening valuation are not present in the source file. No inception-to-date return can be produced."
+      }
+    },
+    "private_equity_performance": {
+      "reporting_basis": "MULTIPLES_AND_IRR",
+      "why_not_twr": "Quarterly, lagged NAVs and irregular capital flows make a time-weighted return misleading for private market assets. Industry practice is to report TVPI, DPI, RVPI and since-inception net IRR.",
+      "nav_as_of_date": "30/06/2026",
+      "portfolio_valuation_date": "22/09/2026",
+      "nav_lag_days": 84,
+      "aggregate": {
+        "committed_capital_usd": 900000.0,
+        "called_capital_usd": 510000.0,
+        "unfunded_commitment_usd": 390000.0,
+        "distributions_to_date_usd": 0.0,
+        "current_nav_usd": 573000.0,
+        "tvpi": 1.124,
+        "dpi": 0.0,
+        "rvpi": 1.124,
+        "net_irr_pct": null,
+        "irr_note": "Since-inception net IRR requires the full LP cash flow series from fund inception, which is not held in this system. Source from the GP capital account statement."
+      },
+      "by_fund": [
+        {
+          "instrument_name": "MERIDIAN CAPITAL PARTNERS IV LP",
+          "isin": "LU2489117735",
+          "vintage_year": 2021,
+          "fund_strategy": "BUYOUT",
+          "committed_capital_usd": 500000.0,
+          "called_capital_usd": 350000.0,
+          "unfunded_commitment_usd": 150000.0,
+          "current_nav_usd": 425000.0,
+          "tvpi": 1.214,
+          "dpi": 0.0,
+          "rvpi": 1.214,
+          "net_irr_pct": null,
+          "irr_note": "Net IRR not computable: full LP cash flow history from fund inception is not held in this system. Manager-reported IRR should be sourced from the quarterly capital account statement."
+        },
+        {
+          "instrument_name": "ASIA GROWTH VENTURES III LP",
+          "isin": "KYG0445T1085",
+          "vintage_year": 2023,
+          "fund_strategy": "GROWTH_EQUITY",
+          "committed_capital_usd": 400000.0,
+          "called_capital_usd": 160000.0,
+          "unfunded_commitment_usd": 240000.0,
+          "current_nav_usd": 148000.0,
+          "tvpi": 0.925,
+          "dpi": 0.0,
+          "rvpi": 0.925,
+          "net_irr_pct": null,
+          "irr_note": "Net IRR not computable from data held. TVPI below 1.0x reflects the standard J-curve: management fees and early-stage write-downs depress NAV before value creation is realised."
+        }
+      ],
+      "guardrail": "PE figures must be presented as at the NAV date, never as a current value. TVPI below 1.0x in early vintages reflects the J-curve and must not be characterised as a loss."
+    },
+    "asset_class_treatment": {
+      "included_in_twr": [
+        "CASH_AND_CURRENT_ACCOUNTS",
+        "BOND",
+        "BOND_FUND",
+        "EQUITY",
+        "FUND_ETF",
+        "COMMODITY_ETF",
+        "STRUCTURED_PRODUCT",
+        "FIXED_TERM_DEPOSIT"
+      ],
+      "excluded_from_twr": [
+        "PRIVATE_EQUITY_FUND"
+      ],
+      "excluded_reporting_basis": "MULTIPLES_AND_IRR",
+      "bridge_treatment": "PE NAV movement appears as its own `pe_nav_movement` line in every attribution bridge so that each bridge still foots to ending market value, while remaining outside the TWR numerator.",
+      "agent_guidance": "When answering a portfolio performance question, quote `twr_pct` and state that it excludes private equity. If the query specifically concerns PE, read `performance.private_equity_performance` instead and always cite the NAV date."
+    }
+  },
+  "valuation_history": [
+    {
+      "snapshot_date": "31/12/2025",
+      "snapshot_type": "YEAR_END",
+      "data_vintage": "31/12/2025",
+      "net_total_usd": 2025714.25,
+      "external_flow_in_month_usd": 0.0,
+      "period_return_pct": null,
+      "holdings_detail_available": true,
+      "asset_class_totals": {
+        "CASH_AND_CURRENT_ACCOUNTS": {
+          "market_value_usd": 1050420.18,
+          "pct_portfolio": 51.85
+        },
+        "BOND": {
+          "market_value_usd": 148220.1,
+          "pct_portfolio": 7.32
+        },
+        "BOND_FUND": {
+          "market_value_usd": 118640.55,
+          "pct_portfolio": 5.86
+        },
+        "STRUCTURED_PRODUCT": {
+          "market_value_usd": 0.0,
+          "pct_portfolio": 0.0
+        },
+        "EQUITY": {
+          "market_value_usd": 402180.44,
+          "pct_portfolio": 19.85
+        },
+        "FUND_ETF": {
+          "market_value_usd": 351902.66,
+          "pct_portfolio": 17.37
+        },
+        "COMMODITY_ETF": {
+          "market_value_usd": 31890.0,
+          "pct_portfolio": 1.57
+        },
+        "PRIVATE_EQUITY_FUND": {
+          "market_value_usd": 0.0,
+          "pct_portfolio": 0.0
+        },
+        "FIXED_TERM_DEPOSIT": {
+          "market_value_usd": -77539.68,
+          "pct_portfolio": -3.83
+        }
+      },
+      "currency_allocation_pct": {
+        "USD": 42.1,
+        "NOK": 11.85,
+        "SEK": 11.72,
+        "SGD": 12.4,
+        "JPY": 8.05,
+        "HKD": 7.42,
+        "EUR": 3.55,
+        "GBP": 2.51,
+        "AUD": 0.4
+      }
+    },
+    {
+      "snapshot_date": "31/01/2026",
+      "snapshot_type": "MONTH_END",
+      "data_vintage": "31/01/2026",
+      "net_total_usd": 2062177.11,
+      "external_flow_in_month_usd": 0.0,
+      "period_return_pct": 1.8,
+      "holdings_detail_available": false
+    },
+    {
+      "snapshot_date": "28/02/2026",
+      "snapshot_type": "MONTH_END",
+      "data_vintage": "28/02/2026",
+      "net_total_usd": 2043617.51,
+      "external_flow_in_month_usd": 0.0,
+      "period_return_pct": -0.9,
+      "holdings_detail_available": false
+    },
+    {
+      "snapshot_date": "31/03/2026",
+      "snapshot_type": "QUARTER_END",
+      "data_vintage": "31/03/2026",
+      "net_total_usd": 2339144.84,
+      "external_flow_in_month_usd": 250000.0,
+      "period_return_pct": 2.1,
+      "holdings_detail_available": false
+    },
+    {
+      "snapshot_date": "30/04/2026",
+      "snapshot_type": "MONTH_END",
+      "data_vintage": "30/04/2026",
+      "net_total_usd": 2306396.81,
+      "external_flow_in_month_usd": 0.0,
+      "period_return_pct": -1.4,
+      "holdings_detail_available": false
+    },
+    {
+      "snapshot_date": "31/05/2026",
+      "snapshot_type": "MONTH_END",
+      "data_vintage": "31/05/2026",
+      "net_total_usd": 2184038.15,
+      "external_flow_in_month_usd": -180000.0,
+      "period_return_pct": 2.6,
+      "holdings_detail_available": false
+    },
+    {
+      "snapshot_date": "30/06/2026",
+      "snapshot_type": "QUARTER_END",
+      "data_vintage": "30/06/2026",
+      "net_total_usd": 2199326.41,
+      "external_flow_in_month_usd": 0.0,
+      "period_return_pct": 0.7,
+      "holdings_detail_available": true,
+      "asset_class_totals": {
+        "CASH_AND_CURRENT_ACCOUNTS": {
+          "market_value_usd": 1128455.3,
+          "pct_portfolio": 51.31
+        },
+        "BOND": {
+          "market_value_usd": 152880.75,
+          "pct_portfolio": 6.95
+        },
+        "BOND_FUND": {
+          "market_value_usd": 140205.18,
+          "pct_portfolio": 6.37
+        },
+        "STRUCTURED_PRODUCT": {
+          "market_value_usd": 0.0,
+          "pct_portfolio": 0.0
+        },
+        "EQUITY": {
+          "market_value_usd": 441905.22,
+          "pct_portfolio": 20.09
+        },
+        "FUND_ETF": {
+          "market_value_usd": 392118.44,
+          "pct_portfolio": 17.83
+        },
+        "COMMODITY_ETF": {
+          "market_value_usd": 33120.6,
+          "pct_portfolio": 1.51
+        },
+        "PRIVATE_EQUITY_FUND": {
+          "market_value_usd": 0.0,
+          "pct_portfolio": 0.0
+        },
+        "FIXED_TERM_DEPOSIT": {
+          "market_value_usd": -89359.08,
+          "pct_portfolio": -4.06
+        }
+      },
+      "currency_allocation_pct": {
+        "USD": 44.85,
+        "NOK": 11.02,
+        "SEK": 10.88,
+        "SGD": 11.6,
+        "JPY": 7.55,
+        "HKD": 7.05,
+        "EUR": 3.48,
+        "GBP": 2.9,
+        "AUD": 0.67
+      }
+    },
+    {
+      "snapshot_date": "31/07/2026",
+      "snapshot_type": "MONTH_END",
+      "data_vintage": "31/07/2026",
+      "net_total_usd": 2232316.31,
+      "external_flow_in_month_usd": 0.0,
+      "period_return_pct": 1.5,
+      "holdings_detail_available": false
+    },
+    {
+      "snapshot_date": "31/08/2026",
+      "snapshot_type": "MONTH_END",
+      "data_vintage": "31/08/2026",
+      "net_total_usd": 6206904.36,
+      "external_flow_in_month_usd": 4000000.0,
+      "period_return_pct": -0.6,
+      "holdings_detail_available": false
+    },
+    {
+      "snapshot_date": "22/09/2026",
+      "snapshot_type": "CURRENT_VALUATION",
+      "data_vintage": "22/09/2026",
+      "net_total_usd": 6289128.22,
+      "external_flow_in_month_usd": 0.0,
+      "period_return_pct": 0.3,
+      "holdings_detail_available": true,
+      "asset_class_totals": {
+        "CASH_AND_CURRENT_ACCOUNTS": {
+          "market_value_usd": 4417495.67,
+          "pct_portfolio": 70.24
+        },
+        "BOND": {
+          "market_value_usd": 185558.34,
+          "pct_portfolio": 2.95
+        },
+        "BOND_FUND": {
+          "market_value_usd": 104618.52,
+          "pct_portfolio": 1.66
+        },
+        "STRUCTURED_PRODUCT": {
+          "market_value_usd": 270393.15,
+          "pct_portfolio": 4.3
+        },
+        "EQUITY": {
+          "market_value_usd": 438064.08,
+          "pct_portfolio": 6.97
+        },
+        "FUND_ETF": {
+          "market_value_usd": 396269.51,
+          "pct_portfolio": 6.3
+        },
+        "COMMODITY_ETF": {
+          "market_value_usd": 34339.2,
+          "pct_portfolio": 0.55
+        },
+        "PRIVATE_EQUITY_FUND": {
+          "market_value_usd": 573000.0,
+          "pct_portfolio": 9.11
+        },
+        "FIXED_TERM_DEPOSIT": {
+          "market_value_usd": -130610.25,
+          "pct_portfolio": -2.08
+        }
+      },
+      "currency_allocation_pct": {
+        "SGD": 5.84,
+        "EUR": 2.98,
+        "GBP": 0.84,
+        "NOK": 7.59,
+        "SEK": 7.52,
+        "USD": 69.0,
+        "AUD": 0.3,
+        "JPY": 3.43,
+        "HKD": 2.5
+      },
+      "composition_change_note": "Structured product and private equity positions were established during September 2026, funded by redeploying part of the August 2026 cash inflow. These asset classes were genuinely absent at all prior snapshot dates, so the 31/12/2025 and 30/06/2026 snapshots are correct as-is and must not be back-filled. Allocation-change calculations against those dates will correctly show SP and PE as new allocations rather than as reclassifications."
+    }
+  ],
+  "country_allocation_metadata": {
+    "coverage": "EQUITY, BOND, BOND_FUND, FIXED_TERM_DEPOSIT, STRUCTURED_PRODUCT, PRIVATE_EQUITY_FUND",
+    "excluded": "CASH_AND_CURRENT_ACCOUNTS, FUND_ETF (no country attribution held)",
+    "attribution_conventions": {
+      "EQUITY": "Country of primary listing / incorporation.",
+      "BOND": "Currency-of-issue bucket as reported by the source system.",
+      "STRUCTURED_PRODUCT": "ISSUER_DOMICILE. A structured product is an unsecured obligation of its issuer; the geography of the reference asset is NOT reflected here. See `reference_assets` on the holding for underlying exposure.",
+      "PRIVATE_EQUITY_FUND": "FUND_DOMICILE. Legal domicile of the fund vehicle, not the underlying portfolio companies. See `look_through_geography` on the holding for economic exposure."
+    },
+    "warning": "Because SP and PE are attributed on a legal rather than economic basis, geographic allocation totals must not be presented to a client as a measure of underlying market exposure without the look-through caveat."
+  },
+  "off_balance_sheet_summary": {
+    "total_unfunded_pe_commitments_usd": 390000.0,
+    "pct_of_net_total": 6.2,
+    "residual_cash_usd": 4417495.67,
+    "commitment_coverage_ratio": 11.33,
+    "coverage_note": "Residual cash comfortably covers outstanding unfunded commitments. Coverage ratio below 1.0x would warrant a liquidity discussion with the client.",
+    "credit_line_usd": -1500000.0,
+    "warning": "Unfunded commitments are contingent obligations and are NOT included in net_total, total_liabilities or any asset_class_total."
+  },
+  "concentration_indicators": {
+    "as_of_date": "22/09/2026",
+    "net_total_usd": 6289128.22,
+    "structured_product_issuer_concentration": [
+      {
+        "issuer_name": "ISSUER A INTERNATIONAL BANK",
+        "market_value_usd": 152400.0,
+        "pct_net_total": 2.42,
+        "credit_rating": "A+",
+        "note": "Structured products are unsecured obligations of the issuer. Exposure here is issuer credit risk, not market risk."
+      },
+      {
+        "issuer_name": "ISSUER B PRIVATE BANK AG",
+        "market_value_usd": 117993.15,
+        "pct_net_total": 1.88,
+        "credit_rating": "AA-",
+        "note": "Structured products are unsecured obligations of the issuer. Exposure here is issuer credit risk, not market risk."
+      }
+    ],
+    "private_equity_strategy_concentration": [
+      {
+        "fund_strategy": "BUYOUT",
+        "nav_usd": 425000.0,
+        "pct_net_total": 6.76
+      },
+      {
+        "fund_strategy": "GROWTH_EQUITY",
+        "nav_usd": 148000.0,
+        "pct_net_total": 2.35
+      }
+    ],
+    "private_equity_vintage_concentration": [
+      {
+        "vintage_year": 2021,
+        "nav_usd": 425000.0,
+        "commitment_usd": 500000.0
+      },
+      {
+        "vintage_year": 2023,
+        "nav_usd": 148000.0,
+        "commitment_usd": 400000.0
+      }
+    ],
+    "illiquidity_concentration": {
+      "illiquid_market_value_usd": 843393.15,
+      "pct_net_total": 13.41,
+      "plus_unfunded_commitments_usd": 390000.0,
+      "note": "Neither SP nor PE offers daily liquidity. Combined with USD 390,000 of callable unfunded commitments, this is the portfolio's binding liquidity constraint."
+    }
+  },
+  "data_quality_flags": {
+    "generated_by": "SP/PE mock data extension - staged build",
+    "extension_date": "22/09/2026",
+    "flags": [
+      {
+        "severity": "INFO",
+        "scope": "STRUCTURED_PRODUCT, PRIVATE_EQUITY_FUND",
+        "message": "Positions established September 2026, funded by redeploying the August 2026 cash inflow. Not present in the 31/12/2025 or 30/06/2026 snapshots, which are correct as-is."
+      },
+      {
+        "severity": "WARNING",
+        "scope": "PRIVATE_EQUITY_FUND",
+        "message": "NAVs carry an 84-day reporting lag (30/06/2026 NAV against a 22/09/2026 valuation date). Must be presented as at the NAV date."
+      },
+      {
+        "severity": "WARNING",
+        "scope": "PRIVATE_EQUITY_FUND",
+        "message": "Since-inception net IRR is unavailable: full LP cash flow history is not held. Must not be estimated."
+      },
+      {
+        "severity": "WARNING",
+        "scope": "STRUCTURED_PRODUCT",
+        "message": "Valued at issuer mark, not an exchange price. Realisable value on early exit may differ materially from the mark."
+      },
+      {
+        "severity": "WARNING",
+        "scope": "exchange_rates",
+        "message": "Pre-existing issue, unrelated to this extension: AUD (01/08/2022), JPY, NOK and SEK (15/04/2021) rates are stale."
+      },
+      {
+        "severity": "INFO",
+        "scope": "holdings",
+        "message": "Two legacy nil-value records exist in the SP/PE asset classes (FCN NOM-PANW/GDX, IDINVEST LUX FUND-COMPARTMENT A). Annotated as CLOSED_NIL_VALUE; they contribute nothing to valuation or performance."
+      },
+      {
+        "severity": "INFO",
+        "scope": "performance",
+        "message": "TWR for affected periods was rescaled to absorb SP unrealised P&L. Derived from the attribution bridge rather than from a daily valuation series, which the source file does not contain."
+      }
+    ]
+  }
 }

@@ -1,17 +1,9 @@
-"""Retrieval tools for the OCR-derived single-account portfolio statement.
+"""Retrieval tools for the single-account portfolio statement.
 
 ``portfolio_data.json`` is a single detailed account statement (not a list of
-customer records like ``portfolio.json``), so it is loaded independently here
-rather than through ``BaseDataTools``. Four focused query methods merge the
-fields that naturally belong together, mirroring the granularity of
-``PortfolioTools``.
-
-Methods
--------
-get_statement_overview        — account metadata + total assets/liabilities/net summary
-get_holdings                  — individual holdings, optionally filtered by asset class
-get_allocation_breakdown       — asset-class totals + country allocation + subtotals
-get_credit_and_fx_info         — off-balance-sheet credit lines + exchange rates used
+customer records like ``portfolio.json``), so it is loaded independently here.
+The methods below expose the statement in focused slices so the LLM can fetch
+the exact section needed without losing newer fields added to the source file.
 """
 
 from __future__ import annotations
@@ -144,4 +136,41 @@ class PortfolioStatementTools:
         return {
             "off_balance_sheet": doc.get("off_balance_sheet", []),
             "exchange_rates": doc.get("exchange_rates", []),
+            "off_balance_sheet_summary": doc.get("off_balance_sheet_summary", {}),
+        }
+
+    def get_transactions(self, portfolio_id: str = "") -> dict[str, Any]:
+        """Return transaction-period metadata and all activity sections.
+
+        Includes trade history, option activity, income events, corporate actions,
+        and cash movements for the statement period.
+        """
+        doc = self._data()
+        self._check_portfolio_id(portfolio_id, doc)
+        return {"transactions": doc.get("transactions", {})}
+
+    def get_performance(self, portfolio_id: str = "") -> dict[str, Any]:
+        """Return performance, attribution, benchmark, and PE reporting sections."""
+        doc = self._data()
+        self._check_portfolio_id(portfolio_id, doc)
+        return {"performance": doc.get("performance", {})}
+
+    def get_valuation_history(self, portfolio_id: str = "") -> dict[str, Any]:
+        """Return historical valuation snapshots and current composition context."""
+        doc = self._data()
+        self._check_portfolio_id(portfolio_id, doc)
+        return {"valuation_history": doc.get("valuation_history", [])}
+
+    def get_risk_and_metadata(self, portfolio_id: str = "") -> dict[str, Any]:
+        """Return concentration, geographic metadata, and statement-level flags.
+
+        This groups the remaining non-transactional analytical fields so no source
+        data is stranded outside the tool surface.
+        """
+        doc = self._data()
+        self._check_portfolio_id(portfolio_id, doc)
+        return {
+            "country_allocation_metadata": doc.get("country_allocation_metadata", {}),
+            "concentration_indicators": doc.get("concentration_indicators", {}),
+            "data_quality_flags": doc.get("data_quality_flags", {}),
         }

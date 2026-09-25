@@ -39,7 +39,7 @@ from typing import TYPE_CHECKING, Any
 
 from app.agents.base_tool import Tool
 from app.agents.mcp_tool_wrapper import MCP_TOOL_PREFIX, McpToolWrapper
-from app.agents.prompts import MERMAID_CHART_RULES
+from app.agents.prompts import HTML_RENDERING_RULES
 from app.logging_config import log_text_preview
 from app.errors import RoutingError
 from app.schemas import AgentAnswer, ConversationTurn, EvaluationMetricResult, RelationshipManagerRequest, RelationshipManagerResponse, ToolCallResponse
@@ -62,19 +62,6 @@ from app.settings import Settings
 
 logger = logging.getLogger(__name__)
 
-# Matches fenced ```mermaid ... ``` blocks so they can be validated/repaired regardless
-# of where they originated (orchestrator answer or a sub-agent tool summary copied verbatim).
-_MERMAID_BLOCK_RE = re.compile(r"```mermaid\s*\n(.*?)```", re.DOTALL | re.IGNORECASE)
-# One valid pie slice line: "Label" : 12.34
-_PIE_SLICE_RE = re.compile(r'^\s*"([^"\n]{1,60})"\s*:\s*([0-9][0-9.,]*)\s*$')
-_XYCHART_TITLE_RE = re.compile(r'^title\s+"([^"]{1,80})"\s*$', re.IGNORECASE)
-_XYCHART_X_AXIS_RE = re.compile(r'^x-axis\s*\[(.*)\]\s*$', re.IGNORECASE)
-_XYCHART_Y_AXIS_RE = re.compile(r'^y-axis\s+"([^"]{1,40})"\s+([0-9][0-9.,]*)\s+-->\s+([0-9][0-9.,]*)\s*$', re.IGNORECASE)
-_XYCHART_BAR_RE = re.compile(r'^bar\s*\[(.*)\]\s*$', re.IGNORECASE)
-_QUOTED_LIST_ITEM_RE = re.compile(r'"([^"\n]{1,40})"')
-_NUMERIC_LIST_RE = re.compile(r'[0-9][0-9.,]*(?:e[+-]?[0-9]+)?', re.IGNORECASE)
-# Characters known to break the Mermaid parser inside titles/labels (quotes, arrows, etc.)
-_MERMAID_UNSAFE_CHARS_RE = re.compile(r'["`<>\\|{}]|-+>|<-+')
 # A message that is ONLY a greeting/pleasantry (no actual question) — matched so we
 # never fetch/name a specific customer's data just to answer "hi" (see _is_pure_greeting).
 _PURE_GREETING_RE = re.compile(
@@ -558,11 +545,6 @@ class RelationshipManagerOrchestrator:
         if not final_answer:
             final_answer = self._combine_answers(all_agent_answers)
 
-        # Repair or strip any malformed Mermaid diagrams before anything else sees this
-        # text (evaluation, disclaimers, persistence) — the UI must never receive broken
-        # chart syntax, regardless of what the LLM produced or copied from a tool summary.
-        final_answer = self._sanitize_mermaid_diagrams(final_answer)
-
         # ── Inject reference citations from ReferenceManager ──────────────────
         references_section = self._build_references_section(reference_manager)
         if references_section:
@@ -834,10 +816,11 @@ class RelationshipManagerOrchestrator:
             # at the old portfolio.json tool, which is why old CUST-1001/Rajesh data sometimes
             # leaked into answers. Replaced below with statement_* (portfolio_data.json) guidance.
             "- Statement tools (statement_overview, statement_holdings, statement_allocation, "
-            "statement_credit_fx) are the ONLY portfolio data source — the raw account "
-            "statement: totals, holdings, asset/geo allocation, credit/FX rates. Use these for "
-            "ALL portfolio questions, including recap/update/'what's new' and general holdings/"
-            "performance questions. CRM detail tools: profile/KYC, interactions/history, "
+            "statement_credit_fx, statement_transactions, statement_performance, "
+            "statement_history, statement_risk) are the ONLY portfolio data source — the raw "
+            "account statement: totals, holdings, allocation, credit/FX, transactions, "
+            "performance, valuation history, and concentration/risk metadata. Use these for ALL "
+            "portfolio questions, including recap/update/'what's new'. CRM detail tools: profile/KYC, interactions/history, "
             "advisory/suggestions.\n\n"
             "CRITICAL — tool call requirement:\n"
             "- You MUST call at least one tool before answering; never answer from memory.\n"
@@ -852,28 +835,38 @@ class RelationshipManagerOrchestrator:
             "which source could not be reached.\n"
             "- Both fail → explain no data could be found for this customer ID and advise "
             "verifying it.\n\n"
+            "- If a requested fact, number, date, or comparison is not present in tool output, say it is not available in the retrieved data.\n"
+            "- Never infer, estimate, interpolate, or fill missing gaps from context.\n\n"
             "Output formatting — adapt to the question and the data (CRITICAL):\n"
+            "- Identify the user's intent first and answer it directly.\n"
+            "- For non-trivial questions, use this order: direct answer, most relevant supporting data, then short interpretation.\n"
+            "- Every factual statement must be grounded in tool output.\n"
             "- These are defaults, not a fixed template. Tool result shape varies call to call "
             "(different tools, customers, missing fields) — build structure from what's "
-            "actually present, and use a different clear format when it serves the data/"
-            "question better.\n"
+            "actually present, and omit irrelevant sections.\n"
+            "- Make the answer feel like a concise briefing note: clear hierarchy, strong section titles, and the most decision-useful information first.\n"
             "- Return the answer directly. Never prefix the response with labels like 'Answer:' "
             "or repeat the same conclusion twice.\n"
-            "- Tool summaries are already pre-formatted (tables/Mermaid charts) where relevant "
+            "- Tool summaries may already be pre-formatted with tables or small optional HTML fragments where relevant "
             "— preserve and reuse them as-is rather than flattening back to prose.\n"
+            "- Lead with the most useful point, not background detail.\n"
+            "- When several headline metrics are available and relevant, surface them early before deeper detail.\n"
             "- Do not rely on tables alone for portfolio questions. Add concise commentary that "
             "interprets the numbers and points out the main driver, concentration, offset, or "
             "risk visible in the retrieved data.\n"
             "- Comparisons (this vs. that, period-over-period, customer vs. benchmark, several "
             "holdings/metrics side by side) → a markdown table with compared items as columns.\n"
-            "- A proportional breakdown spanning multiple tool results, not already charted → a "
-            "Mermaid pie chart; a ranking/comparison across categories → a Mermaid bar chart "
-            "using xychart-beta, if it can be emitted safely (see strict rules below).\n"
+            "- Default to plain text, lists, and markdown tables. Use simple static HTML only when it clearly improves readability, and never depend on frontend-specific rendering.\n"
             "- Broad/'tell me everything' questions spanning domains → ### section headers per "
             "topic (e.g. ### Portfolio Snapshot, ### Client Profile, ### Recent Interactions), "
-            "each followed by its table/chart where applicable.\n"
+            "each followed by its table, list, or small optional HTML block where applicable.\n"
+            "- Prefer briefing-note style headings such as Portfolio Snapshot, Key Changes Since Last Visit, Top Contributors & Detractors, Asset Allocation, Geographic Allocation, Income, Currency Effects, Client Profile, Recent Interactions, and Next Follow-Ups when they fit the data.\n"
+            "- For recap, evolution, or 'what's new' portfolio questions, start with a recent-activity overview, then show only the most significant supporting sections rather than every possible section.\n"
+            "- In those recap/evolution answers, omit any sentence or section that is not supported by real data.\n"
             "- A single narrow fact (e.g. 'what is the customer's NPS score') → one short "
-            "sentence; don't force a table or chart onto trivial data.\n"
+            "sentence; don't force a table or HTML block onto trivial data.\n"
+            "- For broad questions, use a short summary first, then the most relevant sections in priority order.\n"
+            "- For narrow questions, stay narrow and avoid unrelated sections.\n"
             "- For valuation questions, include related totals that materially complete the "
             "picture when present (for example assets, liabilities, and net total), rather than "
             "isolating one number if the retrieved data clearly provides the rest.\n"
@@ -883,14 +876,12 @@ class RelationshipManagerOrchestrator:
             "unless the user explicitly asks for those levels.\n"
             "- Never infer missing dates. If a requested maturity or other date is not explicitly "
             "present in tool output, say it is not available in the retrieved data.\n"
-            "- Never fabricate table rows, chart slices, or values not present in tool "
+            "- Never fabricate table rows, HTML elements, or values not present in tool "
             "outputs.\n\n"
-            f"{MERMAID_CHART_RULES}\n\n"
+            f"{HTML_RENDERING_RULES}\n\n"
             "Citations:\n"
-            "- Do NOT add your own citation markers (e.g. '[1]', 'Source:') or quote raw JSON "
-            "tool payloads verbatim — write a plain, human-readable answer.\n"
-            "- The system automatically appends a verified 'Sources' section — never generate "
-            "this yourself.\n\n"
+            "- Citations are generated by the backend only. Never generate citation markers, source tags, source labels, or a Sources section in the LLM response.\n"
+            "- Do NOT quote raw JSON tool payloads verbatim — write a plain, human-readable answer.\n\n"
         )
         if tool_hints:
             prompt += f"Tool usage guidance:\n{tool_hints}\n"
@@ -958,8 +949,8 @@ class RelationshipManagerOrchestrator:
             ("statement_holdings", (
                 "holding", "holdings", "instrument", "position", "positions", "stock", "stocks",
                 "equity", "equities", "bond", "bonds", "fund", "funds", "etf", "isin", "ticker",
-                "transaction", "transactions", "activity", "top contributor", "top contributors",
-                "top detractor", "top detractors", "best performer", "best performers",
+                "top contributor", "top contributors", "top detractor", "top detractors",
+                "best performer", "best performers",
                 "worst performer", "worst performers", "mover", "movers",
             )),
             ("statement_allocation", (
@@ -970,23 +961,45 @@ class RelationshipManagerOrchestrator:
                 "credit line", "credit facility", "exchange rate", "exchange rates", "fx rate",
                 "fx rates", "currency rate",
             )),
+            ("statement_transactions", (
+                "transaction", "transactions", "trade", "trades", "buy", "buys", "sell", "sells",
+                "activity", "recent activity", "what changed", "what's changed", "income", "dividend",
+                "coupon", "cash movement", "capital call", "corporate action", "fee",
+            )),
+            ("statement_performance", (
+                "performance", "return", "returns", "twr", "mwr", "irr", "benchmark",
+                "attribution", "contribution", "relative return", "alpha", "sharpe",
+            )),
+            ("statement_history", (
+                "history", "historical", "previous valuation", "prior valuation", "month end",
+                "quarter end", "ytd history", "over time", "change over time", "snapshot",
+            )),
+            ("statement_risk", (
+                "concentration", "risk", "liquidity", "illiquid", "issuer concentration",
+                "commitment coverage", "unfunded commitment", "warning", "metadata", "vintage",
+            )),
             ("statement_overview", (
                 "statement", "total assets", "total liabilities", "net total", "net worth",
                 "aum", "valuation", "currency allocation", "account statement", "data quality",
                 "ocr", "unverified", "risk profile", "portfolio", "holding", "holdings",
                 "allocation", "asset", "position", "p&l", "pnl", "profit", "loss", "invest",
-                "investment", "performance", "return", "returns",
+                "investment",
             )),
             ("crm_interactions", (
                 "interaction", "interactions", "conversation", "meeting", "last call",
-                "service request", "service ticket", "follow-up", "follow up", "sentiment",
+                "follow-up", "follow up", "sentiment", "transcript", "meeting transcript",
+                "call transcript", "email thread", "email", "emails", "what did the client say",
+                "what did he say", "what did she say", "what was discussed", "meeting notes",
+                "discussion", "client concern", "client concerns", "client asked", "client request",
             )),
             ("crm_advisory", (
-                "advisory", "suggestion", "recommendation", "compliance flag",
+                "advisory", "suggestion", "recommendation", "compliance flag", "follow-up item",
+                "follow up item", "promised", "action item", "next step", "next steps",
             )),
             ("crm_profile", (
                 "crm", "profile", "kyc", "nps", "churn", "segment", "demographic",
-                "relationship manager", "contact",
+                "relationship manager", "contact", "preferred channel", "linked account",
+                "linked accounts", "client identity",
             )),
             ("crm_book_summary", (
                 "all customers", "pipeline", "every customer", "across customers",
@@ -1059,162 +1072,6 @@ class RelationshipManagerOrchestrator:
         return tool_calls[:max_calls]
 
     # ── Response assembly helpers ─────────────────────────────────────────────
-
-    def _sanitize_mermaid_diagrams(self, text: str) -> str:
-        """Repair or strip Mermaid diagrams so malformed syntax never reaches the UI.
-
-        Defense-in-depth against LLM output like arrows, unescaped quotes/currency
-        symbols, or unsupported diagram types (the exact cause of the observed
-        "Parsing failed: unexpected character" UI error). Only `pie` and
-        `xychart-beta` are supported: any other diagram type is dropped. Pie blocks are
-        rebuilt from valid slices only, and xychart blocks are rebuilt from one safe bar
-        series only. A block that cannot be repaired into a valid compact chart is
-        removed entirely rather than shown broken.
-        """
-
-        def _clean(fragment: str, max_len: int) -> str:
-            return _MERMAID_UNSAFE_CHARS_RE.sub("", fragment).strip()[:max_len]
-
-        def _format_mermaid_number(value: float) -> str:
-            formatted = f"{value:.6f}".rstrip("0").rstrip(".")
-            return formatted or "0"
-
-        def _parse_numeric_list(raw: str) -> list[float]:
-            values: list[float] = []
-            for token in _NUMERIC_LIST_RE.findall(raw):
-                try:
-                    value = float(token.replace(",", ""))
-                except ValueError:
-                    continue
-                values.append(value)
-            return values
-
-        def _repair_xychart(lines: list[str]) -> str:
-            title = "Breakdown"
-            x_labels: list[str] = []
-            y_label = "Value"
-            y_min = 0.0
-            y_max = 0.0
-            bar_values: list[float] = []
-
-            for line in lines[1:]:
-                if title_match := _XYCHART_TITLE_RE.match(line):
-                    title = _clean(title_match.group(1), 60) or "Breakdown"
-                    continue
-                if x_axis_match := _XYCHART_X_AXIS_RE.match(line):
-                    x_labels = [
-                        _clean(label, 30) or "Other"
-                        for label in _QUOTED_LIST_ITEM_RE.findall(x_axis_match.group(1))
-                    ]
-                    continue
-                if y_axis_match := _XYCHART_Y_AXIS_RE.match(line):
-                    y_label = _clean(y_axis_match.group(1), 30) or "Value"
-                    try:
-                        y_min = float(y_axis_match.group(2).replace(",", ""))
-                        y_max = float(y_axis_match.group(3).replace(",", ""))
-                    except ValueError:
-                        y_min = 0.0
-                        y_max = 0.0
-                    continue
-                if bar_match := _XYCHART_BAR_RE.match(line):
-                    bar_values = _parse_numeric_list(bar_match.group(1))
-
-            if len(x_labels) < 2 or len(bar_values) < 2:
-                logger.warning(
-                    "Orchestrator: dropped malformed mermaid xychart (too few valid categories)",
-                    extra={"x_labels": len(x_labels), "bar_values": len(bar_values)},
-                )
-                return ""
-
-            count = min(len(x_labels), len(bar_values), 7)
-            x_labels = x_labels[:count]
-            bar_values = bar_values[:count]
-            if count < 2:
-                logger.warning(
-                    "Orchestrator: dropped malformed mermaid xychart after truncation",
-                    extra={"count": count},
-                )
-                return ""
-
-            safe_max = max(bar_values)
-            if y_max <= y_min or y_max < safe_max:
-                y_min = 0.0 if min(bar_values) >= 0 else min(bar_values)
-                y_max = safe_max
-
-            labels = ", ".join(f'"{label}"' for label in x_labels)
-            values = ", ".join(_format_mermaid_number(value) for value in bar_values)
-            return (
-                "```mermaid\n"
-                "xychart-beta\n"
-                f'    title "{title}"\n'
-                f'    x-axis [{labels}]\n'
-                f'    y-axis "{y_label}" {_format_mermaid_number(y_min)} --> {_format_mermaid_number(y_max)}\n'
-                f'    bar [{values}]\n'
-                "```"
-            )
-
-        def _repair(match: re.Match[str]) -> str:
-            lines = [ln.strip() for ln in match.group(1).splitlines() if ln.strip()]
-            if not lines:
-                return ""
-
-            first = lines[0].lower()
-            if first.startswith("xychart-beta"):
-                return _repair_xychart(lines)
-
-            if not first.startswith("pie"):
-                logger.warning(
-                    "Orchestrator: dropped unsupported/malformed mermaid diagram",
-                    extra={"first_line": lines[0][:50] if lines else ""},
-                )
-                return ""
-
-            first_line = lines[0]
-            remaining = lines[1:]
-            title_match = re.match(r"pie\s+title\s+(.+)", first_line, re.IGNORECASE)
-            if title_match:
-                title = title_match.group(1)
-            elif remaining and remaining[0].lower().startswith("title"):
-                title = re.sub(r"^title\s+", "", remaining[0], flags=re.IGNORECASE)
-                remaining = remaining[1:]
-            else:
-                title = "Breakdown"
-            title = _clean(title, 60) or "Breakdown"
-
-            slices: list[tuple[str, float]] = []
-            for line in remaining:
-                slice_match = _PIE_SLICE_RE.match(line)
-                if not slice_match:
-                    continue
-                label = _clean(slice_match.group(1), 40) or "Other"
-                try:
-                    value = float(slice_match.group(2).replace(",", ""))
-                except ValueError:
-                    continue
-                if value > 0:
-                    slices.append((label, value))
-
-            if len(slices) < 2:
-                logger.warning(
-                    "Orchestrator: dropped malformed mermaid pie chart (too few valid slices)",
-                    extra={"valid_slices": len(slices)},
-                )
-                return ""
-
-            if len(slices) > 7:
-                slices.sort(key=lambda s: s[1], reverse=True)
-                kept, rest = slices[:6], slices[6:]
-                other_total = sum(v for _, v in rest)
-                if other_total > 0:
-                    kept.append(("Other", other_total))
-                slices = kept
-
-            body = "\n".join(
-                f'    "{label}" : {_format_mermaid_number(value)}' for label, value in slices
-            )
-            return f"```mermaid\npie title {title}\n{body}\n```"
-
-        return _MERMAID_BLOCK_RE.sub(_repair, text)
 
     def _combine_answers(self, agent_answers: list[AgentAnswer]) -> str:
         """Compose a fallback final answer from sub-agent outputs."""

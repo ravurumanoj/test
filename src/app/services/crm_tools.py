@@ -1,230 +1,151 @@
 
 """CRM retrieval tools for the CRM sub-agent.
 
-Four focused query methods — each merges the data fields that naturally
-belong together so API routes and the sub-agent never over-fetch.
-
-Methods
--------
-get_all_customers_summary  — RM pipeline overview (all customers)
-get_customer_full_profile  — Demographics + account metadata + RM info
-get_interactions           — Conversation history + open service requests
-get_advisory_view          — Suggestions + compliance flags + alerts
+The CRM source is a single account-linked document. These methods return grouped
+top-level or second-level sections directly, rather than hardcoding every nested
+field, so newly added CRM content remains available to the LLM automatically.
 """
 
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 from typing import Any
 
-from app.services.data_loader import BaseDataTools
+from app.services.data_loader import JsonDataLoader
 
 logger = logging.getLogger(__name__)
 
+_DATA_DIR = Path(__file__).parent.parent / "data"
 
-class CrmTools(BaseDataTools):
-    """Expose CRM-specific retrieval operations over local JSON data."""
+
+class CrmTools:
+    """Expose CRM-specific retrieval operations over the single CRM document."""
 
     def __init__(self) -> None:
         """Initialize with the CRM data file."""
-        super().__init__("crm.json")
+        self._loader = JsonDataLoader(_DATA_DIR)
+        self._filename = "crm.json"
 
-    def get_all_customers_summary(self) -> list[dict[str, Any]]:
-        """Return a pipeline-level summary for every customer.
+    def _data(self) -> dict[str, Any]:
+        """Return the parsed CRM document."""
+        return self._loader.load(self._filename)
 
-        Merges segment, NPS, churn risk, last interaction, pending follow-ups,
-        open suggestions, and compliance flags into one lightweight record per
-        customer — suitable for RM daily dashboards and retention reviews.
-
-        Returns:
-            List of summary dicts (one per customer).
-        """
-        result = []
-        for rec in self._all_records():
-            meta = rec.get("account_metadata", {})
-            profile = rec.get("customer_profile", {})
-            rm = rec.get("relationship_manager", {})
-            pending_followups = sum(
-                1
-                for c in rec.get("conversation_history", [])
-                if c.get("follow_up_required") and c.get("follow_up_date")
+    def _matches_context(self, doc: dict[str, Any], customer_id: str = "", portfolio_id: str = "") -> None:
+        """Log mismatches against the single CRM document without blocking reads."""
+        linked_accounts = doc.get("client", {}).get("linked_accounts", [])
+        linked_portfolio_ids = {
+            str(account.get("portfolio_id", "")).upper()
+            for account in linked_accounts
+            if account.get("portfolio_id")
+        }
+        linked_account_numbers = {
+            str(account.get("account_number", ""))
+            for account in linked_accounts
+            if account.get("account_number")
+        }
+        if portfolio_id and portfolio_id.strip().upper() not in linked_portfolio_ids:
+            logger.warning(
+                "Requested CRM portfolio_id does not match the available CRM document",
+                extra={"requested_portfolio_id": portfolio_id, "available_portfolio_ids": sorted(linked_portfolio_ids)},
             )
-            pending_suggestions = sum(
-                1
-                for s in rec.get("suggestions_provided", [])
-                if s.get("status") in ("pending", "in_progress")
+        if customer_id and customer_id.strip() not in linked_account_numbers:
+            logger.info(
+                "CRM customer_id treated as contextual only for single-document CRM source",
+                extra={"requested_customer_id": customer_id, "available_account_numbers": sorted(linked_account_numbers)},
             )
-            result.append(
-                {
-                    "customer_id": rec.get("customer_id"),
-                    "name": profile.get("name"),
-                    "segment": profile.get("segment"),
-                    "relationship_manager": rm.get("name"),
-                    "nps_score": meta.get("nps_score"),
-                    "churn_risk": meta.get("churn_risk"),
-                    "last_interaction_date": meta.get("last_interaction_date"),
-                    "total_interactions_ytd": meta.get("total_interactions_ytd"),
-                    "pending_followups": pending_followups,
-                    "pending_suggestions": pending_suggestions,
-                    "open_compliance_flags": len(rec.get("compliance_flags", [])),
-                    "alerts": rec.get("alerts", []),
-                }
-            )
-        logger.info("CRM customer summary list built", extra={"count": len(result)})
-        return result
 
-    def get_customer_full_profile(self, customer_id: str) -> dict[str, Any]:
-        """Return customer demographics, account metadata, and RM info.
-
-        Merges the three identity/relationship sections so callers get complete
-        pre-meeting context — contact details, KYC status, segment, lifetime
-        value, NPS, churn risk, and the assigned RM — in a single call.
-
-        Args:
-            customer_id: Unique customer identifier (e.g. ``CUST-1001``).
-
-        Returns:
-            Dict with ``customer_profile``, ``account_metadata``, and
-            ``relationship_manager``.
-        """
-        rec = self._find_customer(customer_id)
-        logger.info("Full CRM profile fetched", extra={"customer_id": customer_id})
+    def get_book_summary(self, portfolio_id: str = "") -> dict[str, Any]:
+        """Return the CRM document's top-level identity and coverage summary."""
+        doc = self._data()
+        self._matches_context(doc, portfolio_id=portfolio_id)
         return {
-            "customer_id": rec.get("customer_id"),
-            "customer_profile": rec.get("customer_profile", {}),
-            "account_metadata": rec.get("account_metadata", {}),
-            "relationship_manager": rec.get("relationship_manager", {}),
+            "file_metadata": doc.get("file_metadata", {}),
+            "client": doc.get("client", {}),
+            "relationship_manager": doc.get("relationship_manager", {}),
+        }
+
+    def get_customer_full_profile(self, customer_id: str = "", portfolio_id: str = "") -> dict[str, Any]:
+        """Return the CRM identity/profile sections for the linked account."""
+        doc = self._data()
+        self._matches_context(doc, customer_id=customer_id, portfolio_id=portfolio_id)
+        logger.info("Full CRM profile fetched", extra={"customer_id": customer_id, "portfolio_id": portfolio_id})
+        return {
+            "file_metadata": doc.get("file_metadata", {}),
+            "client": doc.get("client", {}),
+            "relationship_manager": doc.get("relationship_manager", {}),
         }
 
     def get_interactions(
         self,
-        customer_id: str,
+        customer_id: str = "",
+        portfolio_id: str = "",
         channel: str | None = None,
-        sentiment: str | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
-        """Return conversation history and open service requests.
-
-        Merges both interaction types — conversations and service tickets —
-        with optional filtering so callers can scope to a specific channel,
-        sentiment, or recent-N conversations without a second round-trip.
-
-        Args:
-            customer_id: Unique customer identifier.
-            channel: Optional filter — ``phone``, ``email``, ``in_person``,
-                ``video_call``, or ``app_chat`` (case-insensitive).
-            sentiment: Optional filter — ``positive``, ``neutral``, or
-                ``negative`` (case-insensitive).
-            limit: If set, return only the most recent *N* conversations.
-
-        Returns:
-            Dict with ``conversations`` (filtered/limited list) and
-            ``open_service_requests``.
-        """
-        rec = self._find_customer(customer_id)
-        convs: list[dict[str, Any]] = rec.get("conversation_history", [])
+        """Return grouped interaction sections from meetings and email threads."""
+        doc = self._data()
+        self._matches_context(doc, customer_id=customer_id, portfolio_id=portfolio_id)
+        meetings: list[dict[str, Any]] = doc.get("meetings", [])
+        email_threads: list[dict[str, Any]] = doc.get("email_threads", [])
 
         if channel:
-            convs = [c for c in convs if c.get("channel", "").lower() == channel.lower()]
-        if sentiment:
-            convs = [c for c in convs if c.get("sentiment", "").lower() == sentiment.lower()]
+            needle = channel.lower()
+            meetings = [meeting for meeting in meetings if str(meeting.get("interaction_type", "")).lower() == needle or str(meeting.get("channel", "")).lower() == needle]
+            email_threads = [thread for thread in email_threads if str(thread.get("channel", "email")).lower() == needle]
         if limit is not None and limit > 0:
-            convs = convs[:limit]
-
-        open_sr = [r for r in rec.get("service_requests", []) if r.get("status") != "resolved"]
+            meetings = meetings[:limit]
+            email_threads = email_threads[:limit]
 
         logger.info(
             "Interactions fetched",
             extra={
                 "customer_id": customer_id,
-                "conversations": len(convs),
-                "open_service_requests": len(open_sr),
+                "portfolio_id": portfolio_id,
+                "meetings": len(meetings),
+                "email_threads": len(email_threads),
             },
         )
         return {
-            "customer_id": rec.get("customer_id"),
-            "conversations": convs,
-            "open_service_requests": open_sr,
+            "client": doc.get("client", {}),
+            "meetings": meetings,
+            "email_threads": email_threads,
+            "excluded_interactions": doc.get("excluded_interactions", []),
         }
 
-    def get_advisory_view(self, customer_id: str) -> dict[str, Any]:
-        """Return suggestions, compliance flags, and active alerts.
+    def get_advisory_view(self, customer_id: str = "", portfolio_id: str = "") -> dict[str, Any]:
+        """Return the non-interaction CRM sections relevant for RM follow-up.
 
-        Groups the three advisory-related sections that an RM reviews before
-        each client interaction: what was recommended, compliance blockers,
-        and outstanding actions requiring attention.
-
-        Args:
-            customer_id: Unique customer identifier.
-
-        Returns:
-            Dict with ``suggestions_provided`` (all), ``pending_suggestions``
-            (filtered subset), ``compliance_flags``, and ``alerts``.
+        This intentionally returns grouped top-level sections instead of flattening
+        nested keys, so newly added metadata remains available automatically.
         """
-        rec = self._find_customer(customer_id)
-        all_suggestions: list[dict[str, Any]] = rec.get("suggestions_provided", [])
-        pending = [s for s in all_suggestions if s.get("status") in ("pending", "in_progress")]
-
-        logger.info(
-            "Advisory view fetched",
-            extra={
-                "customer_id": customer_id,
-                "total_suggestions": len(all_suggestions),
-                "pending_suggestions": len(pending),
-                "compliance_flags": len(rec.get("compliance_flags", [])),
-                "alerts": len(rec.get("alerts", [])),
-            },
-        )
+        doc = self._data()
+        self._matches_context(doc, customer_id=customer_id, portfolio_id=portfolio_id)
+        meetings = doc.get("meetings", [])
+        email_threads = doc.get("email_threads", [])
         return {
-            "customer_id": rec.get("customer_id"),
-            "suggestions_provided": all_suggestions,
-            "pending_suggestions": pending,
-            "compliance_flags": rec.get("compliance_flags", []),
-            "alerts": rec.get("alerts", []),
-        }
-
-    def get_customer_crm(self, customer_id: str) -> dict[str, Any]:
-        """Return a comprehensive CRM view combining profile, interactions, and advisory.
-
-        Aggregates get_customer_full_profile, get_interactions, and get_advisory_view
-        into a single payload so the CRM sub-agent has all relationship-management
-        context in one call without multiple round-trips.
-
-        Args:
-            customer_id: Unique customer identifier (e.g. ``CUST-1001``).
-
-        Returns:
-            Dict with ``customer_profile``, ``account_metadata``,
-            ``relationship_manager``, ``conversation_history``,
-            ``open_service_requests``, ``suggestions_provided``,
-            ``pending_suggestions``, ``compliance_flags``, and ``alerts``.
-        """
-        rec = self._find_customer(customer_id)
-        all_suggestions: list[dict[str, Any]] = rec.get("suggestions_provided", [])
-        pending_suggestions = [s for s in all_suggestions if s.get("status") in ("pending", "in_progress")]
-        open_sr = [r for r in rec.get("service_requests", []) if r.get("status") != "resolved"]
-
-        logger.info(
-            "Full CRM context fetched",
-            extra={
-                "customer_id": customer_id,
-                "conversation_history_count": len(rec.get("conversation_history", [])),
-                "open_service_requests": len(open_sr),
-                "total_suggestions": len(all_suggestions),
-                "pending_suggestions": len(pending_suggestions),
-                "compliance_flags": len(rec.get("compliance_flags", [])),
-                "alerts": len(rec.get("alerts", [])),
-            },
-        )
-        return {
-            "customer_id": rec.get("customer_id"),
-            "customer_profile": rec.get("customer_profile", {}),
-            "account_metadata": rec.get("account_metadata", {}),
-            "relationship_manager": rec.get("relationship_manager", {}),
-            "conversation_history": rec.get("conversation_history", []),
-            "open_service_requests": open_sr,
-            "suggestions_provided": all_suggestions,
-            "pending_suggestions": pending_suggestions,
-            "compliance_flags": rec.get("compliance_flags", []),
-            "alerts": rec.get("alerts", []),
+            "file_metadata": doc.get("file_metadata", {}),
+            "client": doc.get("client", {}),
+            "relationship_manager": doc.get("relationship_manager", {}),
+            "meeting_overview": [
+                {
+                    "meeting_id": meeting.get("meeting_id"),
+                    "title": meeting.get("title"),
+                    "meeting_date": meeting.get("meeting_date"),
+                    "interaction_type": meeting.get("interaction_type"),
+                    "linked_portfolio_ids": meeting.get("linked_portfolio_ids", []),
+                }
+                for meeting in meetings
+            ],
+            "email_thread_overview": [
+                {
+                    "thread_id": thread.get("thread_id"),
+                    "subject": thread.get("subject"),
+                    "start_date": thread.get("start_date"),
+                    "end_date": thread.get("end_date"),
+                    "linked_portfolio_ids": thread.get("linked_portfolio_ids", []),
+                }
+                for thread in email_threads
+            ],
+            "excluded_interactions": doc.get("excluded_interactions", []),
         }

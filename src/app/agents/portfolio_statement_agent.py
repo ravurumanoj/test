@@ -7,12 +7,16 @@ no per-customer ``customer_id`` since the source data covers one account.
 
 Tools
 -----
-statement_overview   — account/ID metadata, valuation date, risk profile,
-                       + total assets/liabilities/net-total with currency allocation
-statement_holdings   — individual holdings (instrument, ISIN/ticker, price, value, P&L),
-                       optionally filtered by asset class
-statement_allocation — asset-class totals + geographic (country) allocation + reported subtotals
-statement_credit_fx  — off-balance-sheet credit lines + exchange rates used to value the statement
+statement_overview    — account/ID metadata, valuation date, risk profile,
+                        + total assets/liabilities/net-total with currency allocation
+statement_holdings    — individual holdings (instrument, ISIN/ticker, price, value, P&L),
+                        optionally filtered by asset class
+statement_allocation  — asset-class totals + geographic (country) allocation + reported subtotals
+statement_credit_fx   — off-balance-sheet credit lines, unfunded commitments, FX rates
+statement_transactions — trades, options, income, corporate actions, cash movements
+statement_performance — TWR/MWR, attribution, benchmark, PE reporting, contribution data
+statement_history     — valuation history snapshots and composition changes over time
+statement_risk        — concentration indicators, geographic metadata, statement flags
 
 Internal OCR/data-quality fields (``data_quality_note``, ``statement_type``,
 ``unverified_fields``) are stripped in ``PortfolioStatementTools`` before reaching the
@@ -32,7 +36,7 @@ logger = logging.getLogger(__name__)
 
 
 def build_portfolio_statement_tools(unique_toolkit: UniqueToolkit) -> list[DataQueryTool]:
-    """Build the four statement tools bound to a shared PortfolioStatementTools instance."""
+    """Build the statement tools bound to a shared PortfolioStatementTools instance."""
     tools = PortfolioStatementTools()
     specs = [
         DataQuerySpec(
@@ -117,17 +121,94 @@ def build_portfolio_statement_tools(unique_toolkit: UniqueToolkit) -> list[DataQ
             domain="portfolio",
             description=(
                 "Get the account statement's off-balance-sheet items (e.g. the global credit "
-                "line: reference, currency, amount, and start date) and the exchange rates used "
-                "to value the statement (per-currency rate and rate date). Use for questions "
-                "about credit facilities/lines of credit, or which FX rate/rate date was used to "
-                "convert a currency to USD."
+                "line: reference, currency, amount, and start date), unfunded private-equity "
+                "commitments and coverage summary, and the exchange rates used to value the "
+                "statement (per-currency rate and rate date). Use for questions about credit "
+                "facilities/lines of credit, contingent obligations, liquidity coverage of "
+                "commitments, or which FX rate/rate date was used to convert a currency to USD."
             ),
             prompt_hint=(
-                "Use statement_credit_fx for credit facilities/lines of credit or FX rates/rate "
-                "dates used in the statement."
+                "Use statement_credit_fx for credit facilities, unfunded commitments, liquidity "
+                "coverage, or FX rates/rate dates used in the statement."
             ),
             summarize_prompt=PORTFOLIO_STATEMENT_PROMPT,
             fetch=tools.get_credit_and_fx_info,
+            requires_customer=False,
+            requires_portfolio_id=True,
+        ),
+        DataQuerySpec(
+            name="statement_transactions",
+            domain="portfolio",
+            description=(
+                "Get the statement-period activity ledger: period metadata, trade summary, "
+                "security trades, option transactions, income events, corporate actions, and "
+                "cash movements. Use for questions about buys/sells, recent activity, dividends, "
+                "fees, capital calls, subscriptions, realised P&L, or what changed during the "
+                "statement period."
+            ),
+            prompt_hint=(
+                "Use statement_transactions for transaction history, recent activity, buys/sells, "
+                "income events, fees, cash movements, capital calls, or realised activity over a "
+                "time window covered by the statement."
+            ),
+            summarize_prompt=PORTFOLIO_STATEMENT_PROMPT,
+            fetch=tools.get_transactions,
+            requires_customer=False,
+            requires_portfolio_id=True,
+        ),
+        DataQuerySpec(
+            name="statement_performance",
+            domain="portfolio",
+            description=(
+                "Get the statement's performance reporting: TWR/MWR by period, attribution "
+                "bridges, benchmark comparison, contribution by asset class and position, "
+                "external flows, and private-equity performance reported on TVPI/DPI/RVPI/IRR "
+                "basis. Use for questions about returns, performance drivers, benchmark relative "
+                "performance, attribution, or private-equity performance treatment."
+            ),
+            prompt_hint=(
+                "Use statement_performance for returns, attribution, benchmark comparison, "
+                "performance drivers, external-flow effects, or private-equity performance."
+            ),
+            summarize_prompt=PORTFOLIO_STATEMENT_PROMPT,
+            fetch=tools.get_performance,
+            requires_customer=False,
+            requires_portfolio_id=True,
+        ),
+        DataQuerySpec(
+            name="statement_history",
+            domain="portfolio",
+            description=(
+                "Get historical valuation snapshots across month-end/quarter-end dates, including "
+                "net total, external flows in period, period return, and where available asset-class "
+                "and currency composition. Use for questions about changes over time, prior valuation "
+                "dates, historical allocation, or before-vs-now comparisons."
+            ),
+            prompt_hint=(
+                "Use statement_history for valuation history, prior snapshots, period-over-period "
+                "changes, or historical allocation/composition comparisons."
+            ),
+            summarize_prompt=PORTFOLIO_STATEMENT_PROMPT,
+            fetch=tools.get_valuation_history,
+            requires_customer=False,
+            requires_portfolio_id=True,
+        ),
+        DataQuerySpec(
+            name="statement_risk",
+            domain="portfolio",
+            description=(
+                "Get concentration and metadata sections: structured-product issuer concentration, "
+                "private-equity strategy/vintage concentration, illiquidity concentration, country "
+                "allocation methodology/warnings, and statement-level flags. Use for questions about "
+                "concentration risk, liquidity constraints, geographic attribution caveats, or "
+                "important statement warnings/metadata."
+            ),
+            prompt_hint=(
+                "Use statement_risk for concentration risk, illiquidity, geographic attribution "
+                "caveats, or important statement-level warnings and metadata."
+            ),
+            summarize_prompt=PORTFOLIO_STATEMENT_PROMPT,
+            fetch=tools.get_risk_and_metadata,
             requires_customer=False,
             requires_portfolio_id=True,
         ),

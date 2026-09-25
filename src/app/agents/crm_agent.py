@@ -6,10 +6,10 @@ hardcoded. All four wrap methods on ``CrmTools`` via the generic
 
 Tools
 -----
-crm_profile       — demographics + account metadata + assigned RM
-crm_interactions  — conversation history + open service requests (filterable)
-crm_advisory      — suggestions + compliance flags + active alerts
-crm_book_summary  — pipeline overview across ALL customers
+crm_profile       — file metadata + client identity + assigned RM + linked account context
+crm_interactions  — meetings, transcripts, email threads, excluded interactions
+crm_advisory      — grouped CRM follow-up context and interaction overviews
+crm_book_summary  — top-level CRM document summary for the linked account
 """
 
 from __future__ import annotations
@@ -32,46 +32,42 @@ def build_crm_tools(unique_toolkit: UniqueToolkit) -> list[DataQueryTool]:
             name="crm_profile",
             domain="crm",
             description=(
-                "Get a customer's CRM identity: demographics, account metadata (segment, NPS, "
-                "churn risk, tenure, lifetime value, KYC status), and the assigned relationship "
-                "manager. Use for questions about who the customer is, their segment, KYC, NPS, "
-                "churn risk, or which RM owns the relationship."
+                "Get the CRM identity sections for the linked account: file metadata, client "
+                "profile, linked account/portfolio context, and the assigned relationship manager. "
+                "Use for questions about who the client is, KYC/review dates, preferred channel, "
+                "linked accounts, or which RM owns the relationship."
             ),
             prompt_hint=(
-                "Use crm_profile for customer demographics, segment, KYC, NPS, churn risk, or the assigned RM."
+                "Use crm_profile for client identity, linked account context, KYC/review dates, preferred channel, or the assigned RM."
             ),
             summarize_prompt=CRM_AGENT_PROMPT,
             fetch=tools.get_customer_full_profile,
+            requires_portfolio_id=True,
         ),
         DataQuerySpec(
             name="crm_interactions",
             domain="crm",
             description=(
-                "Get a customer's interaction history (conversations) and open service requests. "
-                "Use for questions about past meetings, calls, emails, conversation history, "
-                "sentiment, follow-ups, or open service tickets. Optional filters let you scope "
-                "to a channel, a sentiment, or the most recent N conversations."
+                "Get the CRM interaction sections for the linked account: meetings with full "
+                "transcripts, email threads with raw messages, and excluded interactions. Use for "
+                "questions about past meetings, calls, emails, what the client said, follow-ups, "
+                "or interaction history. Optional filters let you scope by channel or recent count."
             ),
             prompt_hint=(
-                "Use crm_interactions for conversation history, past meetings/calls, sentiment, "
-                "follow-ups, or open service requests."
+                "Use crm_interactions for meetings, transcripts, email threads, client statements, or interaction history."
             ),
             summarize_prompt=CRM_AGENT_PROMPT,
             fetch=tools.get_interactions,
+            requires_portfolio_id=True,
             optional_parameters={
                 "channel": {
                     "type": "string",
-                    "enum": ["phone", "email", "in_person", "video_call", "app_chat"],
-                    "description": "Optional channel filter for conversations.",
-                },
-                "sentiment": {
-                    "type": "string",
-                    "enum": ["positive", "neutral", "negative"],
-                    "description": "Optional sentiment filter for conversations.",
+                    "enum": ["phone", "email", "telephony_recorded_line"],
+                    "description": "Optional channel filter for meetings/email threads.",
                 },
                 "limit": {
                     "type": "integer",
-                    "description": "Optional — return only the most recent N conversations.",
+                    "description": "Optional — return only the most recent N meetings/email threads.",
                 },
             },
         ),
@@ -79,31 +75,33 @@ def build_crm_tools(unique_toolkit: UniqueToolkit) -> list[DataQueryTool]:
             name="crm_advisory",
             domain="crm",
             description=(
-                "Get a customer's advisory view: suggestions provided (with status), compliance "
-                "flags, and active alerts. Use for questions about recommendations made, pending "
-                "advice, compliance blockers, or outstanding actions."
+                "Get grouped CRM follow-up context for the linked account: top-level metadata, "
+                "client/RM context, meeting overviews, email-thread overviews, and excluded "
+                "interactions. Use for questions about what needs follow-up, what interactions "
+                "exist, or how the CRM record is organised."
             ),
             prompt_hint=(
-                "Use crm_advisory for suggestions/recommendations, compliance flags, or CRM alerts."
+                "Use crm_advisory for grouped CRM follow-up context, interaction overviews, or excluded-interaction context."
             ),
             summarize_prompt=CRM_AGENT_PROMPT,
             fetch=tools.get_advisory_view,
+            requires_portfolio_id=True,
         ),
         DataQuerySpec(
             name="crm_book_summary",
             domain="crm",
             description=(
-                "Get a pipeline-level summary for EVERY customer: segment, NPS, churn risk, last "
-                "interaction, pending follow-ups, open suggestions, and compliance flags per "
-                "customer. Use only for cross-customer or book-wide questions, NOT for a single "
-                "named customer."
+                "Get the top-level CRM document summary for the linked account: file metadata, "
+                "client identity, and relationship-manager ownership. Use for broad CRM summary "
+                "questions when you need the document-level context first."
             ),
             prompt_hint=(
-                "Use crm_book_summary only for book-wide / all-customer pipeline overviews."
+                "Use crm_book_summary for broad CRM document-level context for the linked account."
             ),
             summarize_prompt=CRM_AGENT_PROMPT,
-            fetch=tools.get_all_customers_summary,
+            fetch=tools.get_book_summary,
             requires_customer=False,
+            requires_portfolio_id=True,
         ),
     ]
     built = [DataQueryTool(spec=spec, unique_toolkit=unique_toolkit) for spec in specs]
