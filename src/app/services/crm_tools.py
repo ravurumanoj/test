@@ -60,7 +60,6 @@ class CrmTools:
         doc = self._data()
         self._matches_context(doc, portfolio_id=portfolio_id)
         return {
-            "file_metadata": doc.get("file_metadata", {}),
             "client": doc.get("client", {}),
             "relationship_manager": doc.get("relationship_manager", {}),
         }
@@ -71,7 +70,6 @@ class CrmTools:
         self._matches_context(doc, customer_id=customer_id, portfolio_id=portfolio_id)
         logger.info("Full CRM profile fetched", extra={"customer_id": customer_id, "portfolio_id": portfolio_id})
         return {
-            "file_metadata": doc.get("file_metadata", {}),
             "client": doc.get("client", {}),
             "relationship_manager": doc.get("relationship_manager", {}),
         }
@@ -124,7 +122,6 @@ class CrmTools:
         meetings = doc.get("meetings", [])
         email_threads = doc.get("email_threads", [])
         return {
-            "file_metadata": doc.get("file_metadata", {}),
             "client": doc.get("client", {}),
             "relationship_manager": doc.get("relationship_manager", {}),
             "meeting_overview": [

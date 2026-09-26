@@ -35,6 +35,7 @@ logger = logging.getLogger(__name__)
 
 _TABLE_ROW_RE = re.compile(r"^\|.*\|\s*$")
 _MARKDOWN_HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)$")
+_PIPE_ONLY_LINE_RE = re.compile(r"^[\s.|]+$")
 _MODEL_SOURCES_BLOCK_RE = re.compile(
     r"(?:\n|\A)(?:\*\*Sources:\*\*|Sources:)\s*(?:\n(?:\[[0-9]+\].*|[-*].*|\d+\..*|.+))*\s*\Z",
     re.IGNORECASE,
@@ -859,8 +860,51 @@ class ResponseFormattingPostprocessor(Postprocessor):
 
     async def run(self, response_text: str) -> str:
         cleaned = self._strip_model_generated_sources(response_text)
-        styled = self._style_profit_loss_tables(cleaned)
+        deduplicated = self._deduplicate_repeated_blocks(cleaned)
+        restyled = self._reformat_flat_rankings(deduplicated)
+        styled = self._style_profit_loss_tables(restyled)
         return self._normalize_plaintext_fallbacks(styled)
+
+    def _deduplicate_repeated_blocks(self, text: str) -> str:
+        blocks = [block.strip() for block in re.split(r"\n\s*\n", text) if block.strip()]
+        unique_blocks: list[str] = []
+        seen: set[str] = set()
+        for block in blocks:
+            key = re.sub(r"\s+", " ", block).strip().lower()
+            if key in seen:
+                continue
+            seen.add(key)
+            unique_blocks.append(block)
+        return "\n\n".join(unique_blocks)
+
+    def _reformat_flat_rankings(self, text: str) -> str:
+        rewritten_lines: list[str] = []
+        for line in text.splitlines():
+            stripped = line.strip()
+            if not stripped:
+                rewritten_lines.append(line)
+                continue
+
+            lower = stripped.lower()
+            if lower.startswith("top contributors") or lower.startswith("top detractors") or lower.startswith("top gainers") or lower.startswith("top losers"):
+                rewritten_lines.extend(self._expand_ranking_line(stripped))
+                continue
+
+            rewritten_lines.append(line)
+        return "\n".join(rewritten_lines)
+
+    def _expand_ranking_line(self, line: str) -> list[str]:
+        if ":" not in line:
+            return [line]
+
+        heading, values = line.split(":", 1)
+        items = [item.strip().rstrip(".") for item in values.split(",") if item.strip()]
+        if len(items) < 2:
+            return [line]
+
+        expanded = [f"{heading.strip()}:"]
+        expanded.extend(f"- {item}" for item in items)
+        return expanded
 
     def _strip_model_generated_sources(self, text: str) -> str:
         return _MODEL_SOURCES_BLOCK_RE.sub("", text).rstrip()
@@ -914,7 +958,16 @@ class ResponseFormattingPostprocessor(Postprocessor):
 
     def _normalize_plaintext_fallbacks(self, text: str) -> str:
         text = self._convert_markdown_headings(text)
-        return text
+        text = self._remove_pipe_artifacts(text)
+        return re.sub(r"\n{3,}", "\n\n", text).strip()
+
+    def _remove_pipe_artifacts(self, text: str) -> str:
+        cleaned_lines: list[str] = []
+        for line in text.splitlines():
+            if _PIPE_ONLY_LINE_RE.fullmatch(line.strip()):
+                continue
+            cleaned_lines.append(line)
+        return "\n".join(cleaned_lines)
 
     def _convert_markdown_headings(self, text: str) -> str:
         converted_lines: list[str] = []
