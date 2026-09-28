@@ -1,12 +1,10 @@
 {
   "file_metadata": {
-    "file_purpose": "CLIENT_RELATIONSHIP_SUBAGENT_SOURCE_DATA",
     "schema_version": "1.1",
     "generated_timestamp": "22/09/2026 09:41:10 GMT",
     "date_format": "DD/MM/YYYY",
     "timezone": "Asia/Singapore",
     "joins_to": {
-      "file": "portfolio_data_v2.json",
       "primary_key": "account_number",
       "primary_key_value": "8000223",
       "secondary_keys": {
@@ -14,12 +12,7 @@
         "account_reference": "CH800022300001"
       }
     },
-    "conversation_model": "TWO_PARTY_RM_AND_CLIENT",
-    "conversation_model_note": "All meetings and email correspondence are strictly between the relationship manager and the client. No other bank staff appear as participants or correspondents.",
-    "content_basis": "RAW_UNSUMMARISED",
-    "content_note": "This file contains verbatim transcripts and raw email bodies only. No pre-computed summaries, action items, owners or due dates are supplied. All such output must be derived by the agent and cited back to a meeting_id plus transcript seq, or a thread_id plus message_id.",
     "requesting_user": {
-      "staff_id": "SG-RM-0219",
       "name": "Priya Raghavan",
       "role": "RELATIONSHIP_MANAGER",
       "entitled_account_numbers": [
@@ -40,9 +33,7 @@
     "preferred_channel": "PHONE",
     "last_app_login_date": "23/08/2026",
     "primary_relationship_manager": {
-      "staff_id": "SG-RM-0219",
-      "name": "Priya Raghavan",
-      "email": "priya.raghavan@examplebank.com.sg"
+      "name": "Priya Raghavan"
     },
     "linked_accounts": [
       {
@@ -50,17 +41,14 @@
         "account_reference": "CH800022300001",
         "portfolio_id": "GO00001",
         "reference_currency": "USD",
-        "risk_profile": "Very Dynamic",
-        "relationship_start_date": "08/06/2019"
+        "risk_profile": "Very Dynamic"
       }
     ]
   },
   "relationship_manager": {
-    "staff_id": "SG-RM-0219",
     "name": "Priya Raghavan",
     "role": "RELATIONSHIP_MANAGER",
     "desk": "WM Singapore",
-    "email": "priya.raghavan@examplebank.com.sg",
     "entitled_account_numbers": [
       "8000223"
     ]
@@ -88,8 +76,7 @@
       "participants": [
         {
           "name": "Priya Raghavan",
-          "role": "RELATIONSHIP_MANAGER",
-          "staff_id": "SG-RM-0219"
+          "role": "RELATIONSHIP_MANAGER"
         },
         {
           "name": "Erik Haugen",
@@ -472,8 +459,7 @@
       "participants": [
         {
           "name": "Priya Raghavan",
-          "role": "RELATIONSHIP_MANAGER",
-          "staff_id": "SG-RM-0219"
+          "role": "RELATIONSHIP_MANAGER"
         },
         {
           "name": "Erik Haugen",
@@ -912,8 +898,7 @@
       "participants": [
         {
           "name": "Priya Raghavan",
-          "role": "RELATIONSHIP_MANAGER",
-          "staff_id": "SG-RM-0219"
+          "role": "RELATIONSHIP_MANAGER"
         },
         {
           "name": "Erik Haugen",
@@ -1469,7 +1454,7 @@
       "thread_id": "THR-2026-0221",
       "subject": "Annual review follow-up - action items",
       "source": "OUTLOOK_EXCHANGE",
-      "mailbox_owner": "priya.raghavan@examplebank.com.sg",
+      "mailbox_owner": "priya.raghavan@bnpp.com",
       "linked_account_numbers": [
         "8000223"
       ],
@@ -1490,7 +1475,7 @@
         {
           "message_id": "MSG-0001",
           "sent_datetime_sgt": "20/02/2026 17:42",
-          "from": "priya.raghavan@examplebank.com.sg",
+          "from": "priya.raghavan@bnpp.com",
           "to": [
             "erik.haugen@haugenholdings.no"
           ],
@@ -1505,7 +1490,7 @@
           "sent_datetime_sgt": "24/02/2026 08:15",
           "from": "erik.haugen@haugenholdings.no",
           "to": [
-            "priya.raghavan@examplebank.com.sg"
+            "priya.raghavan@bnpp.com"
           ],
           "cc": [],
           "body": "Priya,\n\nThe Olam bond matures today. I haven't had anything from you on it. Can you confirm what is happening with the proceeds?\n\nErik",
@@ -1516,7 +1501,7 @@
         {
           "message_id": "MSG-0003",
           "sent_datetime_sgt": "02/03/2026 11:20",
-          "from": "priya.raghavan@examplebank.com.sg",
+          "from": "priya.raghavan@bnpp.com",
           "to": [
             "erik.haugen@haugenholdings.no"
           ],
@@ -1534,7 +1519,7 @@
       "thread_id": "THR-2026-0515",
       "subject": "Funds transfer request - USD 180,000",
       "source": "OUTLOOK_EXCHANGE",
-      "mailbox_owner": "priya.raghavan@examplebank.com.sg",
+      "mailbox_owner": "priya.raghavan@bnpp.com",
       "linked_account_numbers": [
         "8000223"
       ],
@@ -1555,7 +1540,7 @@
         {
           "message_id": "MSG-0004",
           "sent_datetime_sgt": "15/05/2026 09:05",
-          "from": "priya.raghavan@examplebank.com.sg",
+          "from": "priya.raghavan@bnpp.com",
           "to": [
             "erik.haugen@haugenholdings.no"
           ],
@@ -1572,7 +1557,7 @@
           "sent_datetime_sgt": "16/05/2026 14:33",
           "from": "erik.haugen@haugenholdings.no",
           "to": [
-            "priya.raghavan@examplebank.com.sg"
+            "priya.raghavan@bnpp.com"
           ],
           "cc": [],
           "body": "Signed and attached. Please process this week - completion is on the 20th.\n\nErik",
@@ -1588,7 +1573,7 @@
       "thread_id": "THR-2026-0611",
       "subject": "Option proposals - HSBC covered call and Ping An put",
       "source": "OUTLOOK_EXCHANGE",
-      "mailbox_owner": "priya.raghavan@examplebank.com.sg",
+      "mailbox_owner": "priya.raghavan@bnpp.com",
       "linked_account_numbers": [
         "8000223"
       ],
@@ -1609,7 +1594,7 @@
         {
           "message_id": "MSG-0006",
           "sent_datetime_sgt": "11/06/2026 16:50",
-          "from": "priya.raghavan@examplebank.com.sg",
+          "from": "priya.raghavan@bnpp.com",
           "to": [
             "erik.haugen@haugenholdings.no"
           ],
@@ -1628,7 +1613,7 @@
       "thread_id": "THR-2026-0818",
       "subject": "Incoming transfer and deployment plan",
       "source": "OUTLOOK_EXCHANGE",
-      "mailbox_owner": "priya.raghavan@examplebank.com.sg",
+      "mailbox_owner": "priya.raghavan@bnpp.com",
       "linked_account_numbers": [
         "8000223"
       ],
@@ -1651,7 +1636,7 @@
           "sent_datetime_sgt": "18/08/2026 10:12",
           "from": "erik.haugen@haugenholdings.no",
           "to": [
-            "priya.raghavan@examplebank.com.sg"
+            "priya.raghavan@bnpp.com"
           ],
           "cc": [],
           "body": "Priya,\n\nThe Haugen Logistics second tranche is close to signing. I expect approximately USD 4,000,000 to reach the account in the week commencing 24 August.\n\nI want a plan for this before it arrives, not after. Can we speak this week.\n\nAlso - I am still waiting on the Olam bond position. It continues to appear on my statement. It was supposed to mature in February.\n\nErik",
@@ -1662,7 +1647,7 @@
         {
           "message_id": "MSG-0008",
           "sent_datetime_sgt": "22/08/2026 18:30",
-          "from": "priya.raghavan@examplebank.com.sg",
+          "from": "priya.raghavan@bnpp.com",
           "to": [
             "erik.haugen@haugenholdings.no"
           ],
@@ -1677,7 +1662,7 @@
           "sent_datetime_sgt": "25/08/2026 08:47",
           "from": "erik.haugen@haugenholdings.no",
           "to": [
-            "priya.raghavan@examplebank.com.sg"
+            "priya.raghavan@bnpp.com"
           ],
           "cc": [],
           "body": "Good. Funds leave escrow today, you should see them tomorrow.\n\nPlease note I have not yet received the FX conversion instruction for the Nordic balances, and I still have nothing on Olam.\n\nErik",
@@ -1691,7 +1676,7 @@
       "thread_id": "THR-2026-0916",
       "subject": "Following up - has anything been invested?",
       "source": "OUTLOOK_EXCHANGE",
-      "mailbox_owner": "priya.raghavan@examplebank.com.sg",
+      "mailbox_owner": "priya.raghavan@bnpp.com",
       "linked_account_numbers": [
         "8000223"
       ],
@@ -1714,7 +1699,7 @@
           "sent_datetime_sgt": "16/09/2026 07:22",
           "from": "erik.haugen@haugenholdings.no",
           "to": [
-            "priya.raghavan@examplebank.com.sg"
+            "priya.raghavan@bnpp.com"
           ],
           "cc": [],
           "body": "Priya,\n\nThe four million arrived on 26 August. It is now 16 September. I have logged into the app and as far as I can tell it is still sitting in the US dollar account doing nothing.\n\nI see some small trades have gone through. I appreciate that. But this is not what we agreed on the 21st. We said phased deployment over six to eight weeks. Three weeks have passed and the overwhelming majority of the money has not moved.\n\nI also note:\n\n- The Nordic balances are still in NOK and SEK. I instructed conversion on 21 August.\n- The China funds have not been touched.\n- I still have no answer on the Olam bond.\n- The IPS review has not been scheduled.\n\nThis is the third time I am asking about some of these. Please call me.\n\nErik",
@@ -1725,7 +1710,7 @@
         {
           "message_id": "MSG-0011",
           "sent_datetime_sgt": "17/09/2026 19:05",
-          "from": "priya.raghavan@examplebank.com.sg",
+          "from": "priya.raghavan@bnpp.com",
           "to": [
             "erik.haugen@haugenholdings.no"
           ],
@@ -1741,7 +1726,7 @@
       "thread_id": "THR-2026-0729",
       "subject": "Haugen Logistics AS - share sale documentation",
       "source": "OUTLOOK_EXCHANGE",
-      "mailbox_owner": "priya.raghavan@examplebank.com.sg",
+      "mailbox_owner": "priya.raghavan@bnpp.com",
       "linked_account_numbers": [
         "8000223"
       ],
