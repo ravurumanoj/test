@@ -298,6 +298,7 @@ class RelationshipManagerOrchestrator:
         total_tool_calls_executed: int = 0  # counts ALL tools (portfolio, crm, mcp__*)
         triggered_tool_names: list[str] = []  # every tool name triggered, in call order
         successful_tool_call_keys: set[tuple[str, str]] = set()
+        successful_tool_names: set[str] = set()
         context: dict[str, Any] = {
             "customer_id": request.customer_id,
             "portfolio_id": resolved_portfolio_id,
@@ -375,6 +376,9 @@ class RelationshipManagerOrchestrator:
             repeated_tool_calls = [
                 tc for tc in tool_calls if self._tool_call_key(tc) in successful_tool_call_keys
             ]
+            repeated_tool_name_calls = [
+                tc for tc in tool_calls if tc.name in successful_tool_names and self._tool_call_key(tc) not in successful_tool_call_keys
+            ]
             if repeated_tool_calls:
                 tool_calls = [
                     tc for tc in tool_calls if self._tool_call_key(tc) not in successful_tool_call_keys
@@ -383,7 +387,13 @@ class RelationshipManagerOrchestrator:
                     "Orchestrator: planner repeated already successful tool calls — skipping duplicates",
                     extra={"tool_names": [tc.name for tc in repeated_tool_calls]},
                 )
-            if repeated_tool_calls and not tool_calls:
+            if repeated_tool_name_calls:
+                tool_calls = [tc for tc in tool_calls if tc.name not in successful_tool_names]
+                logger.warning(
+                    "Orchestrator: planner repeated already satisfied tool names — skipping reruns",
+                    extra={"tool_names": [tc.name for tc in repeated_tool_name_calls]},
+                )
+            if (repeated_tool_calls or repeated_tool_name_calls) and not tool_calls:
                 final_answer = self._combine_answers(all_agent_answers)
                 debug_info_manager.add("loop_exit_reason", "repeated_successful_tool_call")
                 break
@@ -442,6 +452,11 @@ class RelationshipManagerOrchestrator:
             )
             successful_tool_call_keys.update(
                 self._tool_call_key(tool_call)
+                for tool_call, response in zip(tool_calls, tool_responses, strict=True)
+                if response.successful
+            )
+            successful_tool_names.update(
+                tool_call.name
                 for tool_call, response in zip(tool_calls, tool_responses, strict=True)
                 if response.successful
             )
@@ -862,6 +877,10 @@ class RelationshipManagerOrchestrator:
             "- Broad/'tell me everything' questions spanning domains → ### section headers per "
             "topic (e.g. ### Portfolio Snapshot, ### Client Profile, ### Recent Interactions), "
             "each followed by its table, list, or small optional HTML block where applicable.\n"
+            "- For long or multi-part questions, first decompose the request internally into distinct sub-questions and answer each one exactly once.\n"
+            "- If one section already answered a sub-question, later sections must contribute only new information and must not restate the same evidence or conclusion.\n"
+            "- If multiple sub-questions depend on the same evidence, present that evidence once in the best-fitting section instead of repeating it across sections.\n"
+            "- Never restart the answer with a second summary, second conclusion, or alternate rephrasing of points already covered.\n"
             "- Prefer briefing-note style headings such as Portfolio Snapshot, Key Changes Since Last Visit, Top Contributors & Detractors, Asset Allocation, Geographic Allocation, Income, Currency Effects, Client Profile, Recent Interactions, and Next Follow-Ups when they fit the data.\n"
             "- For recap, evolution, or 'what's new' portfolio questions, start with a recent-activity overview, then show only the most significant supporting sections rather than every possible section.\n"
             "- In those recap/evolution answers, omit any sentence or section that is not supported by real data.\n"

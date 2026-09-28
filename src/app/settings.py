@@ -148,7 +148,9 @@ class Settings:
             unique_default_session_id=os.getenv("UNIQUE_DEFAULT_SESSION_ID", "poc-demo-session-001").strip(),
             # ── Webhook integration ──────────────────────────────────────────
             unique_webhook_endpoint_secret=os.getenv("UNIQUE_WEBHOOK_ENDPOINT_SECRET", "").strip(),
-            unique_default_customer_id=os.getenv("UNIQUE_DEFAULT_CUSTOMER_ID", "CUST-1001").strip(),
+            # Keep customer_id optional for the active flow, but never default it
+            # to the old portfolio.json sample customer (CUST-1001 / Rajesh Kumar).
+            unique_default_customer_id=os.getenv("UNIQUE_DEFAULT_CUSTOMER_ID", "").strip(),
             unique_default_portfolio_id=os.getenv("UNIQUE_DEFAULT_PORTFOLIO_ID", "GO00001").strip(),
             # ── MCP integration (see resolution logic above) ─────────────────
             mcp_enabled=mcp_enabled,

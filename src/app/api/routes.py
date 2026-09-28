@@ -251,6 +251,8 @@ def create_router(
             return JSONResponse(status_code=200, content={"success": True, "handled": False})
 
         # 3. Resolve the customer_id and portfolio_id (payload configuration wins; else default).
+        # customer_id is optional for the active single-statement/single-CRM flow,
+        # but it must never silently fall back to the old portfolio.json sample data.
         customer_id = str(payload.configuration.get("customerId") or settings.unique_default_customer_id)
         portfolio_id = str(payload.configuration.get("portfolioId") or settings.unique_default_portfolio_id)
 

@@ -335,27 +335,7 @@ class HistoryManager:
                     extra={"tool_name": resp.name, "error_preview": log_text_preview(resp.error_message or "")},
                 )
             else:
-                content = resp.content
-                if resp.content_chunks:
-                    # Some tools (e.g. MCP passthrough) set content_chunks to the same
-                    # raw text already present in resp.content. Only inline chunks that
-                    # add NEW information, otherwise the same payload is duplicated
-                    # back-to-back in the same tool message (and can bleed into the
-                    # final answer / citations as repeated "internal" looking text).
-                    novel_chunks = [
-                        chunk
-                        for chunk in resp.content_chunks
-                        if not resp.content or chunk.text.strip() not in resp.content
-                    ]
-                    if novel_chunks:
-                        # No bracketed "[Source N]" markers here on purpose: citation
-                        # numbering is owned exclusively by ReferenceManager/_build_
-                        # references_section AFTER the loop ends. If the LLM sees
-                        # citation-shaped syntax in tool context it may copy it verbatim
-                        # into the answer, producing a second, mismatched set of
-                        # "citations" the model invented itself.
-                        chunks_text = "\n\n".join(chunk.text for chunk in novel_chunks)
-                        content = f"{resp.content}\n\nAdditional retrieved detail:\n{chunks_text}" if resp.content else chunks_text
+                content = self._build_tool_history_content(resp)
                 self._loop_history.append(
                     {
                         "role": "tool",
@@ -378,6 +358,42 @@ class HistoryManager:
                 "total_messages": len(self._loop_history),
             },
         )
+
+    def _build_tool_history_content(self, response: ToolCallResponse) -> str:
+        """Build a compact tool-result payload for the next planner iteration.
+
+        The loop only needs enough context to know what was already retrieved and
+        what high-level facts are available. Re-inlining full chunk payloads here
+        causes the final LLM pass to reread the same business facts multiple times
+        in different forms, which increases semantic duplication in the answer.
+        """
+        summary = (response.content or "").strip()
+        if not response.content_chunks:
+            return summary
+
+        section_labels: list[str] = []
+        seen_labels: set[tuple[str, str]] = set()
+        for chunk in response.content_chunks:
+            source = str(chunk.metadata.get("source", "")).strip()
+            section = str(chunk.metadata.get("section", "")).strip()
+            key = (source, section)
+            if key in seen_labels:
+                continue
+            seen_labels.add(key)
+            if source and section:
+                section_labels.append(f"{source}.{section}")
+            elif section:
+                section_labels.append(section)
+            elif source:
+                section_labels.append(source)
+
+        if not section_labels:
+            return summary
+
+        sections_text = ", ".join(section_labels)
+        if summary:
+            return f"{summary}\n\nRetrieved sections: {sections_text}"
+        return f"Retrieved sections: {sections_text}"
 
     # ── History retrieval with token reducer ──────────────────────────────────
 
@@ -870,12 +886,52 @@ class ResponseFormattingPostprocessor(Postprocessor):
         unique_blocks: list[str] = []
         seen: set[str] = set()
         for block in blocks:
-            key = re.sub(r"\s+", " ", block).strip().lower()
+            key = self._normalize_block_for_dedupe(block)
             if key in seen:
                 continue
             seen.add(key)
-            unique_blocks.append(block)
+            unique_blocks.append(self._deduplicate_sentences_within_block(block))
         return "\n\n".join(unique_blocks)
+
+    def _normalize_block_for_dedupe(self, block: str) -> str:
+        normalized = re.sub(r"\s+", " ", block).strip().lower()
+        normalized = re.sub(r"[^a-z0-9%|:.\-\s]", "", normalized)
+        return normalized
+
+    def _deduplicate_sentences_within_block(self, block: str) -> str:
+        if "|" in block or "\n- " in block or block.startswith("- "):
+            return block
+
+        parts = re.split(r"(?<=[.!?])\s+", block)
+        unique_parts: list[str] = []
+        seen_keys: list[set[str]] = []
+        for part in parts:
+            stripped = part.strip()
+            if not stripped:
+                continue
+            key = self._sentence_key_tokens(stripped)
+            if key and any(self._token_overlap_ratio(key, seen) >= 0.8 for seen in seen_keys):
+                continue
+            if key:
+                seen_keys.append(key)
+            unique_parts.append(stripped)
+        return " ".join(unique_parts)
+
+    def _sentence_key_tokens(self, sentence: str) -> set[str]:
+        normalized = re.sub(r"[^a-z0-9\s]", " ", sentence.lower())
+        tokens = {
+            token
+            for token in normalized.split()
+            if len(token) > 2 and token not in {"the", "and", "for", "with", "that", "this", "from", "your", "into", "have"}
+        }
+        return tokens
+
+    @staticmethod
+    def _token_overlap_ratio(left: set[str], right: set[str]) -> float:
+        if not left or not right:
+            return 0.0
+        intersection = len(left & right)
+        return intersection / min(len(left), len(right))
 
     def _reformat_flat_rankings(self, text: str) -> str:
         rewritten_lines: list[str] = []
