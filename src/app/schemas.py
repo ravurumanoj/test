@@ -107,7 +107,13 @@ class ConversationTurn(BaseModel):
 class RelationshipManagerRequest(BaseModel):
     """Represent an incoming relationship manager query."""
 
-    customer_id: str = Field(min_length=1, description="Customer identifier used by the sub-agents.")
+    customer_id: str = Field(
+        default="",
+        description=(
+            "Optional customer identifier used by the sub-agents when available. "
+            "The request may omit it entirely."
+        ),
+    )
     portfolio_id: str = Field(
         default="",
         description=(

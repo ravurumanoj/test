@@ -39,7 +39,7 @@ from typing import TYPE_CHECKING, Any
 
 from app.agents.base_tool import Tool
 from app.agents.mcp_tool_wrapper import MCP_TOOL_PREFIX, McpToolWrapper
-from app.agents.prompts import HTML_RENDERING_RULES
+from app.agents.prompts import FINAL_SYNTHESIS_PROMPT, HTML_RENDERING_RULES
 from app.logging_config import log_text_preview
 from app.errors import RoutingError
 from app.schemas import AgentAnswer, ConversationTurn, EvaluationMetricResult, RelationshipManagerRequest, RelationshipManagerResponse, ToolCallResponse
@@ -355,7 +355,12 @@ class RelationshipManagerOrchestrator:
                     user_id=request.auth_user_id,
                     company_id=request.auth_company_id,
                 )
-                final_answer = planning_result.get("content", "") or self._combine_answers(all_agent_answers)
+                final_answer = planning_result.get("content", "") or await self._synthesize_final_answer(
+                    history_manager=history_manager,
+                    agent_answers=all_agent_answers,
+                    user_id=request.auth_user_id,
+                    company_id=request.auth_company_id,
+                )
                 debug_info_manager.add("loop_exit_reason", "max_iterations_reached")
                 break
 
@@ -394,7 +399,12 @@ class RelationshipManagerOrchestrator:
                     extra={"tool_names": [tc.name for tc in repeated_tool_name_calls]},
                 )
             if (repeated_tool_calls or repeated_tool_name_calls) and not tool_calls:
-                final_answer = self._combine_answers(all_agent_answers)
+                final_answer = await self._synthesize_final_answer(
+                    history_manager=history_manager,
+                    agent_answers=all_agent_answers,
+                    user_id=request.auth_user_id,
+                    company_id=request.auth_company_id,
+                )
                 debug_info_manager.add("loop_exit_reason", "repeated_successful_tool_call")
                 break
 
@@ -433,7 +443,12 @@ class RelationshipManagerOrchestrator:
 
             if not tool_calls:
                 # No tools requested — LLM produced a direct final answer
-                final_answer = planning_result.get("content", "") or self._combine_answers(all_agent_answers)
+                final_answer = planning_result.get("content", "") or await self._synthesize_final_answer(
+                    history_manager=history_manager,
+                    agent_answers=all_agent_answers,
+                    user_id=request.auth_user_id,
+                    company_id=request.auth_company_id,
+                )
                 debug_info_manager.add("loop_exit_reason", "no_tool_calls_requested")
                 logger.info(
                     "Orchestrator: no tool calls requested — using direct LLM answer",
@@ -552,13 +567,23 @@ class RelationshipManagerOrchestrator:
                     "Orchestrator: control hand-off detected — exiting loop",
                     extra={"control_tool": control_tool.name},
                 )
-                final_answer = self._combine_answers(all_agent_answers)
+                final_answer = await self._synthesize_final_answer(
+                    history_manager=history_manager,
+                    agent_answers=all_agent_answers,
+                    user_id=request.auth_user_id,
+                    company_id=request.auth_company_id,
+                )
                 debug_info_manager.add("loop_exit_reason", f"control_taken_by_{control_tool.name}")
                 break
 
         # ── Post-loop: evaluation + postprocessing ─────────────────────────────
         if not final_answer:
-            final_answer = self._combine_answers(all_agent_answers)
+            final_answer = await self._synthesize_final_answer(
+                history_manager=history_manager,
+                agent_answers=all_agent_answers,
+                user_id=request.auth_user_id,
+                company_id=request.auth_company_id,
+            )
 
         # ── Inject reference citations from ReferenceManager ──────────────────
         references_section = self._build_references_section(reference_manager)
@@ -685,6 +710,41 @@ class RelationshipManagerOrchestrator:
             },
         )
         return result
+
+    async def _synthesize_final_answer(
+        self,
+        *,
+        history_manager: HistoryManager,
+        agent_answers: list[AgentAnswer],
+        user_id: str | None = None,
+        company_id: str | None = None,
+    ) -> str:
+        """Ask the LLM for one final no-tools answer using the accumulated history."""
+        messages = history_manager.get_history_for_model_call()
+        synthesis_messages = [
+            {"role": "system", "content": FINAL_SYNTHESIS_PROMPT},
+            *[message for message in messages if message.get("role") != "system"],
+        ]
+        logger.info(
+            "Orchestrator: synthesizing final answer from accumulated tool context",
+            extra={"message_count": len(synthesis_messages), "agent_answer_count": len(agent_answers)},
+        )
+        result = await asyncio.to_thread(
+            self.unique_toolkit.plan_with_tools,
+            messages=synthesis_messages,
+            tool_definitions=[],
+            allow_tools=False,
+            user_id=user_id,
+            company_id=company_id,
+        )
+        content = (result.get("content") or "").strip()
+        if content:
+            return content
+        logger.warning(
+            "Orchestrator: final synthesis returned empty content — falling back to merged tool summaries",
+            extra={"agent_answer_count": len(agent_answers)},
+        )
+        return self._combine_answers(agent_answers)
 
     # ── Tool execution ────────────────────────────────────────────────────────
 
@@ -907,6 +967,7 @@ class RelationshipManagerOrchestrator:
             "- Treat two tables as duplicates when they contain the same facts, metrics, or rankings, even if one is reordered, reformatted, shortened, expanded, or relabeled.\n"
             "- If a table already communicates the facts, do not restate the same rows in prose. Keep only short interpretation.\n"
             "- Ensure the final answer is one coherent response, not multiple partial answers stitched together.\n"
+            "- Ensure the final answer reads like one RM briefing note prepared for a client call, not like a stack of tool outputs.\n"
             "- Check that each user sub-question is answered exactly once in the most relevant section.\n"
             "- Do not expose chain-of-thought, hidden reasoning, self-critique, or the validation steps themselves. Output only the cleaned final answer.\n\n"
             f"{HTML_RENDERING_RULES}\n\n"
