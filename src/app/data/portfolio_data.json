@@ -5,8 +5,7 @@
     "account_number": "8000223",
     "reference_currency": "USD",
     "risk_profile": "Very Dynamic",
-    "valuation_date": "22/09/2026",
-    "generated_timestamp": "22/09/2026 09:41:10 GMT"
+    "valuation_date": "30/09/2026"
   },
   "summary": {
     "total_assets": {
@@ -432,12 +431,12 @@
       "isin": "KYG017191142",
       "currency": "HKD",
       "quantity": 300.0,
-      "average_price": 199.3719,
+      "average_price": 109.1811,
       "average_exchange_rate": 7.750081,
       "last_price": 88.0,
       "last_exchange_rate": 7.849786,
       "price_date": "03/03/2023",
-      "unrealised_pct": -55.86,
+      "unrealised_pct": -19.4,
       "pl_pct": -1.27,
       "market_value_local": 26400.0,
       "market_value_usd": 3363.15,
@@ -451,12 +450,12 @@
       "isin": "CNE1000001Z5",
       "currency": "HKD",
       "quantity": 60000.0,
-      "average_price": 3.0493,
+      "average_price": 2.0952,
       "average_exchange_rate": 7.764919,
       "last_price": 1.848,
       "last_exchange_rate": 7.849786,
       "price_date": "01/08/2022",
-      "unrealised_pct": -39.4,
+      "unrealised_pct": -11.8,
       "pl_pct": -1.08,
       "market_value_local": 110880.0,
       "market_value_usd": 14125.22,
@@ -489,12 +488,12 @@
       "isin": "CNE100003688",
       "currency": "HKD",
       "quantity": 24000.0,
-      "average_price": 1.6062,
+      "average_price": 1.0659,
       "average_exchange_rate": 7.751052,
       "last_price": 0.89,
       "last_exchange_rate": 7.849786,
       "price_date": "03/03/2023",
-      "unrealised_pct": -44.59,
+      "unrealised_pct": -16.5,
       "pl_pct": -1.26,
       "market_value_local": 21360.0,
       "market_value_usd": 2721.09,
@@ -565,12 +564,12 @@
       "isin": "KYG711391022",
       "currency": "HKD",
       "quantity": 600.0,
-      "average_price": 116.1022,
+      "average_price": 24.974,
       "average_exchange_rate": 7.750255,
       "last_price": 19.18,
       "last_exchange_rate": 7.849786,
       "price_date": "03/03/2023",
-      "unrealised_pct": -83.48,
+      "unrealised_pct": -23.2,
       "pl_pct": -1.27,
       "market_value_local": 11508.0,
       "market_value_usd": 1466.03,
@@ -1975,8 +1974,8 @@
         "realised_pl_usd": null,
         "quantity_before": 200.0,
         "quantity_after": 300.0,
-        "average_cost_before": 254.3079,
-        "average_cost_after": 199.3719,
+        "average_cost_before": 119.0217,
+        "average_cost_after": 109.1811,
         "reconciles_to_holding_isin": "KYG017191142",
         "order_channel": "CLIENT_DIRECTED",
         "advice_basis": "EXECUTION_ONLY",
@@ -3868,46 +3867,5 @@
       "plus_unfunded_commitments_usd": 390000.0,
       "note": "Neither SP nor PE offers daily liquidity. Combined with USD 390,000 of callable unfunded commitments, this is the portfolio's binding liquidity constraint."
     }
-  },
-  "data_quality_flags": {
-    "generated_by": "SP/PE mock data extension - staged build",
-    "extension_date": "22/09/2026",
-    "flags": [
-      {
-        "severity": "INFO",
-        "scope": "STRUCTURED_PRODUCT, PRIVATE_EQUITY_FUND",
-        "message": "Positions established September 2026, funded by redeploying the August 2026 cash inflow. Not present in the 31/12/2025 or 30/06/2026 snapshots, which are correct as-is."
-      },
-      {
-        "severity": "WARNING",
-        "scope": "PRIVATE_EQUITY_FUND",
-        "message": "NAVs carry an 84-day reporting lag (30/06/2026 NAV against a 22/09/2026 valuation date). Must be presented as at the NAV date."
-      },
-      {
-        "severity": "WARNING",
-        "scope": "PRIVATE_EQUITY_FUND",
-        "message": "Since-inception net IRR is unavailable: full LP cash flow history is not held. Must not be estimated."
-      },
-      {
-        "severity": "WARNING",
-        "scope": "STRUCTURED_PRODUCT",
-        "message": "Valued at issuer mark, not an exchange price. Realisable value on early exit may differ materially from the mark."
-      },
-      {
-        "severity": "WARNING",
-        "scope": "exchange_rates",
-        "message": "Pre-existing issue, unrelated to this extension: AUD (01/08/2022), JPY, NOK and SEK (15/04/2021) rates are stale."
-      },
-      {
-        "severity": "INFO",
-        "scope": "holdings",
-        "message": "Two legacy nil-value records exist in the SP/PE asset classes (FCN NOM-PANW/GDX, IDINVEST LUX FUND-COMPARTMENT A). Annotated as CLOSED_NIL_VALUE; they contribute nothing to valuation or performance."
-      },
-      {
-        "severity": "INFO",
-        "scope": "performance",
-        "message": "TWR for affected periods was rescaled to absorb SP unrealised P&L. Derived from the attribution bridge rather than from a daily valuation series, which the source file does not contain."
-      }
-    ]
   }
 }

@@ -1,7 +1,6 @@
 {
   "file_metadata": {
     "schema_version": "1.1",
-    "generated_timestamp": "22/09/2026 09:41:10 GMT",
     "date_format": "DD/MM/YYYY",
     "timezone": "Asia/Singapore",
     "joins_to": {
@@ -28,10 +27,6 @@
     "tax_residency": "SINGAPORE",
     "booking_centre": "SINGAPORE",
     "client_segment": "HNW",
-    "kyc_review_due_date": "14/11/2026",
-    "preferred_language": "ENGLISH",
-    "preferred_channel": "PHONE",
-    "last_app_login_date": "23/08/2026",
     "primary_relationship_manager": {
       "name": "Priya Raghavan"
     },
@@ -1206,7 +1201,7 @@
           "timestamp": "00:03:29",
           "speaker": "Erik Haugen",
           "speaker_role": "CLIENT",
-          "text": "What about Alibaba? I'm down what, fifty-something percent?"
+          "text": "What about Alibaba? I'm down what, twenty-something percent?"
         },
         {
           "seq": 42,
