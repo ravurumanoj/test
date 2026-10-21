@@ -245,6 +245,7 @@ class WebhookPayload(BaseModel):
     userMessage: WebhookUserMessage = Field(default_factory=WebhookUserMessage)
     assistantMessage: WebhookAssistantMessage = Field(default_factory=WebhookAssistantMessage)
     configuration: dict[str, Any] = Field(default_factory=dict)
+    mcpServers: list[dict[str, Any]] = Field(default_factory=list)  # MCP connectors enabled in the space
 
 
 class WebhookEvent(BaseModel):

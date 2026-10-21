@@ -18,6 +18,7 @@ from app.schemas import (
     WebhookEvent,
 )
 from app.services.session_service import UniqueSessionService
+from app.services.unique_mcp import is_ping_request, run_mcp_ping
 from app.settings import Settings
 
 try:
@@ -249,6 +250,32 @@ def create_router(
                 extra={"has_text": bool(user_text), "has_chat_id": bool(chat_id)},
             )
             return JSONResponse(status_code=200, content={"success": True, "handled": False})
+
+        # MCP connectivity check: "get ping" calls a tool from payload.mcpServers
+        # directly and skips the orchestrator.
+        if is_ping_request(user_text):
+            answer = await run_mcp_ping(
+                settings,
+                mcp_servers=payload.mcpServers,
+                user_id=event.userId,
+                company_id=event.companyId,
+                chat_id=chat_id,
+                message_id=assistant_message_id,
+            )
+            if session_service is not None:
+                try:
+                    session_service.write_assistant_message(
+                        chat_id=chat_id,
+                        message_id=assistant_message_id,
+                        text=answer,
+                        user_id=event.userId,
+                        company_id=event.companyId,
+                        assistant_id=payload.assistantId,
+                    )
+                except Exception:
+                    logger.exception("Webhook failed to write MCP ping answer", extra={"chat_id": chat_id})
+                    return JSONResponse(status_code=200, content={"success": False, "reason": "write_error"})
+            return JSONResponse(status_code=200, content={"success": True, "handled": True, "mcp_ping": True})
 
         # 3. Resolve optional customer_id and portfolio_id from payload configuration.
         # Missing keys and empty values are both allowed for the active flow.
