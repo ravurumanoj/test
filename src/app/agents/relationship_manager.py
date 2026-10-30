@@ -48,6 +48,7 @@ if TYPE_CHECKING:
     from app.services.mcp_manager import McpManager
     from app.services.session_service import UniqueSessionService
 from app.services.managers import (
+    DISCLAIMER_MARKER,
     DebugInfoManager,
     EvaluationManager,
     FinancialDisclaimerPostprocessor,
@@ -85,6 +86,18 @@ class ToolCall:
     id: str
     name: str
     arguments: str
+
+
+def _insert_before_disclaimer(text: str, section: str) -> str:
+    """Insert ``section`` above the trailing disclaimer, or append it when absent.
+
+    Citations are added after postprocessing (see handle_request), so this keeps
+    the disclaimer as the last thing in the answer, matching the previous layout.
+    """
+    index = text.find(DISCLAIMER_MARKER)
+    if index == -1:
+        return text + section
+    return text[:index].rstrip() + section + "\n\n" + text[index:]
 
 
 class RelationshipManagerOrchestrator:
@@ -247,7 +260,11 @@ class RelationshipManagerOrchestrator:
                 history_manager.add_user_message(msg["content"], source="history")
                 loaded_user += 1
             elif msg["role"] == "assistant":
-                history_manager.add_assistant_message(normalize_terminology(msg["content"]), source="history")
+                # Strip postprocessor artifacts (disclaimer, Sources block) before the
+                # model sees prior turns. Left in, the model imitates them and writes
+                # its own Sources block, which then collides with the real citations.
+                cleaned = await postprocessor_manager.remove_from_text(msg["content"])
+                history_manager.add_assistant_message(normalize_terminology(cleaned), source="history")
                 loaded_assistant += 1
 
         # has_no_loop_messages() is now True iff no prior turns were loaded — mirrors
@@ -587,15 +604,7 @@ class RelationshipManagerOrchestrator:
                 company_id=request.auth_company_id,
             )
 
-        # ── Inject reference citations from ReferenceManager ──────────────────
         final_answer = normalize_terminology(final_answer)
-        references_section = self._build_references_section(reference_manager)
-        if references_section:
-            final_answer += references_section
-            logger.info(
-                "Orchestrator: reference citations appended to final answer",
-                extra={"reference_count": len(reference_manager.get_chunks())},
-            )
 
         logger.info(
             "Orchestrator: running EvaluationManager",
@@ -629,6 +638,18 @@ class RelationshipManagerOrchestrator:
             extra={"postprocessor_count": len(postprocessor_manager.get_postprocessors())},
         )
         final_answer = await postprocessor_manager.run_postprocessors(final_answer)
+
+        # ── Inject reference citations from ReferenceManager ──────────────────
+        # Deliberately after postprocessing: ResponseFormattingPostprocessor strips
+        # any trailing Sources block to remove model-invented citations, and cannot
+        # tell those apart from the real ones. Adding ours last keeps them intact.
+        references_section = self._build_references_section(reference_manager)
+        if references_section:
+            final_answer = _insert_before_disclaimer(final_answer, references_section)
+            logger.info(
+                "Orchestrator: reference citations appended to final answer",
+                extra={"reference_count": len(reference_manager.get_chunks())},
+            )
 
         # ── Tool call persistence (mirrors Unique Toolkit pattern) ─────────────
         persisted_tools = history_manager.extract_message_tools()

@@ -36,6 +36,11 @@ logger = logging.getLogger(__name__)
 _TABLE_ROW_RE = re.compile(r"^\|.*\|\s*$")
 _MARKDOWN_HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)$")
 _PIPE_ONLY_LINE_RE = re.compile(r"^[\s.|]+$")
+# Start of the standard disclaimer. Shared: FinancialDisclaimerPostprocessor appends
+# it, ResponseFormattingPostprocessor splits on it, and the orchestrator inserts the
+# citations block above it.
+DISCLAIMER_MARKER: str = "---\n*This information is for relationship management purposes only"
+
 _MODEL_SOURCES_BLOCK_RE = re.compile(
     r"(?:\n|\A)(?:\*\*Sources:\*\*|Sources:)\s*(?:\n(?:\[[0-9]+\].*|[-*].*|\d+\..*|.+))*\s*\Z",
     re.IGNORECASE,
@@ -749,7 +754,7 @@ class PostprocessorManager:
     """Runs and manages pluggable response postprocessors.
 
     Mirrors PostprocessorManager in unique_toolkit:
-      - run() called in parallel, results applied sequentially
+      - run() called in registration order, each given the previous result
       - remove_from_text() exposed to HistoryManager for history cleanup
     """
 
@@ -774,10 +779,12 @@ class PostprocessorManager:
         return list(self._postprocessors)
 
     async def run_postprocessors(self, response_text: str) -> str:
-        """Run all postprocessors concurrently, then apply modifications sequentially.
+        """Run postprocessors in registration order, chaining their output.
 
-        Mirrors PostprocessorManager.run_postprocessors() in unique_toolkit.
-        The last successfully transformed version is the final output.
+        Each postprocessor receives the previous one's result so their effects
+        compose. The previous implementation ran them all on the *original* text
+        concurrently and kept whichever result differed last, which meant a later
+        postprocessor silently discarded an earlier one's work.
         """
         if not self._postprocessors:
             logger.debug("PostprocessorManager: no postprocessors; returning text unchanged")
@@ -788,27 +795,27 @@ class PostprocessorManager:
             extra={"postprocessor_count": len(self._postprocessors)},
         )
 
-        tasks = [pp.run(response_text) for pp in self._postprocessors]
-        transformed_versions = await asyncio.gather(*tasks, return_exceptions=True)
-
         final_text = response_text
-        for pp, transformed in zip(self._postprocessors, transformed_versions):
-            if isinstance(transformed, Exception):
+        for pp in self._postprocessors:
+            try:
+                transformed = await pp.run(final_text)
+            except Exception as exc:
                 logger.warning(
                     "PostprocessorManager: postprocessor raised an exception",
-                    extra={"postprocessor_name": pp.get_name(), "error": str(transformed)},
+                    extra={"postprocessor_name": pp.get_name(), "error": str(exc)},
                 )
                 continue
-            if isinstance(transformed, str) and transformed != response_text:
-                final_text = transformed
-                logger.info(
-                    "PostprocessorManager: postprocessor applied",
-                    extra={
-                        "postprocessor_name": pp.get_name(),
-                        "original_length": len(response_text),
-                        "new_length": len(final_text),
-                    },
-                )
+            if not isinstance(transformed, str) or transformed == final_text:
+                continue
+            logger.info(
+                "PostprocessorManager: postprocessor applied",
+                extra={
+                    "postprocessor_name": pp.get_name(),
+                    "original_length": len(final_text),
+                    "new_length": len(transformed),
+                },
+            )
+            final_text = transformed
 
         return final_text
 
@@ -905,6 +912,15 @@ class ResponseFormattingPostprocessor(Postprocessor):
         styled = self._style_profit_loss_tables(restyled)
         return self._normalize_plaintext_fallbacks(styled)
 
+    async def remove_from_text(self, text: str) -> str:
+        """Strip the trailing Sources block before the text re-enters LLM history.
+
+        The citations are appended by the orchestrator, not by this postprocessor,
+        but the regex that recognises such a block lives here. Removing it keeps
+        the model from imitating the block in its own answers.
+        """
+        return self._strip_model_generated_sources(text)
+
     def _deduplicate_repeated_blocks(self, text: str) -> str:
         blocks = [block.strip() for block in re.split(r"\n\s*\n", text) if block.strip()]
         unique_blocks: list[str] = []
@@ -987,7 +1003,17 @@ class ResponseFormattingPostprocessor(Postprocessor):
         return expanded
 
     def _strip_model_generated_sources(self, text: str) -> str:
-        return _MODEL_SOURCES_BLOCK_RE.sub("", text).rstrip()
+        """Remove a model-invented Sources block.
+
+        _MODEL_SOURCES_BLOCK_RE only matches such a block at the very end of the
+        text, so a trailing disclaimer is split off first — otherwise a Sources
+        block sitting directly above it would be missed.
+        """
+        index = text.find(DISCLAIMER_MARKER)
+        if index == -1:
+            return _MODEL_SOURCES_BLOCK_RE.sub("", text).rstrip()
+        head, tail = text[:index], text[index:]
+        return _MODEL_SOURCES_BLOCK_RE.sub("", head).rstrip() + "\n\n" + tail
 
     def _style_profit_loss_tables(self, text: str) -> str:
         lines = text.splitlines()
@@ -1074,7 +1100,7 @@ class FinancialDisclaimerPostprocessor(Postprocessor):
         "\n\n---\n*This information is for relationship management purposes only and does not "
         "constitute financial advice. Past performance is not indicative of future results.*"
     )
-    _MARKER: str = "---\n*This information is for relationship management purposes only"
+    _MARKER: str = DISCLAIMER_MARKER
 
     def __init__(self) -> None:
         """Initialize with the disclaimer postprocessor identifier."""
