@@ -33,6 +33,9 @@ logger = logging.getLogger(__name__)
 _CHUNK_MAX_CHARS: int = 2000
 _CHUNK_MIN_CHARS: int = 50
 
+# Domain values that are internal identifiers get a readable label in citations and history.
+_SOURCE_LABELS: dict[str, str] = {"crm": "client interactions"}
+
 
 @dataclass(frozen=True)
 class DataQuerySpec:
@@ -279,7 +282,7 @@ class DataQueryTool(Tool):
                         "customer_id": customer_id,
                         "portfolio_id": portfolio_id,
                         "section": section_name,
-                        "source": self._spec.domain,
+                        "source": _SOURCE_LABELS.get(self._spec.domain, self._spec.domain),
                         "tool": self._spec.name,
                     },
                 )

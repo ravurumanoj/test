@@ -316,10 +316,13 @@ def create_router(
             return JSONResponse(status_code=200, content={"success": False, "reason": "processing_error"})
         elapsed_ms = round((time.perf_counter() - t0) * 1000)
 
-        # 5. Write the answer back into the assistant message placeholder.
+        # 5. Reveal the answer in the assistant message placeholder. The answer is
+        #    already complete — stream_assistant_message only controls how it appears,
+        #    PATCHing the placeholder with a growing prefix so the UI renders it
+        #    progressively instead of all at once.
         if session_service is not None:
             try:
-                session_service.write_assistant_message(
+                await session_service.stream_assistant_message(
                     chat_id=chat_id,
                     message_id=assistant_message_id,
                     text=response.final_answer,

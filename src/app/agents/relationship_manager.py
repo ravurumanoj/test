@@ -896,9 +896,17 @@ class RelationshipManagerOrchestrator:
             "statement_history, statement_risk) are the ONLY portfolio data source — the raw "
             "account statement: totals, holdings, allocation, credit/FX, transactions, "
             "performance, valuation history, and concentration/risk metadata. Use these for ALL "
-            "portfolio questions, including recap/update/'what's new'. Client Interaction Agent tools (crm_*): "
-            "client profile/KYC, past interactions from meeting transcripts and email threads, "
-            "advisory/follow-ups.\n\n"
+            "portfolio questions, including recap/update/'what's new'. Client Interaction Agent tools (client_interaction_*): "
+            "client identity and linked accounts, past meetings and call transcripts, email threads, "
+            "and follow-ups.\n\n"
+            "Capability and naming:\n"
+            "- If the user asks what you can help with, describe two areas in plain language: "
+            "portfolio and account statement insights (valuation, holdings, allocation, performance, "
+            "transactions, risk), and client interactions from past meetings, call transcripts, and "
+            "email threads (what the client said or asked for, concerns, and follow-ups). Do not list "
+            "internal tool names.\n"
+            "- Always call the meeting/email area 'client interactions'. Never use the terms 'CRM', "
+            "'CRM profile', or 'client relationship management', and do not mention KYC.\n\n"
             "CRITICAL — tool call requirement:\n"
             "- You MUST call at least one tool before answering; never answer from memory.\n"
             "- Broad/general questions (e.g. 'what details do you have about me', 'tell me "
@@ -1079,23 +1087,23 @@ class RelationshipManagerOrchestrator:
                 "allocation", "asset", "position", "p&l", "pnl", "profit", "loss", "invest",
                 "investment",
             )),
-            ("crm_interactions", (
+            ("client_interaction_history", (
                 "interaction", "interactions", "conversation", "meeting", "last call",
                 "follow-up", "follow up", "sentiment", "transcript", "meeting transcript",
                 "call transcript", "email thread", "email", "emails", "what did the client say",
                 "what did he say", "what did she say", "what was discussed", "meeting notes",
                 "discussion", "client concern", "client concerns", "client asked", "client request",
             )),
-            ("crm_advisory", (
+            ("client_interaction_advisory", (
                 "advisory", "suggestion", "recommendation", "compliance flag", "follow-up item",
                 "follow up item", "promised", "action item", "next step", "next steps",
             )),
-            ("crm_profile", (
+            ("client_interaction_profile", (
                 "crm", "profile", "kyc", "nps", "churn", "segment", "demographic",
                 "relationship manager", "contact", "preferred channel", "linked account",
                 "linked accounts", "client identity",
             )),
-            ("crm_book_summary", (
+            ("client_interaction_summary", (
                 "all customers", "pipeline", "every customer", "across customers",
                 "book summary",
             )),
@@ -1111,7 +1119,7 @@ class RelationshipManagerOrchestrator:
         if not selected:
             # No strong keyword match — fetch the core per-customer/account views so the
             # final answer is complete across both domains.
-            for default_name in ("statement_overview", "crm_profile"):
+            for default_name in ("statement_overview", "client_interaction_profile"):
                 if default_name in self._tools and self._tools[default_name].is_enabled():
                     selected.append(default_name)
 

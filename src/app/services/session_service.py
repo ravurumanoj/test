@@ -37,6 +37,38 @@ except ImportError:
     _SDK_AVAILABLE = False
 
 
+# ── Progressive reveal tuning ────────────────────────────────────────────────
+# Each chunk is one HTTP PATCH to Unique, so these are deliberately coarse:
+# character-level chunking would mean 100+ calls per answer and risk rate limits.
+_STREAM_CHUNK_CHARS = 120
+_STREAM_CHUNK_DELAY_SECONDS = 0.04
+
+
+def _cumulative_chunks(text: str, chunk_chars: int = _STREAM_CHUNK_CHARS) -> list[str]:
+    """Build cumulative prefixes of ``text``, cut on line/space boundaries.
+
+    Boundary-aware so markdown (**bold**, headings, bullets) is never split
+    mid-token — a raw character slice makes the UI render broken markup while
+    the answer is being revealed.
+
+    The complete text is intentionally excluded from the result: the caller
+    always writes it as the terminating update. Text shorter than one chunk
+    therefore yields an empty list, i.e. a single write, exactly as before.
+    """
+    cuts: list[int] = []
+    position = 0
+    while position < len(text):
+        target = min(position + chunk_chars, len(text))
+        if target < len(text):
+            window = text[position:target]
+            break_at = max(window.rfind("\n"), window.rfind(" "))
+            if break_at > 0:
+                target = position + break_at + 1
+        position = target
+        cuts.append(position)
+    return [text[:cut] for cut in cuts[:-1]]
+
+
 class UniqueSessionService:
     """Persist and retrieve per-session conversation history via Unique AI.
 
@@ -239,6 +271,120 @@ class UniqueSessionService:
             "UniqueSessionService.write_assistant_message: assistant message created (no placeholder id)",
             extra={"chat_id": chat_id, "text_len": len(text)},
         )
+
+    async def stream_assistant_message(
+        self,
+        chat_id: str,
+        message_id: str,
+        text: str,
+        *,
+        user_id: str = "",
+        company_id: str = "",
+        assistant_id: str = "",
+    ) -> None:
+        """Reveal an already-generated answer progressively in the Unique chat UI.
+
+        Nothing is streamed from the LLM — the answer is complete before this is
+        called. We PATCH the assistant message placeholder with a growing prefix
+        of the text, which the Unique UI re-renders on each update. This is the
+        same mechanism unique_toolkit's ToolProgressReporter uses to animate tool
+        status into a message.
+
+        Intermediate updates deliberately omit ``stoppedStreamingAt``/``completedAt``
+        so the UI keeps treating the message as in-flight; the closing update sets
+        both to finish it.
+
+        The closing write is unconditional, so if the progressive updates fail for
+        any reason the message still lands the full answer — identical to what
+        write_assistant_message() produces.
+        """
+        if not message_id:
+            # No placeholder to update — nothing to reveal into.
+            self.write_assistant_message(
+                chat_id=chat_id,
+                message_id="",
+                text=text,
+                user_id=user_id,
+                company_id=company_id,
+                assistant_id=assistant_id,
+            )
+            return
+
+        uid, cid, _aid = self._resolve_identity(user_id, company_id, assistant_id)
+        self._setup_sdk()
+        started_at = datetime.now(timezone.utc)
+        chunks = _cumulative_chunks(text)
+
+        try:
+            for partial in chunks:
+                # Run in a worker thread: Message.modify is a blocking (sync)
+                # unique_sdk HTTP call — inline it would stall the event loop.
+                await asyncio.to_thread(
+                    self._modify_message_text,
+                    chat_id=chat_id,
+                    message_id=message_id,
+                    text=partial,
+                    user_id=uid,
+                    company_id=cid,
+                    started_at=started_at,
+                )
+                await asyncio.sleep(_STREAM_CHUNK_DELAY_SECONDS)
+        except Exception as exc:
+            logger.warning(
+                "UniqueSessionService.stream_assistant_message: progressive reveal failed — "
+                "writing the full answer instead",
+                extra={"chat_id": chat_id, "message_id": message_id, "error": str(exc)},
+            )
+
+        completed_at = datetime.now(timezone.utc)
+        await asyncio.to_thread(
+            self._modify_message_text,
+            chat_id=chat_id,
+            message_id=message_id,
+            text=text,
+            user_id=uid,
+            company_id=cid,
+            started_at=started_at,
+            completed_at=completed_at,
+        )
+        logger.info(
+            "UniqueSessionService.stream_assistant_message: answer revealed",
+            extra={
+                "chat_id": chat_id,
+                "message_id": message_id,
+                "text_len": len(text),
+                "chunk_count": len(chunks),
+            },
+        )
+
+    def _modify_message_text(
+        self,
+        *,
+        chat_id: str,
+        message_id: str,
+        text: str,
+        user_id: str,
+        company_id: str,
+        started_at: datetime,
+        completed_at: datetime | None = None,
+    ) -> None:
+        """PATCH the assistant message with ``text``.
+
+        When ``completed_at`` is None the message stays marked as in-flight, which
+        is what keeps the UI in its streaming state between updates.
+        """
+        params: dict[str, Any] = {
+            "user_id": user_id,
+            "company_id": company_id,
+            "id": message_id,
+            "chatId": chat_id,
+            "text": text,
+            "startedStreamingAt": started_at,
+        }
+        if completed_at is not None:
+            params["stoppedStreamingAt"] = completed_at
+            params["completedAt"] = completed_at
+        _sdk.Message.modify(**params)  # type: ignore[union-attr]
 
     # ── Private helpers ───────────────────────────────────────────────────────
 

@@ -2,7 +2,7 @@
 
 A backend-only FastAPI application that uses the **Unique AI SDK and Unique Toolkit** to
 answer relationship-manager questions through a fully-managed agentic loop. Every
-underlying data API (Portfolio and CRM) is exposed to the LLM as its own tool, so the
+underlying data API (Portfolio and Client Interactions) is exposed to the LLM as its own tool, so the
 model decides which data to fetch — nothing is hardcoded.
 
 It can be driven two ways:
@@ -18,7 +18,7 @@ It can be driven two ways:
 - Accepts a natural-language question via REST **or** a Unique AI webhook event.
 - Runs an iterative orchestrator loop that plans, dispatches granular tool calls, and
   finalises an answer — aligned with the Unique Toolkit orchestrator pattern.
-- Exposes **8 granular data tools** (4 Portfolio + 4 CRM) to the LLM; the model selects
+- Exposes **8 granular data tools** (4 Portfolio + 4 Client Interaction Agent) to the LLM; the model selects
   the right one(s) per question (e.g. a "performance" question calls
   `portfolio_performance`, not a generic snapshot).
 - Wires all five Unique Toolkit managers: **HistoryManager**, **ReferenceManager**,
@@ -48,9 +48,9 @@ POST /relationship-manager/query          POST /relationship-manager/webhook
                               │  (LLM chooses which tools to call)
         ┌────────────────┬────┴───────────┬────────────────┐
         ▼                ▼                ▼                 ▼
- portfolio_snapshot  portfolio_        crm_profile     mcp__<tool>   ← optional, LLM-driven
- portfolio_performance  compliance     crm_interactions
- portfolio_book_summary                crm_advisory / crm_book_summary
+ portfolio_snapshot  portfolio_        client_interaction_profile   mcp__<tool>   ← optional, LLM-driven
+ portfolio_performance  compliance     client_interaction_history
+ portfolio_book_summary                client_interaction_advisory / client_interaction_summary
         │                                │
    PortfolioTools                     CrmTools           ← in-process, JSON-backed
         │                                │
@@ -77,12 +77,12 @@ data method and returns a `ToolCallResponse` with:
 | `portfolio_performance` | portfolio | `get_performance_view` | Returns, risk metrics, sector/geo exposure, events |
 | `portfolio_compliance` | portfolio | `get_compliance_view` | Line of credit, tax summary, alerts |
 | `portfolio_book_summary` | portfolio | `get_all_portfolios_summary` | Book-of-business overview (all customers) |
-| `crm_profile` | crm | `get_customer_full_profile` | Demographics + account metadata + RM |
-| `crm_interactions` | crm | `get_interactions` | Conversation history + open service requests (filterable) |
-| `crm_advisory` | crm | `get_advisory_view` | Suggestions + compliance flags + alerts |
-| `crm_book_summary` | crm | `get_all_customers_summary` | Pipeline overview (all customers) |
+| `client_interaction_profile` | crm | `get_customer_full_profile` | Client identity + linked accounts + RM |
+| `client_interaction_history` | crm | `get_interactions` | Meeting transcripts + email threads (filterable) |
+| `client_interaction_advisory` | crm | `get_advisory_view` | Follow-up context + meeting/email overviews |
+| `client_interaction_summary` | crm | `get_book_summary` | Record-level client interaction summary |
 
-Tools are built by `build_portfolio_tools()` and `build_crm_tools()` and passed to the
+Tools are built by `build_portfolio_tools()` and `build_crm_tools()` (Client Interaction Agent) and passed to the
 orchestrator as a flat list. Each tool's `domain` drives `AgentAnswer` grouping and the
 `routing_decision`.
 
@@ -100,12 +100,12 @@ src/app/
     api/
         routes.py            — orchestrator query, webhook, health, models endpoints
         portfolio_routes.py  — 4 read-only Portfolio GET endpoints
-        crm_routes.py        — 4 read-only CRM GET endpoints
+        crm_routes.py        — 4 read-only Client Interaction GET endpoints
     agents/
         base_tool.py         — abstract Tool + BaseToolConfig (has `domain`)
         data_query_tool.py   — generic DataQueryTool + DataQuerySpec (wraps one data API)
         portfolio_agent.py   — build_portfolio_tools() factory (4 portfolio tools)
-        crm_agent.py         — build_crm_tools() factory (4 CRM tools)
+        crm_agent.py         — build_crm_tools() factory (4 Client Interaction Agent tools)
         mcp_tool_wrapper.py  — McpToolWrapper — exposes each MCP tool to the LLM
         prompts.py           — system prompt strings for summarisation
         relationship_manager.py — RelationshipManagerOrchestrator (all 5 managers)
@@ -120,7 +120,7 @@ src/app/
         data_loader.py       — JsonDataLoader + BaseDataTools (shared base)
     data/
         portfolio.json       — 5 sample customers (full finance/banking detail)
-        crm.json             — 5 sample customers (full CRM history)
+        crm.json             — 5 sample customers (full client interaction history: meeting transcripts + email threads)
 tests/
     test_app.py          — API-level integration tests
     test_health.py       — health endpoint test
@@ -236,14 +236,14 @@ After the server starts:
 - **Orchestrator query:** `POST /relationship-manager/query`
 - **Unique webhook:** `POST /relationship-manager/webhook`
 - **Portfolio data:** `GET /portfolio/` · `GET /portfolio/{id}` · `/performance` · `/compliance`
-- **CRM data:** `GET /crm/` · `GET /crm/{id}` · `/interactions` · `/advisory`
+- **Client interaction data:** `GET /crm/` · `GET /crm/{id}` · `/interactions` · `/advisory`
 
 Example orchestrator request:
 
 ```json
 {
     "customer_id": "CUST-1001",
-    "question": "Share portfolio and CRM summary for this customer",
+    "question": "Share portfolio and client interaction summary for this customer",
     "session_id": ""
 }
 ```
@@ -263,7 +263,7 @@ Example response shape:
     "agent_answers": [
         { "agent_name": "portfolio", "tool_name": "portfolio_snapshot", "summary": "...", "retrieved_context": {} }
     ],
-    "debug_info": { "total_iterations": 2, "triggered_tool_names": ["portfolio_snapshot", "crm_profile"], "reference_chunk_count": 8 },
+    "debug_info": { "total_iterations": 2, "triggered_tool_names": ["portfolio_snapshot", "client_interaction_profile"], "reference_chunk_count": 8 },
     "evaluation_results": [{ "name": "financial_safety", "is_positive": true, "value": "PASS", "reason": "..." }]
 }
 ```
@@ -376,7 +376,7 @@ Returns `HTTP 404` when the customer ID is not found.
 
 ---
 
-## CRM API — `/crm`
+## Client Interaction API — `/crm`
 
 All endpoints are read-only GET.
 
@@ -425,7 +425,7 @@ server. This is the **standard, LLM-driven** MCP pattern: tools are discovered f
 live server, their `inputSchema` is exposed to the LLM verbatim, and the **LLM generates
 the arguments** — no hardcoding.
 
-MCP is handled by the **orchestrator**, not the CRM agent. It is **fully optional**: when
+MCP is handled by the **orchestrator**, not the Client Interaction Agent. It is **fully optional**: when
 no MCP server URL is configured, the app behaves exactly as described above.
 
 ### How it works
@@ -477,7 +477,7 @@ MCP_SERVER_URL=http://localhost:8000/mcp
   changes; each appears to the LLM as `mcp__<toolName>`.
 - **Arguments are LLM-generated** from each tool's own `inputSchema` — no hardcoded
   argument names or per-tool special casing.
-- **MCP results are excluded from `agent_answers`** (only `portfolio`/`crm` domains
+- **MCP results are excluded from `agent_answers`** (only `portfolio`/`crm` (client interactions) domains
   contribute there); they flow into the answer via history and citations.
 
 ### Fail-soft guarantee

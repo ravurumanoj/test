@@ -1,7 +1,7 @@
 [project]
 name = "relationship-manager-agentic-rag-poc"
 version = "0.1.0"
-description = "Backend-only FastAPI POC for a relationship manager agent with portfolio and CRM sub-agents."
+description = "Backend-only FastAPI POC for a relationship manager agent with portfolio and client interaction sub-agents."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

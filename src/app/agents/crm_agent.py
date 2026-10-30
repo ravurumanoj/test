@@ -7,10 +7,10 @@ question; nothing is hardcoded. All four wrap methods on ``CrmTools`` via the ge
 
 Tools
 -----
-crm_profile       — file metadata + client identity + assigned RM + linked account context
-crm_interactions  — meetings, transcripts, email threads, excluded interactions
-crm_advisory      — grouped client interaction follow-up context and interaction overviews
-crm_book_summary  — top-level client interaction record summary for the linked account
+client_interaction_profile   — file metadata + client identity + assigned RM + linked account context
+client_interaction_history   — meetings, transcripts, email threads, excluded interactions
+client_interaction_advisory  — grouped client interaction follow-up context and interaction overviews
+client_interaction_summary   — top-level client interaction record summary for the linked account
 """
 
 from __future__ import annotations
@@ -30,24 +30,24 @@ def build_crm_tools(unique_toolkit: UniqueToolkit) -> list[DataQueryTool]:
     tools = CrmTools()
     specs = [
         DataQuerySpec(
-            name="crm_profile",
+            name="client_interaction_profile",
             domain="crm",
             description=(
                 "Get the client identity sections of the client interaction record for the linked "
-                "account: file metadata, client profile, linked account/portfolio context, and the "
+                "account: file metadata, client details, linked account/portfolio context, and the "
                 "assigned relationship manager. "
-                "Use for questions about who the client is, KYC/review dates, preferred channel, "
-                "linked accounts, or which RM owns the relationship."
+                "Use for questions about who the client is, their linked accounts, or which RM "
+                "owns the relationship."
             ),
             prompt_hint=(
-                "Use crm_profile for client identity, linked account context, KYC/review dates, preferred channel, or the assigned RM."
+                "Use client_interaction_profile for client identity, linked account context, or the assigned RM."
             ),
             summarize_prompt=CRM_AGENT_PROMPT,
             fetch=tools.get_customer_full_profile,
             requires_portfolio_id=True,
         ),
         DataQuerySpec(
-            name="crm_interactions",
+            name="client_interaction_history",
             domain="crm",
             description=(
                 "Get the client interactions for the linked account: meetings with full "
@@ -56,7 +56,7 @@ def build_crm_tools(unique_toolkit: UniqueToolkit) -> list[DataQueryTool]:
                 "or interaction history. Optional filters let you scope by channel or recent count."
             ),
             prompt_hint=(
-                "Use crm_interactions for meetings, transcripts, email threads, client statements, or interaction history."
+                "Use client_interaction_history for past meetings, call transcripts, email threads, what the client said, or interaction history."
             ),
             summarize_prompt=CRM_AGENT_PROMPT,
             fetch=tools.get_interactions,
@@ -74,7 +74,7 @@ def build_crm_tools(unique_toolkit: UniqueToolkit) -> list[DataQueryTool]:
             },
         ),
         DataQuerySpec(
-            name="crm_advisory",
+            name="client_interaction_advisory",
             domain="crm",
             description=(
                 "Get grouped client interaction follow-up context for the linked account: top-level "
@@ -83,14 +83,14 @@ def build_crm_tools(unique_toolkit: UniqueToolkit) -> list[DataQueryTool]:
                 "exist, or how the client interaction record is organised."
             ),
             prompt_hint=(
-                "Use crm_advisory for grouped client interaction follow-up context, interaction overviews, or excluded-interaction context."
+                "Use client_interaction_advisory for grouped client interaction follow-up context, interaction overviews, or excluded-interaction context."
             ),
             summarize_prompt=CRM_AGENT_PROMPT,
             fetch=tools.get_advisory_view,
             requires_portfolio_id=True,
         ),
         DataQuerySpec(
-            name="crm_book_summary",
+            name="client_interaction_summary",
             domain="crm",
             description=(
                 "Get the top-level client interaction record summary for the linked account: file "
@@ -98,7 +98,7 @@ def build_crm_tools(unique_toolkit: UniqueToolkit) -> list[DataQueryTool]:
                 "interaction summary questions when you need the record-level context first."
             ),
             prompt_hint=(
-                "Use crm_book_summary for broad client interaction record-level context for the linked account."
+                "Use client_interaction_summary for broad client interaction record-level context for the linked account."
             ),
             summarize_prompt=CRM_AGENT_PROMPT,
             fetch=tools.get_book_summary,
