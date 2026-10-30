@@ -1,6 +1,6 @@
 """Generic data-query Tool — wraps ONE data-retrieval API as an LLM-callable tool.
 
-Instead of a coarse "portfolio_agent" / "crm_agent" that hardcodes a single data
+Instead of a coarse "portfolio_agent" / "crm_agent" (Client Interaction Agent) that hardcodes a single data
 method, every underlying data API (get_portfolio_snapshot, get_performance_view,
 get_interactions, ...) is exposed to the LLM as its own first-class tool. The LLM
 decides which one(s) to call from the question — no hardcoded routing.
@@ -41,7 +41,7 @@ class DataQuerySpec:
     Attributes
     ----------
     name                — LLM function name (e.g. ``portfolio_performance``).
-    domain              — ``portfolio`` or ``crm`` (drives AgentAnswer routing).
+    domain              — ``portfolio`` or ``crm`` (client interactions; drives AgentAnswer routing).
     description         — LLM-facing description used for tool selection.
     prompt_hint         — extra one-line guidance injected into the system prompt.
     summarize_prompt    — domain prompt used to summarise the fetched data.
@@ -97,7 +97,7 @@ class DataQueryTool(Tool):
 
     @property
     def domain(self) -> str:
-        """Return the business domain (portfolio/crm) for AgentAnswer routing."""
+        """Return the business domain (portfolio/crm — client interactions) for AgentAnswer routing."""
         return self._spec.domain
 
     # ── LLM schema ────────────────────────────────────────────────────────────

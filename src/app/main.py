@@ -44,7 +44,7 @@ logger.info(
 
 # ── MCP Manager wiring (optional) ────────────────────────────────────────────
 # Constructed only when an MCP server URL is configured (MCP_SERVER_URL). When
-# disabled, mcp_manager stays None and the CRM agent runs exactly as before.
+# disabled, mcp_manager stays None and the Client Interaction Agent runs exactly as before.
 mcp_manager: McpManager | None = None
 if settings.mcp_enabled and settings.mcp_server_url:
     mcp_manager = McpManager(

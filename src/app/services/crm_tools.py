@@ -1,9 +1,10 @@
 
-"""CRM retrieval tools for the CRM sub-agent.
+"""Client interaction retrieval tools for the Client Interaction Agent.
 
-The CRM source is a single account-linked document. These methods return grouped
-top-level or second-level sections directly, rather than hardcoding every nested
-field, so newly added CRM content remains available to the LLM automatically.
+The client interaction source is a single account-linked document of meeting
+transcripts and email threads. These methods return grouped top-level or
+second-level sections directly, rather than hardcoding every nested field, so newly
+added client interaction content remains available to the LLM automatically.
 """
 
 from __future__ import annotations
@@ -20,19 +21,19 @@ _DATA_DIR = Path(__file__).parent.parent / "data"
 
 
 class CrmTools:
-    """Expose CRM-specific retrieval operations over the single CRM document."""
+    """Expose client interaction retrieval operations over the single client interaction document."""
 
     def __init__(self) -> None:
-        """Initialize with the CRM data file."""
+        """Initialize with the client interaction data file."""
         self._loader = JsonDataLoader(_DATA_DIR)
         self._filename = "crm.json"
 
     def _data(self) -> dict[str, Any]:
-        """Return the parsed CRM document."""
+        """Return the parsed client interaction document."""
         return self._loader.load(self._filename)
 
     def _matches_context(self, doc: dict[str, Any], customer_id: str = "", portfolio_id: str = "") -> None:
-        """Log mismatches against the single CRM document without blocking reads."""
+        """Log mismatches against the single client interaction document without blocking reads."""
         linked_accounts = doc.get("client", {}).get("linked_accounts", [])
         linked_portfolio_ids = {
             str(account.get("portfolio_id", "")).upper()
@@ -46,17 +47,17 @@ class CrmTools:
         }
         if portfolio_id and portfolio_id.strip().upper() not in linked_portfolio_ids:
             logger.warning(
-                "Requested CRM portfolio_id does not match the available CRM document",
+                "Requested client interaction portfolio_id does not match the available client interaction document",
                 extra={"requested_portfolio_id": portfolio_id, "available_portfolio_ids": sorted(linked_portfolio_ids)},
             )
         if customer_id and customer_id.strip() not in linked_account_numbers:
             logger.info(
-                "CRM customer_id treated as contextual only for single-document CRM source",
+                "Client interaction customer_id treated as contextual only for single-document client interaction source",
                 extra={"requested_customer_id": customer_id, "available_account_numbers": sorted(linked_account_numbers)},
             )
 
     def get_book_summary(self, portfolio_id: str = "") -> dict[str, Any]:
-        """Return the CRM document's top-level identity and coverage summary."""
+        """Return the client interaction document's top-level identity and coverage summary."""
         doc = self._data()
         self._matches_context(doc, portfolio_id=portfolio_id)
         return {
@@ -65,10 +66,10 @@ class CrmTools:
         }
 
     def get_customer_full_profile(self, customer_id: str = "", portfolio_id: str = "") -> dict[str, Any]:
-        """Return the CRM identity/profile sections for the linked account."""
+        """Return the client identity/profile sections of the client interaction record for the linked account."""
         doc = self._data()
         self._matches_context(doc, customer_id=customer_id, portfolio_id=portfolio_id)
-        logger.info("Full CRM profile fetched", extra={"customer_id": customer_id, "portfolio_id": portfolio_id})
+        logger.info("Full client interaction profile fetched", extra={"customer_id": customer_id, "portfolio_id": portfolio_id})
         return {
             "client": doc.get("client", {}),
             "relationship_manager": doc.get("relationship_manager", {}),
@@ -112,7 +113,7 @@ class CrmTools:
         }
 
     def get_advisory_view(self, customer_id: str = "", portfolio_id: str = "") -> dict[str, Any]:
-        """Return the non-interaction CRM sections relevant for RM follow-up.
+        """Return the non-interaction client interaction record sections relevant for RM follow-up.
 
         This intentionally returns grouped top-level sections instead of flattening
         nested keys, so newly added metadata remains available automatically.

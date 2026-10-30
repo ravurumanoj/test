@@ -20,7 +20,7 @@ PostprocessorManager — appends FinancialDisclaimerPostprocessor to final answe
 
 Tool wiring
 -----------
-Every underlying data API (portfolio + CRM) is registered as its own DataQueryTool.
+Every underlying data API (portfolio + client interactions) is registered as its own DataQueryTool.
 The orchestrator exposes their tool_description() as LLM function definitions,
 executes them via run(), and feeds ToolCallResponse into all managers. The LLM
 decides which tool(s) to call — no hardcoded per-domain routing.
@@ -71,7 +71,8 @@ _PURE_GREETING_RE = re.compile(
 )
 _GREETING_REPLY = (
     "Hello! I'm your relationship manager assistant. Ask me about your portfolio "
-    "(holdings, allocation, performance) or your CRM profile and I'll pull up the details."
+    "(holdings, allocation, performance) or your past interactions and communications "
+    "(meetings, calls, emails) and I'll pull up the details."
 )
 
 
@@ -86,7 +87,7 @@ class ToolCall:
 
 
 class RelationshipManagerOrchestrator:
-    """Orchestrate a question to the portfolio and CRM sub-agents.
+    """Orchestrate a question to the portfolio sub-agent and the Client Interaction Agent.
 
     Mirrors the Unique Toolkit Orchestrator (unique_toolkit_agentic_framework_core.md):
       1. Checks for a fresh session (HistoryManager.has_no_loop_messages)
@@ -107,7 +108,7 @@ class RelationshipManagerOrchestrator:
         """Initialize orchestrator with the data tools and runtime settings.
 
         Args:
-            tools:           The data-query tools (portfolio + CRM) exposed to the LLM.
+            tools:           The data-query tools (portfolio + client interactions) exposed to the LLM.
                              Each is a Tool with a ``domain`` used for AgentAnswer routing.
             unique_toolkit:  Facade over the Unique AI SDK.
             settings:        Runtime settings.
@@ -295,7 +296,7 @@ class RelationshipManagerOrchestrator:
         final_answer: str = ""
         evaluation_results: list[EvaluationMetricResult] = []
         iteration_index: int = 0  # initialized so post-loop reference is always defined
-        total_tool_calls_executed: int = 0  # counts ALL tools (portfolio, crm, mcp__*)
+        total_tool_calls_executed: int = 0  # counts ALL tools (portfolio, client interactions, mcp__*)
         triggered_tool_names: list[str] = []  # every tool name triggered, in call order
         successful_tool_call_keys: set[tuple[str, str]] = set()
         successful_tool_names: set[str] = set()
@@ -314,7 +315,7 @@ class RelationshipManagerOrchestrator:
                 extra={
                     "iteration_index": iteration_index,
                     "max_iterations": max_iterations,
-                    # Total tool calls executed so far (portfolio + crm + mcp__* combined)
+                    # Total tool calls executed so far (portfolio + client interactions + mcp__* combined)
                     "tools_called_so_far": total_tool_calls_executed,
                     "agent_answers_so_far": len(all_agent_answers),
                 },
@@ -520,7 +521,7 @@ class RelationshipManagerOrchestrator:
             for resp in tool_responses:
                 if resp.successful:
                     # A tool contributes an AgentAnswer only when it maps to a sub-agent
-                    # domain (portfolio/crm). MCP tools (domain "") contribute
+                    # domain (portfolio/crm — client interactions). MCP tools (domain "") contribute
                     # content_chunks to ReferenceManager instead — their results flow
                     # into the LLM context via history.
                     tool = self._tools.get(resp.name)
@@ -895,13 +896,14 @@ class RelationshipManagerOrchestrator:
             "statement_history, statement_risk) are the ONLY portfolio data source — the raw "
             "account statement: totals, holdings, allocation, credit/FX, transactions, "
             "performance, valuation history, and concentration/risk metadata. Use these for ALL "
-            "portfolio questions, including recap/update/'what's new'. CRM detail tools: profile/KYC, interactions/history, "
-            "advisory/suggestions.\n\n"
+            "portfolio questions, including recap/update/'what's new'. Client Interaction Agent tools (crm_*): "
+            "client profile/KYC, past interactions from meeting transcripts and email threads, "
+            "advisory/follow-ups.\n\n"
             "CRITICAL — tool call requirement:\n"
             "- You MUST call at least one tool before answering; never answer from memory.\n"
             "- Broad/general questions (e.g. 'what details do you have about me', 'tell me "
-            "about this customer', 'give me a summary') → call the core portfolio AND CRM "
-            "tools.\n"
+            "about this customer', 'give me a summary') → call the core portfolio AND client "
+            "interaction tools.\n"
             "- Only produce a final answer AFTER tool results have returned.\n\n"
             "Handling missing or unavailable data:\n"
             "- Tool error (customer not found, retrieval failed) → acknowledge it clearly; do "
@@ -959,7 +961,7 @@ class RelationshipManagerOrchestrator:
             "present in tool output, say it is not available in the retrieved data.\n"
             "- Never fabricate table rows, HTML elements, or values not present in tool "
             "outputs.\n"
-            "- Resolve cross-domain conflicts before answering: do not say CRM or portfolio data is unavailable if retrieved evidence from that domain is present elsewhere in the tool outputs.\n"
+            "- Resolve cross-domain conflicts before answering: do not say client interaction or portfolio data is unavailable if retrieved evidence from that domain is present elsewhere in the tool outputs.\n"
             "- If one source is unavailable but another source answered part of the question, mention that limitation once in the most relevant place instead of repeating the caveat.\n\n"
             "Final validation before answering (MANDATORY INTERNAL CHECK):\n"
             "- Perform a silent final review before producing the response. Do not output this checklist.\n"
@@ -1210,7 +1212,7 @@ class RelationshipManagerOrchestrator:
     def _is_no_data_summary(summary: str) -> bool:
         """Return True for generic no-data placeholders that should not dominate merges."""
         normalized = re.sub(r"\s+", " ", summary).strip().lower()
-        return normalized.startswith("no crm data is available") or normalized.startswith(
+        return normalized.startswith("no client interaction data is available") or normalized.startswith(
             "no portfolio data is available"
         ) or normalized.startswith("no statement data is available")
 
@@ -1272,7 +1274,7 @@ class RelationshipManagerOrchestrator:
 
         Multiple tools in the same domain (e.g. portfolio_recent_activity + statement_overview)
         are all preserved; only exact re-runs of the same tool collapse. Ordered portfolio
-        answers first, then crm, preserving tool call order within each domain.
+        answers first, then client interaction (crm) answers, preserving tool call order within each domain.
         """
         latest: dict[tuple[str, str], AgentAnswer] = {}
         order: list[tuple[str, str]] = []

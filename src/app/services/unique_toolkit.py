@@ -264,7 +264,7 @@ class UniqueToolkit:
             "- Do not restate the question.\n"
             "- Do not add broad introductions, conclusions, or repeated recap sentences.\n"
             "- Prefer one short takeaway followed by only the most relevant facts from this tool's data.\n"
-            "- If the retrieved context overlaps with likely portfolio/CRM facts from other tools, keep this summary narrowly scoped to what this tool uniquely contributes.\n"
+            "- If the retrieved context overlaps with likely portfolio/client interaction facts from other tools, keep this summary narrowly scoped to what this tool uniquely contributes.\n"
             "- If the user asked a long multi-part question, answer only the sub-part that this tool's retrieved context can support; do not try to cover the whole request here.\n"
             "- Do not repeat evidence that is likely to be covered by another tool unless it is necessary to explain this tool's unique contribution.\n"
         )

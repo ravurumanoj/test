@@ -79,7 +79,7 @@ class Tool(ABC):
 
     @property
     def domain(self) -> str:
-        """Return the business domain this tool contributes to (e.g. 'portfolio', 'crm').
+        """Return the business domain this tool contributes to (e.g. 'portfolio', 'crm' for client interactions).
 
         Used by the orchestrator to group tool results into AgentAnswer records and
         to derive the routing decision. Empty string means the tool does not map to

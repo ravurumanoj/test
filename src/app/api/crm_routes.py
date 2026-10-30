@@ -1,5 +1,5 @@
 
-"""CRM API routes.
+"""Client Interaction API routes.
 
 Four endpoints under the ``/crm`` prefix — all read-only (GET).
 
@@ -23,7 +23,7 @@ from app.services.crm_tools import CrmTools
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/crm", tags=["CRM"])
+router = APIRouter(prefix="/crm", tags=["Client Interactions"])
 _tools = CrmTools()
 
 
@@ -32,7 +32,7 @@ def _raise_404_if_not_found(exc: DataAccessError, customer_id: str) -> None:
     if "No record found" in exc.message:
         raise HTTPException(
             status_code=404,
-            detail=f"Customer '{customer_id}' not found in the CRM database.",
+            detail=f"Customer '{customer_id}' not found in the client interaction records.",
         ) from exc
     raise exc
 
@@ -52,7 +52,7 @@ def list_customers_summary() -> list[dict[str, Any]]:
     Returns:
         List of summary dicts (one per customer).
     """
-    logger.info("CRM customer summary list requested")
+    logger.info("Client interaction customer summary list requested")
     return _tools.get_all_customers_summary()
 
 
@@ -79,7 +79,7 @@ def get_customer_full_profile(customer_id: str) -> dict[str, Any]:
         ``relationship_manager``.
 
     Raises:
-        404: If no CRM record is found for the customer.
+        404: If no client interaction record is found for the customer.
     """
     logger.info("Customer full profile requested", extra={"customer_id": customer_id})
     try:

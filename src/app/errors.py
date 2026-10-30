@@ -55,8 +55,8 @@ class McpIntegrationError(AppError):
 
     Kept separate from UniqueIntegrationError so MCP transport/protocol failures
     are attributable to the external MCP server rather than the Unique AI SDK.
-    Callers (e.g. CrmAgent) catch this and degrade gracefully so a misconfigured
-    or unreachable MCP server never breaks the core CRM flow.
+    Callers (e.g. the Client Interaction Agent) catch this and degrade gracefully so a misconfigured
+    or unreachable MCP server never breaks the core client interaction flow.
     """
 
     def __init__(self, message: str, details: dict[str, Any] | None = None) -> None:
