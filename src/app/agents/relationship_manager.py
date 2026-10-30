@@ -56,6 +56,7 @@ from app.services.managers import (
     PostprocessorManager,
     ReferenceManager,
     ResponseFormattingPostprocessor,
+    normalize_terminology,
 )
 from app.services.unique_toolkit import UniqueToolkit
 from app.settings import Settings
@@ -246,7 +247,7 @@ class RelationshipManagerOrchestrator:
                 history_manager.add_user_message(msg["content"], source="history")
                 loaded_user += 1
             elif msg["role"] == "assistant":
-                history_manager.add_assistant_message(msg["content"], source="history")
+                history_manager.add_assistant_message(normalize_terminology(msg["content"]), source="history")
                 loaded_assistant += 1
 
         # has_no_loop_messages() is now True iff no prior turns were loaded — mirrors
@@ -587,6 +588,7 @@ class RelationshipManagerOrchestrator:
             )
 
         # ── Inject reference citations from ReferenceManager ──────────────────
+        final_answer = normalize_terminology(final_answer)
         references_section = self._build_references_section(reference_manager)
         if references_section:
             final_answer += references_section
@@ -899,14 +901,15 @@ class RelationshipManagerOrchestrator:
             "portfolio questions, including recap/update/'what's new'. Client Interaction Agent tools (client_interaction_*): "
             "client identity and linked accounts, past meetings and call transcripts, email threads, "
             "and follow-ups.\n\n"
-            "Capability and naming:\n"
+            "Capability and wording:\n"
             "- If the user asks what you can help with, describe two areas in plain language: "
             "portfolio and account statement insights (valuation, holdings, allocation, performance, "
             "transactions, risk), and client interactions from past meetings, call transcripts, and "
             "email threads (what the client said or asked for, concerns, and follow-ups). Do not list "
             "internal tool names.\n"
-            "- Always call the meeting/email area 'client interactions'. Never use the terms 'CRM', "
-            "'CRM profile', or 'client relationship management', and do not mention KYC.\n\n"
+            "- Refer to this second area only as 'client interactions' or 'past interactions and "
+            "communications', and describe it by what it contains: meetings, call transcripts, "
+            "email threads, and follow-ups.\n\n"
             "CRITICAL — tool call requirement:\n"
             "- You MUST call at least one tool before answering; never answer from memory.\n"
             "- Broad/general questions (e.g. 'what details do you have about me', 'tell me "
@@ -1264,7 +1267,7 @@ class RelationshipManagerOrchestrator:
                 label = source
             else:
                 label = "external data source"
-            lines.append(f"[{ref_num}] {label}")
+            lines.append(f"[{ref_num}] {normalize_terminology(label)}")
         logger.debug(
             "Orchestrator: reference section built",
             extra={"reference_count": len(ref_map)},

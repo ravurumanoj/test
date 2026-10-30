@@ -25,6 +25,7 @@ from typing import Any
 
 from app.agents.base_tool import BaseToolConfig, Tool
 from app.schemas import ContentChunk, ToolCallResponse, ToolDescription
+from app.services.managers import normalize_terminology
 from app.services.unique_toolkit import UniqueToolkit
 
 logger = logging.getLogger(__name__)
@@ -233,6 +234,7 @@ class DataQueryTool(Tool):
             )
 
         content_chunks = self._build_chunks(data=data, customer_id=customer_id, portfolio_id=portfolio_id)
+        summary = normalize_terminology(summary)
         debug_info: dict[str, Any] = {
             "tool_name": self._spec.name,
             "domain": self._spec.domain,

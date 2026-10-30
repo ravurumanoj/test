@@ -45,6 +45,30 @@ _POSITIVE_VALUE_RE = re.compile(r"(?<![\w>+])(?:USD|EUR|GBP|AUD|SGD|JPY|HKD|NOK|
 _LOSS_WORD_RE = re.compile(r"\b(loss|decline|downside|negative|detractor|underperform(?:er|ing)?)\b", re.IGNORECASE)
 _GAIN_WORD_RE = re.compile(r"\b(gain|profit|upside|positive|contributor|outperform(?:er|ing)?)\b", re.IGNORECASE)
 
+# Retired CRM wording is rewritten in code because a prompt alone cannot guarantee a word is avoided.
+_CRM_TERM_RE = re.compile(
+    r"\b(?:client|customer)\s+relationship\s+management\b(?:\s*\(\s*CRM\s*\))?"
+    r"|(?<![\w/])CRMs?(?![\w/]|\.\w)",
+    re.IGNORECASE,
+)
+_NOUN_FOLLOWS_RE = re.compile(
+    r"-[A-Za-z]|[\s-]+(?:data|profile|records?|notes?|system|context|details?|information|insights?|"
+    r"entries|entry|summary|history|sections?|sources?|document|database|tools?|agent|assistant|"
+    r"view|overview|platform)\b",
+    re.IGNORECASE,
+)
+_SENTENCE_START_RE = re.compile(r"(?:(?:\A|\n)[ \t>*#|\-]*|[.!?]\s+)\Z")
+
+
+def _client_interaction_phrase(match: re.Match[str]) -> str:
+    phrase = "client interaction" if _NOUN_FOLLOWS_RE.match(match.string, match.end()) else "client interactions"
+    return phrase.capitalize() if _SENTENCE_START_RE.search(match.string[: match.start()]) else phrase
+
+
+def normalize_terminology(text: str) -> str:
+    """Replace the retired CRM wording with 'client interactions' in user-visible text."""
+    return _CRM_TERM_RE.sub(_client_interaction_phrase, text) if text else text
+
 
 # ─── DebugInfoManager ────────────────────────────────────────────────────────
 

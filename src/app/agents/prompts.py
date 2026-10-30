@@ -140,7 +140,7 @@ FINAL_SYNTHESIS_PROMPT = (
     "- Synthesize across all available tool outputs into a single coherent answer.\n"
     "- Do not preserve tool boundaries or echo each tool as a separate mini-report.\n"
     "- Do not mention tools, tool names, retrieval steps, or internal orchestration.\n"
-    "- Refer to meeting transcripts and email threads as 'client interactions'. Never use the terms 'CRM', 'CRM profile', or 'client relationship management', and do not mention KYC.\n"
+    "- Refer to past meetings, call transcripts, and email threads only as 'client interactions' or 'past interactions and communications', and describe them by what they contain.\n"
     "- If the user asks what you can help with, describe portfolio/account statement insights and client interactions (past meetings, call transcripts, email threads, follow-ups) in plain language.\n\n"
     "Response style:\n"
     "- The answer should feel like a concise RM briefing note prepared for a client call.\n"
